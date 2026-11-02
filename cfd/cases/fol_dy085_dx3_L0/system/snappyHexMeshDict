@@ -1,0 +1,30 @@
+FoamFile { version 2.0; format ascii; class dictionary; object snappyHexMeshDict; }
+castellatedMesh true; snap true; addLayers false;
+geometry {
+    leader.stl { type triSurfaceMesh; name leader; }
+    follower.stl { type triSurfaceMesh; name follower; }
+    wakeBox { type searchableBox; min (-0.5 0 -0.45); max (12.36 3.762 0.45); }
+    tipBox { type searchableBox; min (-0.3 0.55 -0.30); max (9.36 1.560 0.30); }
+    folBox { type searchableBox; min (5.960 0.392 -0.30); max (9.560 3.212 0.30); }
+}
+castellatedMeshControls {
+    maxLocalCells 4000000; maxGlobalCells 6000000; minRefinementCells 20; maxLoadUnbalance 0.2; nCellsBetweenLevels 3;
+    features ();
+    refinementSurfaces {
+        leader { level (4 5); patchInfo { type wall; } }
+        follower { level (4 5); patchInfo { type wall; } }
+    }
+    resolveFeatureAngle 30;
+    refinementRegions {
+        leader { mode distance; levels ((0.02 5) (0.06 4) (0.15 3)); }
+        follower { mode distance; levels ((0.02 5) (0.06 4) (0.15 3)); }
+        wakeBox { mode inside; levels ((1e15 2)); }
+        tipBox { mode inside; levels ((1e15 3)); }
+        folBox { mode inside; levels ((1e15 3)); }
+    }
+    locationInMesh (-7.0 4.0 3.0); allowFreeStandingZoneFaces true;
+}
+snapControls { nSmoothPatch 3; tolerance 2.0; nSolveIter 60; nRelaxIter 5; nFeatureSnapIter 10; implicitFeatureSnap false; explicitFeatureSnap false; multiRegionFeatureSnap false; }
+addLayersControls { layers {} relativeSizes true; expansionRatio 1.2; finalLayerThickness 0.3; minThickness 0.1; nGrow 0; featureAngle 60; nRelaxIter 3; nSmoothSurfaceNormals 1; nSmoothNormals 3; nSmoothThickness 10; maxFaceThicknessRatio 0.5; maxThicknessToMedialRatio 0.3; minMedialAxisAngle 90; nBufferCellsNoExtrude 0; nLayerIter 50; }
+meshQualityControls { maxNonOrtho 70; maxBoundarySkewness 20; maxInternalSkewness 4; maxConcave 80; minVol 1e-15; minTetQuality 1e-15; minArea -1; minTwist 0.02; minDeterminant 0.001; minFaceWeight 0.02; minVolRatio 0.01; minTriangleTwist -1; nSmoothScale 4; errorReduction 0.75; }
+mergeTolerance 1e-6;

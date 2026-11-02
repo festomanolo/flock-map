@@ -1,0 +1,36 @@
+{
+ "case": "iso_a3_L2",
+ "meta": {
+  "alpha": 3.0,
+  "level": 2,
+  "follower": null,
+  "iters": 700,
+  "U": 18.0,
+  "S": 0.8162,
+  "MAC": 0.4007792523376624,
+  "b": 2.12,
+  "xqc": -0.13
+ },
+ "n_cells": 1251382,
+ "vtkdir": "/home/user/flockmap-research/cfd/cases/iso_a3_L2/VTK/iso_a3_L2_200",
+ "leader": {
+  "CL": 0.2223255502694262,
+  "CD": 0.012375778614692193,
+  "CD_pressure": 0.009181354734506693,
+  "CD_viscous": 0.0031944238801853387,
+  "Cl_roll": 0.048840455680143016,
+  "Cm_pitch": -0.08795571408389158,
+  "yplus_mean": 51.48884264218284,
+  "yplus_p05": 30.322513988893608,
+  "yplus_p95": 86.88793237733971,
+  "n_faces": 53501,
+  "frac_owner_found": 1.0
+ },
+ "residuals_last": {
+  "p": 9.5141338e-09,
+  "Ux": 9.852374e-07,
+  "k": 2.4369985e-09,
+  "omega": 1.2392532e-09
+ },
+ "n_iter": 400
+}

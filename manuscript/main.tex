@@ -1,0 +1,338 @@
+%% Manuscript prepared with the Elsevier `elsarticle' class (numbered references).
+%% Target-journal conventions (Highlights, Graphical abstract, CRediT, Data availability) are followed;
+%% check the live Guide for Authors of the chosen journal before submission.
+\documentclass[preprint,12pt]{elsarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx,booktabs,multirow,array,siunitx,xcolor}
+\usepackage{algorithm,algpseudocode}
+\usepackage{float,placeins}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+\input{numbers.tex}
+\input{numbers_extra.tex}
+\sisetup{detect-all, per-mode=symbol}
+\newcommand{\Va}{V_a}
+\newcommand{\dx}{d_x}\newcommand{\dy}{d_y}
+\newcommand{\Earea}{E_{\mathrm{area}}}
+\journal{Aerospace Science and Technology}
+\graphicspath{{figures/}}
+\biboptions{numbers,sort&compress}
+
+\begin{document}
+\begin{frontmatter}
+\title{Goose-Inspired Adaptive V-Formation for Energy-Efficient Fixed-Wing UAV Topographic Mapping: Break-Even Conditions from a Reproducible Simulation Study with Independent Aerodynamic Cross-Checks}
+
+\author[inst1]{[Author One]\corref{cor1}}
+\ead{[corresponding.author@institution.example]}
+\author[inst1]{[Author Two]}
+\cortext[cor1]{Corresponding author}
+\affiliation[inst1]{organization={[Department]},addressline={[Institution]},city={[City]},country={[Country]}}
+
+\begin{abstract}
+Fixed-wing survey UAVs could save energy by flying in the upwash of a leader's wingtip vortices, but a formation tight enough to harvest the wake sees almost the same ground as a single aircraft, so aerodynamic and photogrammetric requirements conflict.
+We study when a three-aircraft adaptive formation (tight V during transit, parallel sub-swaths while mapping) lowers fleet energy per accepted hectare for a \SI{100}{ha} survey flown with a Skywalker-X8-class aircraft.
+A reproducible pipeline couples an analytic Lamb--Oseen wake and strip theory, an independent vortex-lattice (VLM) follower model with an unsteady free-wake solver that lets the wake roll up by itself, a guidance-level NMPC with a relative-degree-3 high-order control-barrier-function safety filter, a phase-by-phase power/battery model with Dubins turns, and a geometric ray-multiplicity coverage model; \nnTrials{} paired environment realisations and \nnControl{} controller runs are archived.
+Re-deriving a preliminary version of this work exposed a factor-two error in wake circulation and a dimensionally inconsistent roll-moment coefficient; corrected, the wake benefit is broad (\npeakFree--\npeakSheet\,\% follower power saving depending on the wake model, peak near $\dy/b\approx\npeakSheetDy$) rather than a knife-edge at $0.80b$; the free-wake simulation shows the sheet is bowed but not rolled up at the formation distance, contradicting the rolled-up-pair assumption.
+In the mission simulation the full framework changes fleet energy per accepted hectare by \nrelASheet\,\% against independent flight, but the decomposition shows that this comes from a shorter route enabled by an unverified \SI{58}{\percent} side-overlap assumption (\nrelFSheet\,\%), not from the wake; formation transit alone costs \nrelBSheet\,\% at \SI{2.5}{km} and breaks even only beyond about \nbeSevSheet--\nbeSevFree\,km one-way.
+The safety filter does not prevent separation violations when leader braking exceeds follower authority.
+Steady RANS simulations of the X8-class planform in OpenFOAM (\ncfdNcases{} cases, three mesh levels) reproduce the sign, lateral breadth and order of magnitude of the follower benefit and bracket it at roughly 0.4--1.1 times the planar-sheet VLM value; they are not a validation against measurements. Photogrammetric accuracy (RMSE$_H$, RMSE$_V$) and flight tests were \emph{not} performed and are stated as future work.
+\end{abstract}
+
+\begin{highlights}
+\item Wake-circulation error (factor 2) and roll-moment normalisation error found and corrected in the preliminary model.
+\item Independent vortex-lattice and free-wake simulations: benefit is broad (\npeakFree--\npeakSheet\,\%); the wake is bowed but not rolled up at $3b$; formation transit costs \nrelBSheet\,\% at \SI{2.5}{km}.
+\item Full-framework gain comes from route/overlap planning, not from wake exploitation.
+\item Break-even one-way transit distance about \nbeSevSheet--\nbeSevFree\,km (17-strip route); about \nbeFourteenSheet--\nbeFourteenFree\,km for the 14-strip route.
+\item Safety filter fails when leader braking exceeds follower authority; all raw trials archived.
+\end{highlights}
+
+\begin{keyword}
+formation flight \sep wake vortex \sep fixed-wing UAV \sep photogrammetric mapping \sep model predictive control \sep control barrier function
+\end{keyword}
+\end{frontmatter}
+
+\linenumbers
+%==============================================================================================
+\input{sections/nomenclature}
+
+\section{Introduction}
+Fixed-wing unmanned aerial vehicles (UAVs) are the platform of choice for survey-scale topographic mapping because of their lift-to-drag ratio and endurance, but a high-resolution mission still draws substantial electrical power for propulsion, payload and computing, and spends energy in banked turns between strips. Migratory birds are known to save energy by flying in the upwash of a leader's wingtip vortices \cite{lissaman1970,hummel1983,weimerskirch2001}, and ideal-aerodynamics analyses of aircraft in formation predict induced-drag reductions of the same kind \cite{king2005,katz2001}. Close-formation CFD of fixed-wing UAVs reports lift-to-drag gains of the order of a quarter at the most favourable offsets \cite{oendo2025}, although at the low lift coefficients of a survey cruise, induced drag is a small share of the total and the attainable saving is correspondingly smaller (Sec.~\ref{sec:aero}).
+
+Translating this into a mapping system exposes a contradiction that we call the \emph{aerodynamic--photogrammetric coupling paradox}: the lateral offset that maximises wake benefit ($\approx0.8$--$0.9$ wingspans, here about \SI{1.7}{m}) is under 1\,\% of the camera footprint width at \SI{120}{m} AGL (\SI{\nWg}{m}), so a rigid formation images the same ground three times. An adaptive formation---tight V in transit, parallel sub-swaths while mapping---avoids that but pays for reconfiguration and waiting. Whether it wins therefore depends on distance, speed, manoeuvre cost, and on how many strips the multi-vehicle geometry lets the planner remove.
+
+\paragraph{Contributions} (i) A reproducible, fully scripted evaluation of four mission strategies in which every reported number is computed from archived raw trials; (ii) an independent aerodynamic cross-check (vortex-lattice) and a documented correction of two errors in the analytic wake model on which an earlier version of this work relied; (iii) a controlled factorial decomposition that separates aerodynamic savings from route/overlap-planning savings; (iv) simulated break-even conditions for wake-aware formation transit; (v) a safety analysis including the conditions under which a barrier-function filter does \emph{not} prevent separation violations.
+
+\paragraph{Scope and evidence status} This is a simulation study. Table~\ref{tab:status} states what was executed. PX4/Gazebo SITL, hardware-in-the-loop, structure-from-motion reconstruction and flight tests were not run; they are not reported as results. Steady RANS CFD (OpenFOAM) was run for the isolated and formation planform and is reported in Sec.~\ref{sec:cfd}. The wildlife-monitoring material of the preliminary version is out of scope and is intended for a separate manuscript with its own ecological validation.
+
+\begin{table}[H]
+\centering\small
+\caption{Evidence status of each component. ``Executed'' means run in this study with archived outputs.}\label{tab:status}
+\begin{tabular}{@{}p{4.0cm}p{2.6cm}p{6.6cm}@{}}
+\toprule
+Component & Status & Basis / what is missing\\\midrule
+Isolated power and drag polar & Executed & Closed-form; parameters from the preliminary version, not re-measured\\
+Analytic wake + strip theory & Executed & Reproduced, errors found, corrected variant\\
+Vortex-lattice follower model & Executed & Verified against lifting-line and Helmbold slope (Sec.~\ref{sec:vlm})\\
+Free-wake vortex lattice (roll-up) & Executed & Inviscid with prescribed core radius; core uncalibrated\\
+CFD (OpenFOAM, steady RANS) & \textbf{Executed} (all cases listed) & Wall-function $k$--$\omega$ SST on a clean wing; unvalidated against measurements\\
+Guidance-level NMPC/HOCBF & Executed & Point-mass + actuator lags; not 6-DOF; wake not fed back\\
+PX4/Gazebo SITL, HITL & \textbf{Not executed} & --\\
+Mission energy Monte Carlo & Executed & \nnTrials{} paired trials $\times$ 6 strategies $\times$ 5 aerodynamic models\\
+Coverage / ray multiplicity & Executed & Geometry only, flat terrain\\
+SfM reconstruction, RMSE$_{H,V}$ & \textbf{Not executed} & No accuracy claim is made\\
+3-D renders (PyVista) & Executed & Meshes are approximate X8-class geometry; fields are the simulated ones\\
+Flight tests & \textbf{Not executed} & --\\\bottomrule
+\end{tabular}
+\end{table}
+
+\input{sections/intro_extra}
+
+%==============================================================================================
+\section{System model}\label{sec:model}
+\subsection{Aircraft, propulsion and battery}
+The reference aircraft is a Skywalker-X8-class flying wing (mass \SI{3.5}{kg}, span $b=\SI{2.12}{m}$, area $S=\SI{0.80}{m^2}$, $AR=5.62$) with a parabolic polar $C_D=C_{D0}+k_0C_L^2$, $k_0=1/(\pi AR\,e_0)$. Table~\ref{tab:params} lists parameters with provenance; most values are taken from the preliminary version and have \emph{not} been independently measured. In level flight at $\Va=\SI{18}{m/s}$, $C_L=\nCLiso$, $L/D=\nLoverD$ and electrical load $P=\SI{\npIso}{W}$:
+\begin{equation}
+P_{\mathrm{el}}=\frac{D\,\Va}{\eta_p}+P_{\mathrm{hotel}},\qquad D=\tfrac12\rho\Va^2S\,[C_{D0}+k_0C_L^2],\quad C_L=\frac{mg}{\tfrac12\rho\Va^2S\cos\phi}.
+\end{equation}
+A banked turn at $\phi=\SI{25}{\degree}$ draws \SI{\npTurn}{W}. Battery energy is integrated with a 6S open-circuit-voltage curve and a pack resistance of \SI{20}{m\ohm} (assumed); cell-side energy is reported next to load-side energy, and a \SI{20}{\percent} reserve defines feasibility.
+
+\begin{table}[H]
+\centering\small
+\caption{Parameters. M: from the preliminary manuscript (unverified); D: derived; A: assumption introduced here. All A-values need measurement before any quantitative claim is transferred to hardware.}\label{tab:params}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}llll@{}}
+\toprule
+Parameter & Value & Tag & Note\\\midrule
+$m$, $b$, $S$ & \SI{3.5}{kg}, \SI{2.12}{m}, \SI{0.80}{m^2} & M &\\
+$C_{D0}$, $e_0$ & 0.024, 0.80 & M & ``wind-tunnel'' values, not re-verified\\
+$\eta_p$, $P_{\mathrm{hotel}}$ & 0.68, \SI{28}{W} & M & constant; real motor/prop efficiency varies\\
+$C_{l\delta_a}$, $k_{\mathrm{trim}}$ & \SI{0.15}{rad^{-1}}, \SI{0.035}{rad^{-2}} & M & trim-drag law unvalidated\\
+$\nu_{\mathrm{eff}}$, $r_{c0}$ & \SI{0.002}{m^2/s}, $0.05b$ & M & uncalibrated; varied in Sec.~\ref{sec:sens}\\
+Camera & \SI{13.2}{mm} sensor, $f=\SI{9}{mm}$, \SI{120}{m} AGL & M & GSD \SI{\ngsd}{cm}; footprint \SI{\nWg}{m}$\times$\SI{\nHg}{m}\\
+Overlap & 75\,\% fwd, 65\,\% side (58\,\% claimed) & M & 58\,\% unverified\\
+Climb rate, landing time & \SI{2}{m/s}, \SI{90}{s} & A &\\
+Pack resistance, OCV curve & \SI{20}{m\ohm}, generic LiPo & A &\\
+Gust time constant $\tau_g$ & \SI{1}{s} & A & aircraft response to wind change\\
+Actuator limits & $|\phi|\le35^\circ$, $|a|\le\SI{3}{m/s^2}$, $V_a\in[12,26]$ & M/A &\\\bottomrule\end{tabular}}
+\end{table}
+
+\input{sections/model_extra}
+
+\subsection{Wake and follower aerodynamics}\label{sec:wake}
+\paragraph{Analytic model} The leader's rolled-up wake is a counter-rotating Lamb--Oseen pair \cite{lamb1932} at $y=\pm b_0/2$, $b_0=\pi b/4$, with core radius $r_c^2=r_{c0}^2+4\nu_{\mathrm{eff}}d_x/\Va$. For an elliptic loading, $L=\rho\Va\Gamma_0 b_0$ gives
+\begin{equation}
+\Gamma_0=\frac{L}{\rho\Va b_0}=\frac{2\Va S C_L}{\pi b}=\SI{\ngammaTrue}{m^2/s}\quad(\Va=\SI{18}{m/s}).
+\end{equation}
+The preliminary version used $4\Va SC_L/(\pi b)=\SI{\ngammaPub}{m^2/s}$, i.e.\ twice this value (the factor $\tfrac12$ in $L=\tfrac12\rho\Va^2SC_L$ had been dropped); every upwash and saving derived from it was overstated roughly twofold.
+
+\paragraph{Strip theory} The follower wing is split into 51 strips; the span-averaged upwash $\bar w$ gives $\Delta C_{Di}=C_L\bar w/\Va$. The wake rolling moment is
+\begin{equation}
+C_{l,\mathrm{wake}}=\frac{a}{b^2}\int_{d_y-b/2}^{d_y+b/2}\frac{w(y)}{\Va}\,(y-d_y)\,dy,
+\end{equation}
+with finite-wing lift slope $a=2\pi AR/(AR+2)$. The preliminary version used a normalisation $1/(bS)$ (not dimensionless) and $a=2\pi$, overstating $C_{l,\mathrm{wake}}$ by a factor \nclPubOverCorr{} at $d_y=0.8b$. Trim requires an elevon deflection $\delta_a=-C_{l,\mathrm{wake}}/C_{l\delta_a}$ with parasitic drag $k_{\mathrm{trim}}\delta_a^2$, and the net drag change is $\Delta C_{D,\mathrm{net}}=\Delta C_{Di}-k_{\mathrm{trim}}\delta_a^2$.
+
+\paragraph{Vortex-lattice cross-check}\label{sec:vlm} As a method independent of the analytic wake we use a planar horseshoe vortex lattice (one chordwise panel, bound vortex at $c/4$, control point at $3c/4$ \cite{weissinger1947,katz2001}) for both aircraft. The follower is solved in the velocity field of (a) the leader's own trailing-vortex sheet (no roll-up), (b) a rolled-up pair with the leader's VLM-derived $\Gamma_0$, $b_0$, or (c) the analytic pair. Forces follow from Kutta--Joukowski, induced drag from the near-field downwash at the bound vortices, at matched lift. The isolated wing converges to an Oswald factor of \nvlmE{} (ideal: 1) and $C_{L\alpha}=\nvlmCla$\,rad$^{-1}$ against Helmbold's \nhelmCla{} (\nvlmClaErr\,\%; Fig.~\ref{fig:A3}). The planform is rectangular with equal span and area, so sweep and taper of the real aircraft are not represented, and a planar wake cannot represent roll-up or viscous decay.
+
+\paragraph{Free-wake vortex lattice} To remove the assumption of a rolled-up wake we implemented an unsteady free-wake solver: vortex rings with constant circulation after shedding, wake nodes advected at every time step by the freestream plus the velocity induced by all vortex filaments (so the sheet can sink, bow and curl by itself), core radius $r_c^2=r_{c0}^2+4\nu t$ with $r_{c0}=0.05b$, \nfwSpan{} spanwise rings, $\Delta t=\SI{20}{ms}$ (near-field run, \SI{38}{m}) and \SI{\nfwDt}{ms} (long run, \nfwRows{} rows, \SI{\nfwXend}{m}, $\nfwXendB\,b$), lift trimmed to the weight ($L/W=\nfwLiftRatio$). The sheet centre sinks at \SI{\nfwSink}{m/s}, matching the lifting-line value $\Gamma_0/(2b)=\SI{\nfwSinkTheory}{m/s}$. The follower is then solved in the instantaneous field of this wake. The model is inviscid with a prescribed core radius, includes no turbulence or ambient atmosphere, and remains no substitute for CFD validation.
+
+%==============================================================================================
+\section{Adaptive formation framework}\label{sec:framework}
+\subsection{Geometry and strategies}
+Three aircraft (leader, two followers) fly a symmetric V with slot offsets $(-d_x,\pm d_y,0)$ in the leader's course frame (Fig.~\ref{fig:geom}); the nominal slot is $d_x=3b=\SI{6.36}{m}$, $d_y=0.8b=\SI{1.70}{m}$ (centre distance \SI{6.58}{m}, minimum allowed $D_{\mathrm{safe}}=2b=\SI{4.24}{m}$). Four strategies are compared on a $\SI{1}{km}\times\SI{1}{km}$ polygon \SI{2.5}{km} from the launch point:
+\textbf{S1} independent UAVs (6-6-5 strips at 65\,\% side overlap); \textbf{S2} rigid V through all 17 strips; \textbf{S3} adaptive geometric V (V in transit, 6-6-5 sub-swaths); \textbf{S4} wake-aware adaptive V (as S3, but 14 strips, 5-5-4, using the claimed 58\,\% overlap). To isolate causes we add \textbf{D1}: independent UAVs on S4's 14-strip route.
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig05_formation_geometry}
+\caption{Three-UAV formation geometry (top and side views, nominal slot). The planform is a schematic, not the exact X8 outline.}\label{fig:geom}\end{figure}
+
+\subsection{Guidance, NMPC and safety filter}
+Each follower is a point-mass with first-order bank ($\tau_\phi=\SI{0.25}{s}$) and acceleration ($\tau_a=\SI{0.30}{s}$) lags, state $[p_x,p_y,V,\chi,\phi,a]$, inputs $[a_{\mathrm{cmd}},\phi_{\mathrm{cmd}}]$, ground velocity $V[\cos\chi,\sin\chi]+w_{\mathrm{eff}}$ with the wind low-pass filtered ($\tau_g$). A nonlinear MPC (multiple shooting, RK4, $N=25$, $\Delta t=\SI{0.1}{s}$, CasADi/IPOPT \cite{andersson2019,wachter2006}) tracks the slot position and velocity with quadratic cost and input-rate penalties and bank/speed/acceleration bounds. The wake-power term of the preliminary cost function is \emph{not} used here, so tracking and wake benefit are decoupled.
+
+The safety layer enforces $h=\|p_f-p_L\|^2-D^2\ge0$ with $D=D_{\mathrm{safe}}+\SI{0.5}{m}$. Because bank enters through $\dot\phi=(\phi_{\mathrm{cmd}}-\phi)/\tau_\phi$ and acceleration through a lag, $h$ has \emph{relative degree 3} with respect to both inputs (the preliminary version stated 2). We therefore use a third-order HOCBF \cite{xiao2022,ames2017}: $\psi_0=h$, $\psi_{i}=\dot\psi_{i-1}+\alpha_i\psi_{i-1}$ ($\alpha=1.2,1.6,2.0$), constraint $\psi_3\ge0$ linear in the inputs, solved as a two-variable QP at \SI{50}{Hz} that minimally modifies the NMPC command. The filter is evaluated on a noisy relative-position measurement and, as shown in Sec.~\ref{sec:control}, it guarantees nothing when the constraint is infeasible within input limits.
+
+\begin{algorithm}[H]
+\caption{Supervisory logic per mission phase}\label{alg:sup}
+\begin{algorithmic}[1]
+\State \textbf{Takeoff/climb} individually; \textbf{join-up} to slot $(d_x,d_y)$ (Y=\SI{60}{m}), NMPC minimum-jerk reference
+\State \textbf{Transit (formation)}: hold slot, rotate leader role cyclically (equalises battery drain)
+\State \textbf{Split}: min-jerk lateral move to zone centre at planner-chosen peak lateral speed ($\le\SI{50}{\percent}$ of transit time)
+\State \textbf{Map}: each UAV flies its own strips; early finishers loiter at best-endurance speed
+\State \textbf{Merge}, formation transit home, \textbf{break-up}, landing
+\State HOCBF filter active throughout; fall back to $d_y\ge 2.5b$ if relative-position uncertainty exceeds $0.5b$ (not exercised in the reported trials)
+\end{algorithmic}\end{algorithm}
+
+\subsection{Mission energy and coverage}
+Energy is the integral of the power model over phases (climb, transit, mapping legs, Dubins turns, ferry legs, waiting, reconfiguration, landing) with wind-triangle ground speed on every leg. Turning between adjacent strips (spacing \SI{\ndyBase}{m} $<2R=\SI{141.7}{m}$) is a Dubins path with a straight run-in (\SI{441}{m} per turn, not the \SI{222.6}{m} semicircle of the preliminary version). Reconfiguration energy is \emph{simulated} (Sec.~\ref{sec:reconf}) rather than charged as full cruise power for an assumed duration. Coverage is a raster ray-multiplicity count of rotated rectangular footprints. A \SI{1}{ha} tile is \emph{geometrically accepted} if $\ge99\,\%$ is imaged and $\ge5$ images cover $\ge95\,\%$ of it. The RMSE criteria of the acceptance rule require SfM and were not evaluated.
+
+\input{sections/framework_extra}
+
+%==============================================================================================
+\section{Methods and verification}\label{sec:methods}
+\paragraph{Experimental unit and pairing} One \emph{trial} is one environment realisation: wind speed $U(2,6)$\,m/s, direction $U(0,2\pi)$, and one recorded \SI{40}{s} follower station-keeping error series bootstrapped from the control campaign (so aerodynamic benefit reflects realised, not ideal, slot keeping). Every strategy and aerodynamic model is evaluated on the same realisation; paired differences are the outcomes. $\nnTrials$ trials were run (seed 20260101).
+
+\paragraph{Aerodynamic model ensemble} Because the wake model is the dominant epistemic uncertainty, every mission result is computed with five aerodynamic variants: the manuscript's equations as published (audit only), corrected strip theory, VLM with a rolled-up pair, VLM with the planar sheet (reported as headline: it has an independent verification and is the upper bound) and VLM in the free wake (finite cores; the more conservative bound). Spread among them is the model-form uncertainty.
+
+\paragraph{Control campaign} Six scenarios $\times$ three controllers (PD baseline, NMPC, NMPC+HOCBF) $\times$ 30 seeds (\nnControl{} runs; same seed $=$ same disturbance): turbulence, \SI{8.5}{m/s} differential gust doublet, \SI{4}{m/s} leader braking with \SI{250}{ms} dropout, degraded GNSS (\SI{0.5}{m} noise, \SI{1.5}{m} bias), their combination, and a deliberately over-capability \SI{6}{m/s} braking in \SI{1.5}{s}. The NMPC solved in \SI{\nsolveMean}{ms} on average (maximum \SI{\nsolveMax}{ms}) with no solver failures.
+
+\paragraph{Statistics} For paired outcomes we report mean differences and the 5--95\,\% range of trial-wise relative differences. Because the simulator is nearly deterministic given the environment, paired differences have tiny variance and conventional $p$-values and Cohen's $d_z$ (here $|d_z|$ up to \ndzA--\ndzC) are mathematically large but carry \emph{no} evidential weight about real aircraft; we therefore do not use hypothesis tests as support. Holm-adjusted $p$-values \cite{holm1979}, bootstrap intervals \cite{efron1993} and Wilcoxon statistics are in the archived tables for completeness. Global sensitivity uses standardised regression coefficients \cite{saltelli2008}.
+
+\paragraph{Reproducibility} All figures and every number in this paper are generated by scripts from raw CSV/NPZ files (\texttt{make reproduce}); unit tests cover the closed-form checks in Sec.~\ref{sec:model} and the audit findings of \ref{app:audit}.
+
+%==============================================================================================
+\section{Results}
+\subsection{Aerodynamic interaction}\label{sec:aero}
+\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{fig01_wake_3d}
+\caption{Wingtip-vortex pair (red) and vertical induced velocity at the followers' plane ($d_x=3b$) for the nominal geometry; analytic Lamb--Oseen field with corrected $\Gamma_0$.}\label{fig:wake3d}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig02_wake_contours}
+\caption{Vertical induced velocity $w(y,z)$ behind the leader at $d_x=3b$: analytic pair (left) and vortex-lattice planar sheet (right). Upwash $>0$ outboard of the vortex centres.}\label{fig:wakecont}\end{figure}
+
+Figures~\ref{fig:wake3d}--\ref{fig:wakecont} show the geometry and the field. With the corrected circulation, the corrected strip model and the vortex-lattice variants agree on the shape of the benefit (Fig.~\ref{fig:A2}): a broad maximum of \npeakFree--\npeakSheet\,\% follower electrical-power saving at $d_y/b\approx0.85$--$0.90$ (\npeakFree\,\% free wake, \npeakStrip\,\% corrected strip, \npeakRolled\,\% rolled-up pair, \npeakSheet\,\% planar sheet), decaying slowly outboard. At the preliminary version's slot, $d_y=0.8b$, the saving is \natEightyStrip\,\% (strip, corrected) to \natEightySheet\,\% (VLM sheet), against \npubAtEighty\,\% as published. The published equations place a sharp peak at exactly $0.80b$ with a \npubAtEightyFive\,\% saving at $0.85b$ and a \npubDropNinety\,\% loss at $0.90b$; \ref{app:audit} shows this feature is an artefact of the two errors above, which cancel only near $0.80b$ and are not reproduced by the published table itself.
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{A1_freewake_formation}
+\caption{Three-dimensional free-wake simulation of the formation ($d_x=3b$, $d_y=0.85b$; real-scale X8-class meshes). (a) Wake sheet, coloured by height, and the induced vertical velocity at the followers' plane; (b) plan view of the vertical velocity at flight level: upwash lobes lie outboard of the tip vortices, the downwash trough between them; (c) cross-flow vectors $(v,w)$ at the followers' plane; (d) follower wing coloured by the circulation change relative to isolated flight, with the induced upwash along the span.}\label{fig:A1fw}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{A2_wake_rollup}
+\caption{Long free-wake run (\nfwXend{} m, $\nfwXendB\,b$). (a) The sheet at true scale; coloured cross-sections at 10, 40, 80 and 110 m. (b) The same cross-sections seen from behind at true vertical scale: the centre sinks \nfwCentreZ{} m while the tips sink \nfwTipZ{} m and begin to curl into spirals, but no coherent vortex pair has formed.}\label{fig:A2roll}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{A3_vorticity_isosurface}
+\caption{Streamwise vorticity $\omega_x=\partial w/\partial y-\partial v/\partial z$ on cross-flow planes following the sinking sheet at 10, 60 and 110 m behind the leader (free-wake field).}\label{fig:A3vort}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig03_spanwise_loading}
+\caption{Follower response: (a) upwash across the span and (b) circulation change from the VLM follower in the rolled-up (finite-core) wake (the planar sheet has line-vortex singularities at the tip-vortex crossing that make local values spiky, although integrated forces stay finite), (c) wake rolling-moment coefficient and (d) elevon deflection required to trim, for the three analyses. The published equations demand implausible elevon angles away from $0.8b$.}\label{fig:loading}\end{figure}
+
+The free wake adds two facts the idealised models could not. First, at the formation distance the sheet is bowed but not rolled up (centre-to-tip sag \nfwSagTen\,cm at \SI{10}{m} and \nfwSagForty\,m at \SI{40}{m}); tips begin to curl at roughly 20--40 spans and no coherent pair exists even at $\nfwXendB\,b$ (Figs.~\ref{fig:A2roll}--\ref{fig:A3vort}). The assumption of a fully rolled-up Lamb--Oseen pair at $3b$ in the preliminary version is therefore not supported; the planar sheet and free wake are the appropriate near-wake descriptions. Second, with finite cores the follower sees less upwash than from the singular line-vortex tips of the planar sheet: the saving at $0.9b$ is \npeakFree\,\% (free wake) against \npeakSheet\,\% (sheet), and varies from \ncoreBig\,\% to \ncoreSmall\,\% as the core radius goes from $0.10b$ to $0.02b$ (\ncoreLo--\ncoreHi\,\% over the runs tested). The core radius is not calibrated, so the free-wake figure is a plausible lower bound and the sheet an upper bound.
+
+Spanwise loading (Fig.~\ref{fig:loading}) shows why trim matters less than the preliminary version claimed: with the dimensionally consistent coefficient, $|C_{l,\mathrm{wake}}|$ stays below 0.02 over the offsets of interest, trim angles remain a few degrees and trim drag is negligible compared with the induced-drag change.
+
+\begin{figure}[H]\centering\includegraphics[width=0.75\textwidth]{fig04_sensitivity_map}
+\caption{Follower power change over longitudinal and lateral offset (VLM planar sheet, $\Va=\SI{18}{m/s}$). Hatched: inside $D_{\mathrm{safe}}$. Ellipse: $1\sigma$ station-keeping error from the control campaign (scenario S1, NMPC+HOCBF). A planar sheet has no roll-up or decay, so the weak $d_x$ dependence is a model limitation, not a result.}\label{fig:map}\end{figure}
+
+The benefit region is wide in $d_y$ (Fig.~\ref{fig:map}); the station-keeping error of the NMPC (RMS $e_y=\SI{\nrmsEySOneC}{m}$, $\nrmsEyFracB\,b$) is small relative to it, and the realised mean follower saving in the mission simulation was \nsavFrac\,\%. The maximum modelled saving is \nmapMinW\,W per follower (about 6\,\% of \SI{\npIso}{W}). The saving scales steeply with airspeed (Fig.~\ref{fig:sens}a): with the VLM sheet it is \nsheetVThirteen\,\% at \SI{13}{m/s}, \nsheetVEighteen\,\% at \SI{18}{m/s} and \nsheetVTwentyFour\,\% at \SI{24}{m/s}. The 5--95\,\% band from parametric uncertainty (drag, efficiency, hotel load, viscosity, core size, circulation $\pm15$\,\%, position error) around corrected strip theory at \SI{18}{m/s} is \nuncEighteenLo--\nuncEighteenHi\,\%; this band reflects parameter uncertainty only and does not include the unquantified roll-up/decay error that CFD would resolve.
+
+\input{sections/res_aero_extra}
+
+\subsection{Controller performance and safety}\label{sec:control}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig07_control_performance}
+\caption{Scenario S5 (combined disturbance) for one seed, the three controllers, and a \SI{370}{m} split manoeuvre (f). Panel (a): lateral offset; (c): separation vs.\ $D_{\mathrm{safe}}$; (e): airspeed floor at \SI{12}{m/s} is reached while closing on a braking leader.}\label{fig:ctrl}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig14_safety_tracking}
+\caption{All \nnControl{} control runs: (a) minimum true separation, (b) RMS lateral error, (c) fraction of trials entering the unsafe set ($h<0$), (d) HOCBF activity and input saturation.}\label{fig:safety}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{B1_safety_sphere}
+\caption{Follower trajectories relative to the leader (real-scale meshes) around the $D_{\mathrm{safe}}=\SI{4.24}{m}$ sphere for the three controllers: braking with dropout (left), combined disturbance (centre), braking beyond follower authority (right). Spheres mark the closest approach.}\label{fig:B1}\end{figure}
+\begin{table}[H]\centering\small
+\caption{Control campaign, mean RMS lateral error (m) / worst-case minimum separation (m) / trials with $h<0$ (\%), 30 seeds each. $D_{\mathrm{safe}}=\SI{4.24}{m}$.}\label{tab:control}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccc@{}}\toprule Scenario & PD & NMPC & NMPC+HOCBF \\ \midrule
+\input{tables/tab_control.tex}\\
+\bottomrule\end{tabular}}\end{table}
+
+Under turbulence the NMPC halves the PD baseline's lateral error (\nrmsEySOneN{} vs.\ \nrmsEySOneP{} m RMS; Table~\ref{tab:control}). The \SI{8.5}{m/s} differential gust doublet causes no violations for any controller (RMS \nrmsEySTwoN{}--\nrmsEySTwoC{} m). The safety filter's value is limited and conditional: in the braking-with-dropout scenario the PD baseline violates the safe set in \nviolSThreeP\,\% of trials, the NMPC in \nviolSThreeN\,\%, and adding the HOCBF changes nothing (\nviolSThreeC\,\%; active \nactSThreeC\,\% of the time) because the closure is longitudinal and bounded by deceleration authority; in the combined scenario the filter reduces violations from \nviolSFiveN\,\% to \nviolSFiveC\,\%; in the over-capability scenario every controller violates in \nviolSSixC\,\% of trials, and the filter increases lateral error to \nrmsEySSixC\,m without preventing the violation. Degraded GNSS leads to violations in \nviolSFourC\,\% of trials for all controllers since the filter acts on a biased measurement. Thus a barrier-function constraint is not a collision-avoidance guarantee once actuator saturation, model mismatch or measurement bias are present; we recorded no QP infeasibility events (\ncbfInfeas) because the filter's QP always had a bounded solution, not because the constraint was always satisfiable.
+
+\input{sections/res_control_extra}
+
+\subsection{Reconfiguration cost}\label{sec:reconf}
+Splitting into zones (\SI{369.6}{m} lateral displacement) was simulated for five peak lateral speeds. The energy above isolated cruise over the manoeuvre window is \novFast\,Wh at \ntFast\,s and \novSlow\,Wh at \ntSlow\,s (\novMid\,Wh at \ntMid\,s), per follower, including the lost wake benefit. The preliminary version charged \SI{\nmanuReconf}{Wh} (three aircraft $\times$\,\SI{45}{s} at full cruise power) \emph{on top of} the time already counted. \begin{figure}[H]\centering\includegraphics[width=\textwidth]{B2_split_manoeuvre}
+\caption{Split of the formation into zones (\SI{370}{m} lateral displacement, NMPC). Follower paths are coloured by the instantaneous aerodynamic power saving (VLM planar sheet): the saving vanishes within seconds of leaving the slot. Aircraft are drawn 40$\times$.}\label{fig:B2}\end{figure}
+The real penalties are different: the manoeuvre occupies a large share of a \SI{2.5}{km} transit (\SI{>60}{s} of \SI{139}{s}), so the wake is harvested only briefly, and the early-finishing aircraft must wait for the slowest before re-forming (waiting energy \nwaitSFour\,Wh for S4).
+
+\input{sections/res_reconf_extra}
+
+\subsection{Mission energy per accepted hectare}\label{sec:mission}
+\begin{table}[H]\centering\small
+\caption{Mission outcomes, VLM planar-sheet model, mean $\pm$ SD over \nnTrials{} paired trials. Accepted area is geometric (criteria 1--2 only).}\label{tab:strat}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccccc@{}}\toprule Strategy & $E_{\mathrm{fleet}}$ (Wh) & max per-UAV (Wh) & time (min) & acc.\ (ha) & $\Earea$ (Wh/ha)\\\midrule
+\input{tables/tab_strategies.tex}\\
+\bottomrule\end{tabular}}\end{table}
+\begin{table}[H]\centering\small
+\caption{Change in $\Earea$ relative to the reference (\%): mean (5th, 95th percentile of trials) for five aerodynamic models. Negative = saving.}\label{tab:paired}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lcccc@{}}\toprule Comparison & VLM sheet & VLM free wake & Strip, corrected & As published\\\midrule
+\input{tables/tab_paired.tex}\\
+\bottomrule\end{tabular}}\end{table}
+\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{fig09_energy_breakdown}
+\caption{Phase breakdown of fleet energy (VLM sheet, mean of \nnTrials{} trials).}\label{fig:break}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig10_energy_efficiency}
+\caption{(a) Energy per accepted hectare, raw paired trials. (b) Change vs.\ reference for five aerodynamic models (markers) with 5--95\,\% trial range (bars).}\label{fig:eff}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.85\textwidth]{fig15_decomposition}
+\caption{Factorial decomposition of the S4-vs-S1 difference into formation-transit, route/overlap and interaction components (positive = saving).}\label{fig:dec}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig06_mission_comparison}
+\caption{The \SI{100}{ha} polygon under the four strategies (turn loops schematic).}\label{fig:missions}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{D1_mission_overview}
+\caption{Three-dimensional view of the four strategies over synthetic terrain (terrain for visualisation only; the study assumes flat ground). Tubes: flight paths at \SI{120}{m} AGL by aircraft; yellow: camera footprints; red sphere: split/merge point. Aircraft drawn 60$\times$.}\label{fig:D1}\end{figure}
+
+Table~\ref{tab:strat} and Figs.~\ref{fig:break}--\ref{fig:eff} give the results. Every strategy is feasible within the \SI{80}{\percent} usable-battery limit (max per-UAV load \nmisEmaxSOne\,Wh for S1 of about \SI{178}{Wh} usable). Climb and landing alone cost \nclimbLand\,Wh of S1's fleet energy and the Dubins turns \nturnsOne\,Wh, which dilute any percentage saving relative to a model that ignores them. The rigid V (S2) uses \nrelCSheet\,\% more energy per accepted hectare than S1, because it flies three times the track for identical coverage (S3 vs.\ S2: \nrelDSheet\,\%). The full framework (S4) changes $\Earea$ by \nrelASheet\,\% with the VLM model (\nrelAPub\,\% with the published equations), well below the \SI{5}{\percent} threshold set in the preliminary version.
+
+The decomposition (Fig.~\ref{fig:dec}) shows \emph{where} it comes from. Moving to the 14-strip route without formation (D1) saves \nrelFSheet\,\%. Formation transit on the unchanged 17-strip route (S3) \emph{costs} \nrelBSheet\,\% (\ndWhB\,Wh per mission), and on the 14-strip route (S4 vs.\ D1) \nrelESheet\,\%. In energy terms: formation only \ndecFormSheet\,Wh, route/overlap only \ndecRouteSheet\,Wh, interaction \ndecInterSheet\,Wh, total \ndecTotSheet\,Wh of S1's \nmisESOne\,Wh. The interaction is negative because the 5-5-4 split is less balanced (waiting) and the formation overhead is paid for four events. Hence, within this model, the 58\,\% side-overlap assumption, available to independent aircraft with RTK, not the wake, produces the gain: the framework's central claim of an aerodynamic benefit is not supported at \SI{2.5}{km}.
+
+\input{sections/res_mission_extra}
+
+\subsection{Break-even and sensitivity}\label{sec:sens}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig11_sensitivity}
+\caption{(a) Saving vs.\ airspeed with parametric uncertainty band; (b) saving vs.\ offset; (c) standardised regression coefficients of the net formation effect ($R^2=\nsrcRtwo$). ``Wind'' is a negative-control input with no path to the output.}\label{fig:sens}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig12_breakeven}
+\caption{(a) Net fleet saving of formation transit over a split/merge window $T$ and one-way distance (VLM sheet; window times below \SI{62.7}{s} would need $>12$\,m/s lateral speed and are not simulated). (b) Mission-simulator saving of S3 vs.\ S1 vs.\ distance; band: 5--95\,\% of trials. For $D\lesssim 2$\,km the fastest manoeuvre exceeds the available transit and the result is a lower bound.}\label{fig:be}\end{figure}
+Formation transit on the 17-strip route breaks even at about \nbeSevSheet\,km one-way with the VLM sheet, \nbeSevFree\,km with the free wake and \nbeSevStrip\,km with corrected strip theory; with the published equations it never does, because realised station-keeping errors of order \SI{0.1}{m} fall off the published knife-edge. On the 14-strip route the break-even is \nbeFourteenSheet\,km (sheet) to \nbeFourteenFree\,km (free wake) because of the larger waiting penalty. The global sensitivity (Fig.~\ref{fig:sens}c, $R^2=\nsrcRtwo$) ranks transit distance ($\nsrcD$) above airspeed ($\nsrcV$), wake-circulation scale ($\nsrcG$), and shows negligible dependence on reconfiguration window ($\nsrcT$) within the simulated range and on viscosity ($\nsrcNu$); the null-control factor is \nsrcW. Flying the formation slower raises the \emph{percentage} saving (VLM: \nsheetVEighteen\,\% at \SI{18}{m/s} to \nsheetVThirteen\,\% at \SI{13}{m/s}, each against the isolated aircraft at the same speed) but lengthens the transit and therefore the time over which the hotel load is paid; the mission simulations here use a single \SI{18}{m/s} cruise.
+
+\input{sections/res_sens_extra}
+
+\subsection{Coverage geometry}\label{sec:geom}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{C1_camera_frustums}
+\caption{True camera geometry for three adjacent strips at \SI{120}{m} AGL: footprints, 75\,\% forward and 65\,\% side overlap, GSD \SI{\ngsd}{cm}.}\label{fig:C1}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{C2_coverage_relief}
+\caption{Ray multiplicity as relief for the three route plans; red tiles fail the $\ge5$-ray rule at the block edge (\SI{80}{ha} accepted for the 14-strip plan at the specified \SI{58}{\percent}).}\label{fig:C2}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig13_mapping_geometry}
+\caption{Ray multiplicity for the three route plans and accepted area vs.\ camera crab angle. Geometry only; no SfM was run.}\label{fig:map13}\end{figure}
+The 17-strip plan has a minimum multiplicity of \nminMultSeven{} (mean \nmeanMultSeven). The 14-strip plan at the claimed \SI{58}{\percent} overlap has a minimum of \nminMultFourteen{} and, with the strip block centred and zero crab, the outer 1-ha columns fail the five-ray criterion over \SI{95}{\percent} of the tile by a margin of \nedgeFailM\,m (accepted area \naccFourteen\,ha). Any crab angle above about \SI{1}{\degree} (wind $>0.3$ m/s) widens the rotated footprint enough to pass, and a spacing of \SI{74.0}{m} (\nMarginOverlap\,\% overlap) passes at zero crab; we use the latter in S4. The 58\,\% plan therefore sits within a fraction of a percent of violating the preliminary version's own acceptance rule. The base-to-height ratio between adjacent strips rises from \nBHbase{} to \nBHopt{}, which favours intersection geometry in principle, but whether tie-point density and RTK-constrained bundle adjustment maintain RMSE$_H\le\SI{4.5}{cm}$ and RMSE$_V\le\SI{6.5}{cm}$ cannot be answered without reconstruction: no accuracy claim is made, and the preliminary RMSE tables are withdrawn (\ref{app:audit}). Independent aircraft carrying RTK receivers could in principle use the same 58\,\% plan; the claim that it needs synchronised formation flight is untested.
+
+\input{sections/res_cov_extra}
+
+\input{sections/res_cfd}
+
+%==============================================================================================
+\section{Discussion and limitations}
+\paragraph{What the evidence supports} (1) A rigid V is unsuitable for nadir mapping (\nrelCSheet\,\% energy). (2) Corrected physics gives a broad \npeakFree--\npeakSheet\,\% follower-power benefit near $0.85$--$0.90b$ at \SI{18}{m/s}, rising at lower speed, consistent between the free-wake simulation, an independent VLM and corrected strip theory and bracketed by steady RANS CFD at 0.4--1.1 times the planar-sheet value but unvalidated against measurement; the wake is not rolled up at the formation distance. (3) For a \SI{2.5}{km} transit, adaptive formation is a net loss; break-even is at roughly \nbeSevSheet--\nbeSevFree\,km one-way in this model, dominated by distance. (4) The apparent mission gain of the full framework is attributable to route/overlap planning under an unverified overlap assumption. (5) A barrier-function filter does not remove the need for authority margins.
+
+\paragraph{Limitations} The wake models are inviscid: the free wake resolves sheet sinking and the onset of roll-up but its core radius is prescribed (not calibrated), and there is no turbulence, atmospheric stratification, wake meander or aircraft-to-wake feedback. The aircraft is a rectangular-equivalent wing; $C_{D0}$, $e_0$, $\eta_p$, hotel load, trim-drag law and elevon effectiveness come from the preliminary version. The control simulation is a guidance-level point mass with kinematic wind, no wake-to-dynamics feedback, no altitude channel, and a single 2-D formation plane. Battery parameters are generic. Terrain is flat; photogrammetric accuracy was not computed. The statistical design samples only environmental and station-keeping variability, so narrow trial intervals reflect simulator determinism, not confidence about reality; model-form spread (Table~\ref{tab:paired}) is the more honest uncertainty.
+
+\paragraph{Decision rule for practitioners} The model-based break-even gives a simple rule: formation transit pays only if the one-way transit exceeds roughly the distance at which the cumulative wake saving (follower saving $\times$ time at the slot) exceeds the fixed reconfiguration and formation-assembly cost (Sec.~\ref{sec:reconf}); with $\kappa\in[0.3,1.5]$ this distance spans several kilometres (Fig.~\ref{fig:X2}), so for single-block surveys within a few kilometres of the launch point independent flight on the optimised route is preferable. Formation becomes attractive for long ferry legs, repeated blocks, or when the fleet must in any case travel together.
+
+\paragraph{Threats to validity} \emph{Internal:} all aerodynamic inputs outside the wake ($C_{D0}$, $e_0$, $\eta_p$) are inherited and unverified; the NMPC is a point-mass abstraction. \emph{Construct:} energy per accepted hectare depends on an acceptance rule (five-ray multiplicity) that is a geometric proxy for photogrammetric success. \emph{External:} one aircraft class, one wind distribution, flat terrain, one block geometry. \emph{Conclusion:} the narrow trial-wise intervals are properties of a near-deterministic simulator; model-form spread and the $\kappa$ sensitivity are the relevant uncertainty.
+
+\paragraph{Relation to the literature} The follower benefit we obtain is smaller than the quarter-scale lift-to-drag gains reported for close-formation CFD at higher lift coefficients \cite{oendo2025} because a survey cruise operates at $C_L\approx0.22$ where induced drag is a small fraction of the total; the RANS follower response (lift increase of about 0.03 and a trimmed drag reduction of roughly 6--15\,\% of the total RANS drag, depending on the trimming slope) is of the same sign and order as ideal-aerodynamics predictions \cite{king2005,katz2001}.
+
+\paragraph{Next validation steps} (i) higher-fidelity CFD (prism layers, URANS or scale-resolving, propeller and fuselage) with a published benchmark and wind-tunnel data for this planform; (ii) 6-DOF SITL with the wake-force plugin and the same scenarios; (iii) controlled comparison of $65\%$ vs.\ $58\%$ side overlap for \emph{single} and \emph{formation} acquisition on a surveyed test range with independent checkpoints; (iv) flight test of a two-aircraft formation with measured electrical power at stepped offsets and altitudes.
+
+\section{Conclusions}
+Within a transparent and reproducible simulation, wake-aware formation flight with a three-aircraft survey fleet does not lower energy per accepted hectare at a \SI{2.5}{km} transit; the apparent \nabsASheet\,\% saving of the complete framework derives from a shorter route enabled by a relaxed overlap assumption that is not yet verified and not specific to formation. The wake saving is real in the model but modest (\npeakFree--\npeakSheet\,\% of power per follower), broad in lateral offset, and pays off only for transits beyond roughly \nbeSevSheet--\nbeSevFree\,km one-way. Steady RANS CFD of the planform supports the existence and lateral breadth of the wake benefit and places its magnitude at 0.4--1.1 times the planar-sheet value, inside the sensitivity range used for the mission results. Claims about photogrammetric accuracy, experimental agreement and in-flight safety require the validation steps above.
+
+%==============================================================================================
+\section*{Declarations}
+\textbf{CRediT:} [to be completed by the authors]. \textbf{Competing interests:} [to be completed]. \textbf{Funding:} [to be completed]. \textbf{Use of AI assistance:} code, analysis scripts and a first draft of this manuscript were produced with an AI coding assistant working from the authors' preliminary manuscript and a reviewer's assessment; the authors remain responsible for verifying all content. \textbf{Data and code availability:} all scripts, raw trial data (control and mission), processed tables and figure sources are in the repository accompanying this submission (\texttt{flockmap-research/}); a persistent archive (DOI) is to be created on acceptance. No external datasets were used.
+
+\appendix
+\setcounter{figure}{0}\setcounter{table}{0}
+\section{Audit of the preliminary version}\label{app:audit}
+The preliminary version's numerical sections (aerodynamics table, Sec.~6.2 code, Sec.~7 statistics) were re-derived. Findings, each reproduced by \texttt{audit/} and \texttt{tests/}:
+\begin{enumerate}\small
+\item \textbf{Circulation} $\Gamma_0=4VSC_L/(\pi b)$ is twice $L/(\rho Vb_0)$ (\ngammaPub{} vs.\ \ngammaTrue\,m$^2$/s).
+\item \textbf{Roll moment} used $1/(bS)$ (not dimensionless) and lift slope $2\pi$: $C_{l,\mathrm{wake}}$ overstated by \nclPubOverCorr$\times$ at $0.8b$; trim-drag penalties ($\propto C_l^2$) overstated by an order of magnitude.
+\item \textbf{Table not reproducible:} the published equations reproduce the printed upwash for only \nnTabMatch{} of \nnTabAll{} lateral offsets; at $0.85$, $0.90$ and $1.0b$ the code gives \npubAtEightyFive, \npubDropNinety\,\% and negative savings where the table prints $+5.95$, $+5.06$, $+3.62$\,\% (max.\ discrepancy \nauditMaxPctErr\,percentage points; Fig.~\ref{fig:A1}, Table~\ref{tab:audit}).
+\item \textbf{Synthetic outcomes:} horizontal/vertical RMSE and accepted-area fractions were drawn from \texttt{np.random.normal/uniform} with the means printed in the results table; they are not measurements.
+\item \textbf{Degenerate statistics:} all energy variance came from one scalar draw shared by all UAVs and strategies (correlation between strategies \nauditCorr), so reproducing the code gives $|t|\approx\nauditHthreeT$ and $|d_z|\approx\nauditHthreeD$ for the H$_3$ comparison. These are artefacts, not evidence. The reported standard deviations (e.g.\ \SI{1.15}{Wh} for S1) are also smaller than the code generates (\nauditEoneSD\,Wh).
+\item \textbf{Wind unused:} wind speed/direction were stated but no wind enters the energy calculation; climb, landing, reserve, battery sag, waiting and ferry legs were absent; strips 61.6\,m apart were joined by 222.6\,m semicircles although the turn diameter is 141.7\,m.
+\item \textbf{Reconfiguration cost} double-counted flight time (full cruise power for 45\,s added to time already integrated).
+\item \textbf{HOCBF relative degree} was stated as 2; with the stated bank-lag dynamics it is 3.
+\item \textbf{Turn power:} \SI{146.42}{W} at $25^\circ$ bank is inconsistent with the stated polar (\SI{\npTurn}{W}).
+\end{enumerate}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figA1_table_audit}
+\caption{Printed table of the preliminary version versus the same equations recomputed.}\label{fig:A1}\end{figure}
+\begin{table}[H]\centering\scriptsize
+\caption{Printed vs.\ recomputed values (published equations, $d_x=3b$).}\label{tab:audit}
+\begin{tabular}{@{}rrrrrrr@{}}\toprule $d_y/b$ & $\bar w$ table & $\bar w$ recomp. & $C_l$ table & $C_l$ recomp. & $\%P$ table & $\%P$ recomp.\\\midrule
+\input{tables/tab_audit33.tex}\\
+\bottomrule\end{tabular}\end{table}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figA2_model_comparison}
+\caption{Follower power saving for the published equations and four corrected/independent variants; (b) peak saving per model.}\label{fig:A2}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.85\textwidth]{figA3_vlm_verification}
+\caption{Vortex-lattice verification: (a) Oswald factor and (b) lift slope versus panel count.}\label{fig:A3}\end{figure}
+
+\input{sections/appendix_extra}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+\end{document}

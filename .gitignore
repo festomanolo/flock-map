@@ -1,0 +1,71 @@
+# Large output files - CFD and simulation results
+*.vtm
+*.vti
+*.vtr
+*.vts
+*.vtp
+*.vtu
+*.npz
+*.dat
+*.csv
+outputs/
+cfd/*/VTK/
+figures/out/
+figures/out3d/
+data/processed/
+manuscript/figures/
+
+# Generated documentation
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.fls
+manuscript/*.fdb_latexmk
+manuscript/*.spl
+manuscript/*.docx
+manuscript/main.pdf
+
+# Archive files
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+*.egg
+build/
+dist/
+
+# IDE and editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter notebook
+.ipynb_checkpoints
+
+# Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+cfd/*/*.log
+
+# Temp files
+tmp/
+temp/
+*.tmp

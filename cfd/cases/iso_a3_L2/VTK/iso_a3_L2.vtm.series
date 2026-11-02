@@ -1,0 +1,6 @@
+{
+  "file-series-version" : "1.0",
+  "files" : [
+    { "name" : "iso_a3_L2_200.vtm", "time" : 200 }
+  ]
+}

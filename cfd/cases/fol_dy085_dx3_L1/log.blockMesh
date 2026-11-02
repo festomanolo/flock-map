@@ -1,0 +1,80 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : OPENFOAM=1912 patch=200626
+Arch   : "LSB;label=32;scalar=64"
+Exec   : blockMesh
+Date   : Oct 30 2026
+Time   : 03:43:54
+Host   : vm
+PID    : 1968
+I/O    : uncollated
+Case   : /home/user/flockmap-research/cfd/cases/fol_dy085_dx3_L1
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Creating block mesh from "system/blockMeshDict"
+--> FOAM IOWarning :
+    Found [v1012] 'convertToMeters' entry instead of 'scale' in dictionary "/home/user/flockmap-research/cfd/cases/fol_dy085_dx3_L1/system/blockMeshDict" 
+
+    This keyword is deemed to be 108 months old.
+
+Creating block edges
+No non-planar block faces defined
+Creating topology blocks
+Creating topology patches
+
+Creating block mesh topology
+
+Check topology
+
+	Basic statistics
+		Number of internal faces : 0
+		Number of boundary faces : 6
+		Number of defined boundary faces : 6
+		Number of undefined boundary faces : 0
+	Checking patch -> block consistency
+
+Creating block offsets
+Creating merge list...
+
+Creating polyMesh from blockMesh
+Creating patches
+Creating cells
+Creating points with scale 1
+    Block 0 cell size :
+        i : 0.49808219 .. 0.49808219
+        j : 0.5 .. 0.5
+        k : 0.5 .. 0.5
+
+
+There are no merge patch pairs
+
+Writing polyMesh with 0 cellZones
+----------------
+Mesh Information
+----------------
+  boundingBox: (-8 0 -7) (28.36 9 7)
+  nPoints: 40774
+  nCells: 36792
+  nFaces: 114238
+  nInternalFaces: 106514
+----------------
+Patches
+----------------
+  patch 0 (start: 106514 size: 504) name: inlet
+  patch 1 (start: 107018 size: 504) name: outlet
+  patch 2 (start: 107522 size: 2044) name: symmetry
+  patch 3 (start: 109566 size: 4672) name: farfield
+
+End
+

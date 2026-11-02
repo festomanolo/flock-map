@@ -1,0 +1,25 @@
+{
+ "case": "iso_a6_L1",
+ "n_cells": 378991,
+ "vtkdir": "/home/user/flockmap-research/cfd/cases/iso_a6_L1/VTK/iso_a6_L1_173",
+ "leader": {
+  "CL": 0.41154680897539936,
+  "CD": 0.032969926718685205,
+  "CD_pressure": 0.031918315253713726,
+  "CD_viscous": 0.0010516114649713364,
+  "Cl_roll": 0.09072129374126472,
+  "Cm_pitch": -0.15955200318353588,
+  "yplus_mean": 58.12845937899362,
+  "yplus_p05": 38.99883537816285,
+  "yplus_p95": 71.69390698200684,
+  "n_faces": 13440,
+  "frac_owner_found": 1.0
+ },
+ "residuals_last": {
+  "p": 1.9871776e-08,
+  "Ux": 3.6178707e-07,
+  "k": 3.0946617e-08,
+  "omega": 5.9249926e-09
+ },
+ "n_iter": 346
+}
