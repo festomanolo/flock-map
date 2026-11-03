@@ -12,3 +12,4 @@ CUR=$(git rev-list --count HEAD)
 while [ "$CUR" -lt "$TARGET" ]; do
   CUR=$((CUR + 1))
   printf 'micro commit %d/%d @ %s step=%s\n' \
+    "$CUR" "$TARGET" "$(date -u +%FT%TZ)" "$((CUR - 70))" >> "$LOG"
