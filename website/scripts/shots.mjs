@@ -14,3 +14,6 @@ const ctx = await browser.newContext({ viewport: { width: W, height: H }, colorS
 const page = await ctx.newPage();
 const errs = [];
 page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) errs.push(`${m.type()}: ${m.text()}`); });
+page.on('pageerror', (e) => errs.push(`pageerror: ${e.message}`));
+await page.goto(url, { waitUntil: 'networkidle' });
+await page.waitForTimeout(2500);
