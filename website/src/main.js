@@ -311,7 +311,8 @@ function loop(now) {
     if (slow >= 8 && S.tier < 2) { S.setQuality(S.tier + 1); slow = 0; }
   }
   // teardown explode follows scroll with a light lag
-  exCur += (tdTarget - exCur) * (1 - Math.exp(-(reduced ? 80 : 7) * dt));
+  const exGoal = S.view.preset === 'teardown' ? tdTarget : 0;          // reassembles when the chapter ends
+  exCur += (exGoal - exCur) * (1 - Math.exp(-(reduced ? 80 : 7) * dt));
   S.drone.setExplode(exCur);
   // roll dynamics
   if (ctrl.t < 3) { ctrl.t += dt; ctrl.now = ctrl.from + (ctrl.to - ctrl.from) * (1 - Math.exp(-ctrl.t / AC.tauPhi)); }
