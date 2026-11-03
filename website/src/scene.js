@@ -70,7 +70,7 @@ export function createScene(canvas) {
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     size = { w, h };
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, TIER_DPR[tier]));
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
   }
