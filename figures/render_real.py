@@ -52,3 +52,11 @@ def ground(p, alt=0.0, extent=900, **kw):
     p.add_mesh(g, scalars="tint", cmap=EARTH, show_scalar_bar=False, smooth_shading=True, specular=0.05)
     return g
 
+
+def uav(p, pos, course=0.0, bank=0.0, scale=3.0, accent="#d4442c"):
+    viz3d.add_x8(p, pos, heading_deg=course - 90.0, bank_deg=bank, scale=scale, color="#f5f5f2", accent=accent)
+
+
+def vortex(p, start, length=90.0, sign=1, spread=0.9, color="#e9f0f7"):
+    """Translucent, slowly widening wingtip-vortex trail (stacked tubes of growing radius, fading opacity)."""
+    t = np.linspace(0, length, 80)
