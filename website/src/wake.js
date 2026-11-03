@@ -71,6 +71,7 @@ export function createWake() {
   function update(t) {
     const p = geo.getAttribute('position'), c = geo.getAttribute('color');
     for (let i = 0; i < total; i++) {
+      if (low && (i & 1)) { c.setW(i, 0); continue; }
       const sd = seed[i];
       const s = (sd.s0 + t * params.speed / L) % 1;
       const dist = s * L;
