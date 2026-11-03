@@ -15,7 +15,7 @@ const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=sw
 const ctx = await browser.newContext({ viewport: { width: W, height: H }, colorScheme: theme, deviceScaleFactor: 1 });
 const page = await ctx.newPage();
 const errs = [];
-page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) errs.push(`${m.type()}: ${m.text()}`); });
+page.on('console', (m) => { if (m.type() === 'error' || (m.type() === 'warning' && !/GPU stall|GL Driver/.test(m.text()))) errs.push(`${m.type()}: ${m.text()}`); });
 page.on('pageerror', (e) => errs.push(`pageerror: ${e.message}`));
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForTimeout(2500);
