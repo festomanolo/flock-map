@@ -99,3 +99,11 @@ def s_formation():
 def s_topdown():
     p = scene(2000, 2000, sky=("#cfd8c4", "#a9c4e0"))
     ground(p, alt=0.0, extent=300, n=520, amp=6.0)
+    formation(p, alt=60.0, scale=4.0, trails=False)
+    render(p, "R2_topdown_survey", [(0, -25, 330), (0, -12, 60), (0, 1, 0)])
+
+
+def s_low():
+    p = scene(2400, 1200, sky=("#ffb877", "#2b4a7a"))
+    ground(p, alt=0.0)
+    formation(p, alt=70.0, scale=5.0, bank=4.0)
