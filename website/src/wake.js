@@ -89,5 +89,5 @@ export function createWake() {
     p.needsUpdate = true; c.needsUpdate = true;
   }
 
-  return { group, set, update, plane, paintPlane };
+  return { group, set, update, plane, paintPlane, setLow };
 }
