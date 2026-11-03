@@ -127,5 +127,5 @@ export function createScene(canvas) {
     if (cur.alpha > 0.01) renderer.render(scene, camera);
   }
 
-  return { renderer, scene, camera, drone, followers, wake, view, cur, orbit, resize, frame, project, setTheme };
+  return { renderer, scene, camera, drone, followers, wake, view, cur, orbit, resize, frame, project, setTheme, setQuality, get tier() { return tier; } };
 }
