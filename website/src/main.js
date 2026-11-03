@@ -363,4 +363,5 @@ addEventListener('resize', resizeAll);
 resizeAll(); bindPresets(); setV(AC.va); bankIn.dispatchEvent(new Event('input')); drawWake(); showStage(0);
 document.fonts?.ready.then(() => { resizeAll(); ScrollTrigger.refresh(); });
 requestAnimationFrame(loop);
+// test hook: jump the damped camera, explode and reveals to their targets (used by scripts/shots.mjs)
 window.__fm = { S, ScrollTrigger };
