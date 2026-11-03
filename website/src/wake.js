@@ -29,7 +29,7 @@ export function createWake() {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
-  const mat = new THREE.PointsMaterial({ size: 0.055, map: softSprite(), vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
+  const mat = new THREE.PointsMaterial({ size: 0.085, map: softSprite(), vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
   const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; group.add(pts);
 
   // upwash heat-plane at the follower station
