@@ -44,6 +44,10 @@ export function createWake() {
           const dist = (i / 140) * L;
           const rc = Math.sqrt(rc00 * rc00 + 4 * WK.nuEff * (dist / V1));
           const r = r0 * Math.sqrt(rc / rc00) * 0.9;
+          const om = (G1 / (2 * Math.PI * r * r)) * (1 - Math.exp(-(r * r) / (rc * rc)));
+          const th = ph + (v === 0 ? 1 : -1) * om * (dist / V1);
+          pts.push(new THREE.Vector3((v === 0 ? y1 : -y1) + r * Math.cos(th), r * Math.sin(th), Z0 + dist));
+        }
 
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
