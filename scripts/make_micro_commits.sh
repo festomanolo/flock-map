@@ -9,3 +9,4 @@ mkdir -p meta
 touch "$LOG"
 
 CUR=$(git rev-list --count HEAD)
+while [ "$CUR" -lt "$TARGET" ]; do
