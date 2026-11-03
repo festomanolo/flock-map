@@ -6,6 +6,7 @@ import { AC, WK, gamma, coreRadius, upwash } from './physics.js';
 
 const N_PER = 1500;
 const L = 9.0;                       // visible wake length, m
+const SWIRL_K = 6;                   // visual exaggeration of the swirl angle only (stated on the page); fields and charts are exact
 const Z0 = 0.48;                     // release plane just aft of the trailing edge (Z aft)
 
 function softSprite() {
