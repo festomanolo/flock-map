@@ -76,3 +76,10 @@ def formation(p, alt, scale, dy=0.85, dx=3.0, accent=("#d4442c", "#2a78d6", "#1b
     if trails:
         for q in pos:
             for sg in (-1, 1):
+                vortex(p, (q[0] + sg * 0.5 * B * s, q[1] - 0.2 * s, q[2]), length=70, sign=sg)
+    return pos
+
+
+def render(p, name, cam):
+    p.camera_position = cam
+    p.camera.view_angle = 38
