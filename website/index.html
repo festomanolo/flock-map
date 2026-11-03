@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FlockMap Teardown</title>
+<meta name="description" content="An interactive teardown of a wake-aware V-formation study for fixed-wing mapping drones. Every number is read from the study's parameter file.">
+<meta name="theme-color" content="#edf0f3">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2311151a'/%3E%3Cpath d='M4 17 16 9l12 8-12-3z' fill='%23e8470f'/%3E%3C/svg%3E">
+<script type="module" src="/src/main.js"></script>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#hero" aria-label="FlockMap, back to top">FlockMap</a>
+  <nav aria-label="Sections">
+    <a href="#teardown">Teardown</a>
+    <a href="#lift">Mechanics</a>
+    <a href="#wake">Wake</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#evidence">Evidence</a>
+  </nav>
+  <button class="btn-quiet" id="themeBtn" type="button" aria-label="Switch colour theme">Dark</button>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-copy">
+      <h1>Three flying wings,<br>one shared wake.</h1>
+      <p class="lead">A simulation study of wake-aware V-formation for fixed-wing mapping drones, taken apart one mechanism at a time.</p>
+      <div class="cta">
+        <a class="btn" href="#teardown" data-magnetic>Start the teardown</a>
+        <a class="btn ghost" href="https://github.com/festomanolo/flock-map" rel="noopener">Read the code</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEARDOWN (sticky, scroll scrubbed) -->
+  <section class="chapter teardown" id="teardown" aria-label="Airframe teardown">
+    <div class="pin">
+      <div class="td-left">
+        <h2>Take the airframe apart</h2>
+        <p class="sub">Scroll to pull it open. Every number below is read from the study's parameter file.</p>
+        <ol class="stops" id="stops"></ol>
+        <dl class="legend" aria-label="Source tags">
+          <div><dt class="tag MS">MS</dt><dd>from the preliminary manuscript, not verified</dd></div>
+          <div><dt class="tag DER">DER</dt><dd>derived here from other parameters</dd></div>
+          <div><dt class="tag ASM">ASM</dt><dd>assumed here, to be measured</dd></div>
+          <div><dt class="tag MODEL">MODEL</dt><dd>approximate geometry, not a CAD copy</dd></div>
+        </dl>
+      </div>
+      <div class="td-stage" id="tdStage" data-orbit>
+        <svg class="leader" id="leader" aria-hidden="true"><path id="leaderPath" d=""/><circle id="leaderDot" r="4"/></svg>
+      </div>
+      <article class="card" id="card" aria-live="polite">
+        <h3 id="cardName"></h3>
+        <p id="cardText"></p>
+        <dl class="specs" id="cardSpecs"></dl>
+      </article>
+      <div class="td-progress" aria-hidden="true"><i id="tdBar"></i></div>
+    </div>
+  </section>
+
+  <!-- LIFT & POWER -->
+  <section class="block" id="lift">
+    <div class="wrap two">
+      <div class="panel reveal">
+        <h2>What 3.5 kg costs to keep flying</h2>
+        <p class="sub">In level flight lift equals weight, so speed fixes the lift coefficient. Drag and power follow from it.</p>
+        <label class="slider" for="vLift"><span>Airspeed</span><output id="vLiftOut">18.0 m/s</output></label>
+        <input id="vLift" type="range" min="12" max="26" step="0.1" value="18">
+        <dl class="readouts" id="liftRead"></dl>
+        <p class="note">Level flight, trim drag excluded, constant propeller efficiency. A calculation from the study's parameters, not a flight test.</p>
+      </div>
+      <figure class="chart-wrap reveal"><canvas id="liftChart" role="img" aria-label="Power against airspeed"></canvas></figure>
+    </div>
+  </section>
+
+  <!-- CONTROL (3D right) -->
+  <section class="block control" id="control">
+    <div class="wrap">
+      <div class="panel narrow reveal">
+        <h2>Rolling a wing with no tail</h2>
+        <p class="sub">Differential elevon deflection rolls the aircraft. The study models bank angle as a first-order lag with a 0.25 s time constant.</p>
+        <label class="slider" for="bank"><span>Commanded bank</span><output id="bankOut">25&deg;</output></label>
+        <input id="bank" type="range" min="-35" max="35" step="1" value="25">
+        <div class="row"><button class="btn small" id="stepBtn" type="button">Send step command</button><button class="btn small ghost" id="levelBtn" type="button">Level</button></div>
+        <canvas id="stepChart" role="img" aria-label="Bank angle step response"></canvas>
+        <dl class="readouts compact" id="ctrlRead"></dl>
+        <p class="note">Elevon deflection is drawn in proportion to the command, for illustration. Turns use 25&deg; and the limit is 35&deg;.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENERGY -->
+  <section class="block energy" id="energy">
+    <div class="wrap energy-grid">
+      <div class="reveal">
+        <h2>How long the pack lasts</h2>
+        <p class="sub">Usable energy divided by cruise power gives endurance. The 20 % reserve policy comes from the manuscript.</p>
+        <div class="big" aria-live="polite"><span id="enMin">74.6</span><small>minutes</small></div>
+        <div class="bigsub"><span id="enKm">80.6</span> km at <span id="enV">18.0</span> m/s</div>
+        <label class="slider" for="vEn"><span>Airspeed</span><output id="vEnOut">18.0 m/s</output></label>
+        <input id="vEn" type="range" min="12" max="26" step="0.1" value="18">
+        <p class="note">Assumes 3.7 V nominal per cell and ignores climb, turns and wind. Cruise power at 18 m/s includes 28 W of hotel load.</p>
+      </div>
+      <div class="pack reveal" id="pack" role="img" aria-label="Six-cell battery with usable and reserve energy">
+        <div class="cells" id="cells"></div>
+        <div class="pack-meta"><div><b>6S</b><span>cells in series</span></div><div><b>10 Ah</b><span>capacity</span></div><div><b id="enWh">178</b><span>Wh usable of 222</span></div></div>
+        <canvas id="enChart" role="img" aria-label="Endurance against airspeed"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAMERA -->
+  <section class="block camera" id="camera">
+    <div class="wrap camera-grid">
+      <figure class="map reveal"><canvas id="camMap" role="img" aria-label="Three aircraft flying adjacent survey strips with overlapping camera footprints"></canvas></figure>
+      <div class="panel reveal">
+        <h2>How the camera sets the flight lines</h2>
+        <p class="sub">Altitude fixes the ground footprint. Side overlap then fixes how far apart the strips fly.</p>
+        <label class="slider" for="agl"><span>Altitude above ground</span><output id="aglOut">120 m</output></label>
+        <input id="agl" type="range" min="60" max="150" step="1" value="120">
+        <div class="seg" role="group" aria-label="Side overlap"><button type="button" class="on" data-os="0.65">65 % side overlap</button><button type="button" data-os="0.58">58 % claimed</button></div>
+        <dl class="readouts compact" id="camRead"></dl>
+        <p class="note">Forward overlap is 75 %. The manuscript's 58 % stereo-assisted claim is unverified.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAKE (3D full) -->
+  <section class="block wake" id="wake">
+    <div class="wrap">
+      <div class="panel narrow reveal">
+        <h2>Where the follower finds free lift</h2>
+        <p class="sub">Each tip vortex lifts the air outside it. A follower flying there meets a small upwash and can trim to lower power.</p>
+        <label class="slider" for="dy"><span>Lateral spacing d<sub>y</sub> / b</span><output id="dyOut">0.85</output></label>
+        <input id="dy" type="range" min="0.6" max="2" step="0.01" value="0.85">
+        <dl class="readouts compact" id="wakeRead"></dl>
+        <canvas id="wakeChart" role="img" aria-label="Upwash across the follower wing span"></canvas>
+        <p class="note">Upwash uses the study's Lamb-Oseen vortex model, followers 3 b behind. The power saving comes from the free-wake runs: 3.1 to 4.4 %, depending on an uncalibrated core radius.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="block gallery" id="gallery">
+    <div class="wrap">
+      <div class="reveal gal-head">
+        <h2>The study, imagined</h2>
+        <p class="sub">Concept art and short films made with Gemini from the teardown prompts. Illustrative, not simulation output.</p>
+      </div>
+      <div class="bento">
+        <div class="cell a reveal"><video muted loop playsinline preload="none" poster="/media/hero-flight.jpg" data-src="/media/flyby-a.mp4" aria-label="Concept film: a flying wing passes over farmland"></video></div>
+        <div class="cell b reveal"><img loading="lazy" src="/media/v-formation.jpg" alt="Concept art: three flying wings in V-formation over farmland"></div>
+        <div class="cell c reveal"><img loading="lazy" src="/media/wingtip-vortex.jpg" alt="Concept art: a wingtip vortex behind a winglet"></div>
+        <div class="cell d reveal"><img loading="lazy" src="/media/top-down.jpg" alt="Concept art: a drone seen from directly above"></div>
+        <div class="cell e reveal"><img loading="lazy" src="/media/wake-upwash.jpg" alt="Concept art: two flying wings with coloured upwash streamlines and smoke vortices"></div>
+        <div class="cell f reveal"><video muted loop playsinline preload="none" poster="/media/survey.jpg" data-src="/media/flyby-b.mp4" aria-label="Concept film: second fly-by"></video></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVIDENCE -->
+  <section class="block evidence" id="evidence">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>What is solid and what is not</h2>
+        <p class="sub">The study is a simulation. It says so on its first page, and so does this one.</p>
+      </div>
+      <div class="ev-grid">
+        <div class="ev yes reveal">
+          <h3>Built and checked</h3>
+          <ul>
+            <li>14 tests on closed-form results and audit findings</li>
+            <li>A faithful re-implementation of the preliminary manuscript's code, with its findings</li>
+            <li>Independent vortex-lattice and free-wake models as cross-checks</li>
+            <li>A steady-RANS CFD campaign in OpenFOAM v1912</li>
+            <li>Every number, table and figure regenerates from the repository</li>
+          </ul>
+        </div>
+        <div class="ev no reveal">
+          <h3>Not done yet</h3>
+          <ul>
+            <li>PX4 and Gazebo software-in-the-loop, hardware-in-the-loop</li>
+            <li>Photogrammetry reconstruction and checkpoint error</li>
+            <li>Flight tests and wind-tunnel validation</li>
+            <li>Measured airframe data for every MS and ASM parameter</li>
+            <li>Mesh-converged absolute CFD drag</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ev-cta reveal"><a class="btn" href="https://github.com/festomanolo/flock-map/tree/main/docs/plan" rel="noopener">Read the plans</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>FlockMap. Built from the repository's own parameter file.</span>
+  <a href="https://github.com/festomanolo/flock-map" rel="noopener">Read the code</a>
+</footer>
+</body>
+</html>
