@@ -29,3 +29,11 @@ def terrain(x0, x1, y0, y1, n=420, amp=3.5, seed=7):
     g["tint"] = s.ravel(order="F")
     return g.extract_surface().compute_normals(point_normals=True)
 
+
+EARTH = LinearSegmentedColormap.from_list("earth", ["#2f4a22", "#476b2b", "#6b8a3a", "#9aa356", "#b59a62", "#8a6c45"])
+
+
+def scene(w=2400, h=1350, sky=("#f3e6cf", "#5f93cf")):
+    p = pv.Plotter(off_screen=True, window_size=(w, h))
+    p.set_background(sky[0], top=sky[1])
+    p.enable_anti_aliasing("ssaa")
