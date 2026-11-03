@@ -20,6 +20,7 @@ page.on('pageerror', (e) => errs.push(`pageerror: ${e.message}`));
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForTimeout(2500);
 
+const shot = async (name, y, extra = 0) => {
 const shot = async (name, y, wait = 3200) => { await page.evaluate((v) => window.scrollTo(0, v), y); await page.waitForTimeout(wait); await page.screenshot({ path: `${out}/${name}.png` }); console.log('shot', name, Math.round(y)); };
 const pos = await page.evaluate(() => {
   const g = (id) => document.getElementById(id); const td = g('teardown');
