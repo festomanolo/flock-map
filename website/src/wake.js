@@ -32,6 +32,10 @@ export function createWake() {
   const mat = new THREE.PointsMaterial({ size: 0.085, map: softSprite(), vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
   const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; group.add(pts);
 
+  // exact helical streamlines of the rolled-up vortices (the particles ride on these families)
+  const acc0 = new THREE.Color(0xe8470f);
+  const helices = new THREE.Group(); group.add(helices);
+
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
   const pg = new THREE.PlaneGeometry(8, 2.4, NY - 1, NZ - 1);
