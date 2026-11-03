@@ -8,6 +8,7 @@ const { chromium } = require(process.env.PW || '/Users/festomanolo/.claude/skill
 
 const url = process.argv[2] || 'http://localhost:4173/?q=1';
 const W = +(process.argv[3] || 1440), H = +(process.argv[4] || 900), theme = process.argv[5] || 'light';
+const only = process.argv[6] ? new RegExp(process.argv[6]) : null;
 const out = `.shots/${W}x${H}-${theme}`; fs.mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--hide-scrollbars'] });
