@@ -185,8 +185,8 @@ function drawLift() {
   line((v) => flight(v).pShaft, col.muted, 1.5, [7, 5]);
   line((v) => flight(v).pTotal, col.ink, 2.5);
   x.font = '11px "Geist Mono Variable", monospace'; x.fillStyle = col.muted; x.textAlign = 'left'; x.textBaseline = 'bottom';
-  x.fillText('hotel load 28 W', X(20.2), Y(AC.pHotel) - 6); x.fillText('propulsion', X(22.4), Y(flight(22.4).pShaft) - 8);
-  x.fillStyle = col.ink; x.fillText('total', X(23.6), Y(flight(23.6).pTotal) - 10);
+  x.fillText('hotel load 28 W', X(20.2), Y(AC.pHotel) - 6); x.textBaseline = 'top'; x.fillText('propulsion', X(22.6), Y(flight(22.6).pShaft) + 12);
+  x.fillStyle = col.ink; x.textBaseline = 'bottom'; x.textAlign = 'right'; x.fillText('total', X(23.2) - 6, Y(flight(23.2).pTotal) - 14); x.textAlign = 'left';
   x.strokeStyle = col.accent; x.lineWidth = 1.5; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(X(V), Y(f.pTotal)); x.lineTo(X(V), h - m.b); x.stroke(); x.setLineDash([]);
   dot(x, X(V), Y(f.pTotal), col.accent);
   x.strokeStyle = col.ink; x.lineWidth = 1.5; x.beginPath(); x.arc(X(pMin.V), Y(pMin.P), 4, 0, 7); x.stroke();
