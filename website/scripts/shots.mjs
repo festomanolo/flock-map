@@ -6,7 +6,7 @@ import fs from 'node:fs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PW || '/Users/festomanolo/.claude/skills/teardown/node_modules/playwright');
 
-const url = process.argv[2] || 'http://localhost:4173/';
+const url = process.argv[2] || 'http://localhost:4173/?q=1';
 const W = +(process.argv[3] || 1440), H = +(process.argv[4] || 900), theme = process.argv[5] || 'light';
 const out = `.shots/${W}x${H}-${theme}`; fs.mkdirSync(out, { recursive: true });
 
