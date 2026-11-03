@@ -35,6 +35,10 @@ export function createWake() {
   // exact helical streamlines of the rolled-up vortices (the particles ride on these families)
   const acc0 = new THREE.Color(0xe8470f);
   const helices = new THREE.Group(); group.add(helices);
+  {
+    const G1 = gamma(), V1 = AC.va, y1 = AC.b0 / 2, rc00 = WK.rc0Frac * AC.b;
+    [0.035, 0.07, 0.11, 0.16, 0.23, 0.32, 0.44].forEach((r0, k) => {
+      for (let v = 0; v < 2; v++) for (const ph of [0, Math.PI]) {
 
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
