@@ -1,5 +1,6 @@
 // Dev tool: screenshot each chapter of the built site and report console errors.
 // Usage: node scripts/shots.mjs [url] [width] [height] [theme]
+// The software renderer is slow, so after each scroll we call window.__fm.snap() to jump damped values to their targets.
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 const require = createRequire(import.meta.url);
