@@ -30,7 +30,7 @@ const pos = await page.evaluate(() => {
   const g = (id) => document.getElementById(id); const td = g('teardown');
   return { td: td.offsetTop, tdRange: td.offsetHeight - innerHeight, ids: Object.fromEntries(['lift', 'control', 'energy', 'camera', 'wake', 'gallery', 'evidence'].map((i) => [i, g(i).offsetTop])) };
 });
-await shot("00-hero", 0, 6000);
+await shot('00-hero', 0, 2500);
 for (const [i, p] of [[1, 0.0], [2, 0.18], [3, 0.4], [4, 0.62], [5, 0.8], [6, 0.97]]) await shot(`0${i}-teardown-${Math.round(p * 100)}`, pos.td + p * pos.tdRange + 4, 3500);
 let n = 7;
 for (const id of ['lift', 'control', 'energy', 'camera', 'wake', 'gallery', 'evidence']) await shot(`${String(n++).padStart(2, '0')}-${id}`, pos.ids[id], 4200);
