@@ -106,7 +106,7 @@ export function createWake() {
       p.setXYZ(i, y, r * Math.sin(th) + 0.0, Z0 + dist);
       const fade = Math.min(1, s * 8) * (1 - Math.pow(s, 3));
       const core = 1 - Math.min(1, r / 0.55);
-      c.setXYZW(i, acc.r, acc.g, acc.b, fade * (0.28 + 0.5 * core));
+      c.setXYZW(i, acc.r, acc.g, acc.b, fade * (0.45 + 0.55 * core));
     }
     p.needsUpdate = true; c.needsUpdate = true;
   }
