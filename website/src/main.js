@@ -35,7 +35,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { S.
 
 // ------------------------------------------------------------------------------------------- camera presets (one table, scroll picks the row)
 const PRESET = {
-  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 4.7, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
+  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.28, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
   teardown: () => ({ theta: 2.35, phi: 1.08, r: 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
   off: () => ({ alpha: 0 }),
   control: () => ({ theta: 0.28, phi: 1.32, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
@@ -363,4 +363,5 @@ addEventListener('resize', resizeAll);
 resizeAll(); bindPresets(); setV(AC.va); bankIn.dispatchEvent(new Event('input')); drawWake(); showStage(0);
 document.fonts?.ready.then(() => { resizeAll(); ScrollTrigger.refresh(); });
 requestAnimationFrame(loop);
-window.__fm = { S, ScrollTrigger };
+// test hook: jump the damped camera, explode and reveals to their targets (used by scripts/shots.mjs)
+window.__fm = { S, ScrollTrigger, snap() { Object.assign(S.cur, S.view); exCur = S.view.preset === 'teardown' ? tdTarget : 0; $$('.reveal').forEach((e) => { e.style.opacity = 1; e.style.transform = 'none'; }); } };
