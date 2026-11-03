@@ -12,7 +12,7 @@ export function createScene(canvas) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.VSMShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -24,7 +24,7 @@ export function createScene(canvas) {
   sun.position.set(-4, 7, 5); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 0.5, far: 24 });
-  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.025; sun.shadow.radius = 5;
+  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.025; sun.shadow.radius = 9; sun.shadow.blurSamples = 16;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0xdfe8f4, 0x8a8f96, 0.55));
 
@@ -55,10 +55,22 @@ export function createScene(canvas) {
   let size = { w: 1, h: 1 };
   let dark = false;
 
+  // quality tiers: 0 full, 1 cheaper shadows and pixel ratio, 2 no shadows, half the wake particles
+  let tier = 0;
+  const TIER_DPR = [2, 1.25, 1];
+  function setQuality(t) {
+    tier = Math.min(2, t);
+    if (tier === 1) { renderer.shadowMap.type = THREE.PCFSoftShadowMap; sun.shadow.mapSize.set(1024, 1024); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+    if (tier === 2) { renderer.shadowMap.enabled = false; catcher.visible = false; }
+    wake.setLow(tier >= 2);
+    scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; });
+    resize();
+  }
+
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     size = { w, h };
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, TIER_DPR[tier]));
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
   }
@@ -115,5 +127,5 @@ export function createScene(canvas) {
     if (cur.alpha > 0.01) renderer.render(scene, camera);
   }
 
-  return { renderer, scene, camera, drone, followers, wake, view, cur, orbit, resize, frame, project, setTheme };
+  return { renderer, scene, camera, drone, followers, wake, view, cur, orbit, resize, frame, project, setTheme, setQuality, get tier() { return tier; } };
 }

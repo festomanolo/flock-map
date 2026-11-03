@@ -66,9 +66,12 @@ export function createWake() {
   }
 
   const G0 = gamma(), V = AC.va, yv = AC.b0 / 2, rc0 = WK.rc0Frac * AC.b;
+  let low = false;
+  const setLow = (v) => { low = v; };
   function update(t) {
     const p = geo.getAttribute('position'), c = geo.getAttribute('color');
     for (let i = 0; i < total; i++) {
+      if (low && (i & 1)) { c.setW(i, 0); continue; }
       const sd = seed[i];
       const s = (sd.s0 + t * params.speed / L) % 1;
       const dist = s * L;
@@ -86,5 +89,5 @@ export function createWake() {
     p.needsUpdate = true; c.needsUpdate = true;
   }
 
-  return { group, set, update, plane, paintPlane };
+  return { group, set, update, plane, paintPlane, setLow };
 }

@@ -5,6 +5,7 @@ import { createScene } from './scene.js';
 import { AC, BAT, CAM, flight, energy, rollResponse, camera as camGeo, gamma, followerUpwash, upwash, coreRadius, fmt } from './physics.js';
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.ticker.lagSmoothing(0);          // slow frames must not stretch entrance animations
 document.documentElement.classList.add('js');
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -34,8 +35,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { S.
 
 // ------------------------------------------------------------------------------------------- camera presets (one table, scroll picks the row)
 const PRESET = {
-  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 8.6 : 6.4, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
-  teardown: () => ({ theta: 2.35, phi: 1.08, r: 9.4, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
+  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 4.7, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
+  teardown: () => ({ theta: 2.35, phi: 1.08, r: 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
   off: () => ({ alpha: 0 }),
   control: () => ({ theta: 0.28, phi: 1.32, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
   wake: () => ({ theta: -0.62, phi: 1.02, r: mobile() ? 21 : 14.5, tx: 0, ty: 0, tz: 3.2, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? -0.2 : 0, groundY: -1.6, alpha: 1, mode: 'formation', float: 0.6 }),
@@ -119,7 +120,7 @@ function tdUpdate(p) {
   let idx = 0; STAGES.forEach((s, i) => { if (tdTarget >= s.at) idx = i; });
   showStage(idx);
   $('#tdBar').style.width = `${(p * 100).toFixed(1)}%`;
-  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = 7.4 + 3 * Math.min(1, tdTarget * 1.6); S.view.phi = 1.18 - 0.1 * tdTarget; }
+  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = 5.4 + 1.9 * Math.min(1, tdTarget * 1.4); S.view.phi = 1.18 - 0.1 * tdTarget; }
 }
 ScrollTrigger.create({ trigger: tdSection, start: 'top top', end: 'bottom bottom', onUpdate: (self) => tdUpdate(self.progress), onRefresh: (self) => tdUpdate(self.progress) });
 let exCur = 0;
@@ -200,7 +201,7 @@ function drawEnergy() {
   $('#enMin').textContent = fmt(e.minutes, 1); $('#enKm').textContent = fmt(e.rangeKm, 1); $('#enV').textContent = fmt(V, 1); $('#vEnOut').textContent = `${fmt(V, 1)} m/s`;
   $('#enWh').textContent = fmt(BAT.usableWh, 0);
   const c = $('#enChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 40, r: 14, t: 18, b: 28 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 120];
+  const m = { l: 40, r: 14, t: 22, b: 34 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 120];
   axes(x, w, h, m, xr, yr, [12, 16, 20, 24], [0, 40, 80, 120], col, 'airspeed m/s', 'minutes');
   const { X, Y } = mapper(w, h, m, xr, yr);
   x.beginPath(); for (let v = xr[0]; v <= xr[1]; v += 0.2) { const px = X(v), py = Y(energy(v).minutes); v === xr[0] ? x.moveTo(px, py) : x.lineTo(px, py); } x.strokeStyle = col.ink; x.lineWidth = 2.2; x.stroke();
@@ -218,7 +219,7 @@ $('#stepBtn').addEventListener('click', () => { ctrl.now = 0; startStep(0, +bank
 $('#levelBtn').addEventListener('click', () => { bankIn.value = 0; $('#bankOut').textContent = '0°'; startStep(ctrl.now, 0); });
 function drawStep() {
   const c = $('#stepChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 34, r: 12, t: 14, b: 24 }, xr = [0, 2], span = ctrl.to - ctrl.from, lim = Math.max(10, Math.abs(ctrl.from), Math.abs(ctrl.to));
+  const m = { l: 34, r: 12, t: 22, b: 34 }, xr = [0, 2], span = ctrl.to - ctrl.from, lim = Math.max(10, Math.abs(ctrl.from), Math.abs(ctrl.to));
   const yr = [-lim, lim];
   axes(x, w, h, m, xr, yr, [0, 0.5, 1, 1.5, 2], [-lim, 0, lim].map(Math.round), col, 'seconds', '');
   const { X, Y } = mapper(w, h, m, xr, yr);
@@ -283,7 +284,7 @@ function drawWake() {
   $('#dyOut').textContent = fmt(dyb, 2);
   S.view.fx = dyb; S.view.dx = dx;
   const c = $('#wakeChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 36, r: 12, t: 14, b: 24 }, xr = [-1.5, 4.5], yr = [-0.6, 0.6];
+  const m = { l: 36, r: 12, t: 22, b: 34 }, xr = [-1.5, 4.5], yr = [-0.6, 0.6];
   axes(x, w, h, m, xr, yr, [-1, 0, 1, 2, 3, 4], [-0.5, 0, 0.5], col, 'lateral y (m)', 'w (m/s)');
   const { X, Y } = mapper(w, h, m, xr, yr);
   x.fillStyle = col.accent; x.globalAlpha = 0.14; x.fillRect(X(yc - AC.b / 2), m.t, X(yc + AC.b / 2) - X(yc - AC.b / 2), h - m.t - m.b); x.globalAlpha = 1;
@@ -298,10 +299,20 @@ dyIn.addEventListener('input', () => { dyb = +dyIn.value; drawWake(); });
 function redrawAll() { drawLift(); drawEnergy(); drawStep(); updateCamRead(); drawWake(); }
 
 let last = performance.now();
+let slow = 0;
+const forcedQ = new URLSearchParams(location.search).get('q');      // ?q=0|1|2 pins a quality tier (testing)
+if (forcedQ !== null) S.setQuality(+forcedQ);
 function loop(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const raw = (now - last) / 1000;
+  const dt = Math.min(0.05, raw); last = now;
+  // quality governor: sustained slow frames step the renderer down a tier (see scene.js setQuality)
+  if (forcedQ === null && S.cur.alpha > 0.05 && !document.hidden) {
+    slow = raw > 0.04 ? slow + 1 : Math.max(0, slow - 2);
+    if (slow >= 8 && S.tier < 2) { S.setQuality(S.tier + 1); slow = 0; }
+  }
   // teardown explode follows scroll with a light lag
-  exCur += (tdTarget - exCur) * (1 - Math.exp(-(reduced ? 80 : 7) * dt));
+  const exGoal = S.view.preset === 'teardown' ? tdTarget : 0;          // reassembles when the chapter ends
+  exCur += (exGoal - exCur) * (1 - Math.exp(-(reduced ? 80 : 7) * dt));
   S.drone.setExplode(exCur);
   // roll dynamics
   if (ctrl.t < 3) { ctrl.t += dt; ctrl.now = ctrl.from + (ctrl.to - ctrl.from) * (1 - Math.exp(-ctrl.t / AC.tauPhi)); }
