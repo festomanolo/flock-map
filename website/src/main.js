@@ -284,7 +284,7 @@ function drawWake() {
   $('#dyOut').textContent = fmt(dyb, 2);
   S.view.fx = dyb; S.view.dx = dx;
   const c = $('#wakeChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 36, r: 12, t: 14, b: 24 }, xr = [-1.5, 4.5], yr = [-0.6, 0.6];
+  const m = { l: 36, r: 12, t: 22, b: 34 }, xr = [-1.5, 4.5], yr = [-0.6, 0.6];
   axes(x, w, h, m, xr, yr, [-1, 0, 1, 2, 3, 4], [-0.5, 0, 0.5], col, 'lateral y (m)', 'w (m/s)');
   const { X, Y } = mapper(w, h, m, xr, yr);
   x.fillStyle = col.accent; x.globalAlpha = 0.14; x.fillRect(X(yc - AC.b / 2), m.t, X(yc + AC.b / 2) - X(yc - AC.b / 2), h - m.t - m.b); x.globalAlpha = 1;
