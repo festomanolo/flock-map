@@ -201,7 +201,7 @@ function drawEnergy() {
   $('#enMin').textContent = fmt(e.minutes, 1); $('#enKm').textContent = fmt(e.rangeKm, 1); $('#enV').textContent = fmt(V, 1); $('#vEnOut').textContent = `${fmt(V, 1)} m/s`;
   $('#enWh').textContent = fmt(BAT.usableWh, 0);
   const c = $('#enChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 40, r: 14, t: 18, b: 28 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 120];
+  const m = { l: 40, r: 14, t: 22, b: 34 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 120];
   axes(x, w, h, m, xr, yr, [12, 16, 20, 24], [0, 40, 80, 120], col, 'airspeed m/s', 'minutes');
   const { X, Y } = mapper(w, h, m, xr, yr);
   x.beginPath(); for (let v = xr[0]; v <= xr[1]; v += 0.2) { const px = X(v), py = Y(energy(v).minutes); v === xr[0] ? x.moveTo(px, py) : x.lineTo(px, py); } x.strokeStyle = col.ink; x.lineWidth = 2.2; x.stroke();
