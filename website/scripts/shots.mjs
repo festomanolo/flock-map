@@ -23,6 +23,7 @@ await page.waitForTimeout(2500);
 const shot = async (name, y, extra = 0) => {
   if (only && !only.test(name)) return;
   await page.evaluate((v) => window.scrollTo(0, v), y); await page.waitForTimeout(900 + extra);
+  await page.evaluate(() => window.__fm.snap()); await page.waitForTimeout(1200 + extra);
 const shot = async (name, y, wait = 3200) => { await page.evaluate((v) => window.scrollTo(0, v), y); await page.waitForTimeout(wait); await page.screenshot({ path: `${out}/${name}.png` }); console.log('shot', name, Math.round(y)); };
 const pos = await page.evaluate(() => {
   const g = (id) => document.getElementById(id); const td = g('teardown');
