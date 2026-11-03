@@ -219,7 +219,7 @@ $('#stepBtn').addEventListener('click', () => { ctrl.now = 0; startStep(0, +bank
 $('#levelBtn').addEventListener('click', () => { bankIn.value = 0; $('#bankOut').textContent = '0°'; startStep(ctrl.now, 0); });
 function drawStep() {
   const c = $('#stepChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 34, r: 12, t: 14, b: 24 }, xr = [0, 2], span = ctrl.to - ctrl.from, lim = Math.max(10, Math.abs(ctrl.from), Math.abs(ctrl.to));
+  const m = { l: 34, r: 12, t: 22, b: 34 }, xr = [0, 2], span = ctrl.to - ctrl.from, lim = Math.max(10, Math.abs(ctrl.from), Math.abs(ctrl.to));
   const yr = [-lim, lim];
   axes(x, w, h, m, xr, yr, [0, 0.5, 1, 1.5, 2], [-lim, 0, lim].map(Math.round), col, 'seconds', '');
   const { X, Y } = mapper(w, h, m, xr, yr);
