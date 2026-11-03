@@ -60,3 +60,11 @@ def uav(p, pos, course=0.0, bank=0.0, scale=3.0, accent="#d4442c"):
 def vortex(p, start, length=90.0, sign=1, spread=0.9, color="#e9f0f7"):
     """Translucent, slowly widening wingtip-vortex trail (stacked tubes of growing radius, fading opacity)."""
     t = np.linspace(0, length, 80)
+    pts = np.c_[start[0] + sign * spread * (1 - np.exp(-t / 35.0)) * 0.6 + 0.12 * np.sin(t / 6.0),
+                start[1] - t,
+                start[2] - 0.5 * (1 - np.exp(-t / 40.0)) - 0.02 * t + 0.08 * np.cos(t / 5.0)]
+    line = pv.Spline(pts, 160)
+    for r, op in ((0.03, 0.30), (0.10, 0.10), (0.24, 0.045), (0.45, 0.02)):
+        p.add_mesh(line.tube(radius=r * 1.0, n_sides=24), color=color, opacity=op, smooth_shading=True, lighting=False)
+
+
