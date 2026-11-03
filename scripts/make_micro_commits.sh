@@ -4,3 +4,4 @@
 set -euo pipefail
 
 TARGET=${1:-3672}
+LOG=meta/micro_commits.txt
