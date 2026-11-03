@@ -16,3 +16,4 @@ while [ "$CUR" -lt "$TARGET" ]; do
   git add -- "$LOG"
   git commit -q -m "chore(history): micro commit $CUR/$TARGET"
 done
+echo "done: $CUR commits (target $TARGET)"
