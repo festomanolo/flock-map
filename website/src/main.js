@@ -120,7 +120,7 @@ function tdUpdate(p) {
   let idx = 0; STAGES.forEach((s, i) => { if (tdTarget >= s.at) idx = i; });
   showStage(idx);
   $('#tdBar').style.width = `${(p * 100).toFixed(1)}%`;
-  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = 5.4 + 1.9 * Math.min(1, tdTarget * 1.4); S.view.phi = 1.18 - 0.1 * tdTarget; }
+  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = (5.4 + 1.9 * Math.min(1, tdTarget * 1.4)) * (mobile() ? 1.6 : 1); S.view.phi = 1.18 - 0.1 * tdTarget; }
 }
 ScrollTrigger.create({ trigger: tdSection, start: 'top top', end: 'bottom bottom', onUpdate: (self) => tdUpdate(self.progress), onRefresh: (self) => tdUpdate(self.progress) });
 let exCur = 0;
