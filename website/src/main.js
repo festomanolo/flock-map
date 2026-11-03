@@ -190,7 +190,7 @@ function drawLift() {
   x.strokeStyle = col.accent; x.lineWidth = 1.5; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(X(V), Y(f.pTotal)); x.lineTo(X(V), h - m.b); x.stroke(); x.setLineDash([]);
   dot(x, X(V), Y(f.pTotal), col.accent);
   x.strokeStyle = col.ink; x.lineWidth = 1.5; x.beginPath(); x.arc(X(pMin.V), Y(pMin.P), 4, 0, 7); x.stroke();
-  x.fillStyle = col.ink; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText(`minimum ${fmt(pMin.P, 0)} W at ${fmt(pMin.V, 1)} m/s`, X(pMin.V) + 10, Y(pMin.P) + 8);
+  x.fillStyle = col.ink; x.textAlign = 'left'; x.textBaseline = 'bottom'; x.fillText(`lowest in range: ${fmt(pMin.P, 0)} W at ${fmt(pMin.V, 0)} m/s`, X(pMin.V) + 4, Y(pMin.P) - 14);
 }
 
 // ------------------------------------------------------------------------------------------- energy
