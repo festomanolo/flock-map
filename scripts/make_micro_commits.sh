@@ -8,3 +8,4 @@ LOG=meta/micro_commits.txt
 mkdir -p meta
 touch "$LOG"
 
+CUR=$(git rev-list --count HEAD)
