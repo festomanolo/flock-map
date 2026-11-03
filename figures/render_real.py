@@ -93,7 +93,7 @@ def s_formation():
     p = scene()
     ground(p, alt=0.0)
     formation(p, alt=95.0, scale=4.0)
-    render(p, "R1_formation_chase", [(-16, -42, 101), (0, -8, 94), (0, 0, 1)])
+    render(p, "R1_formation_chase", [(10, -80, 106), (0, -10, 94), (0, 0, 1)])
 
 
 def s_topdown():
