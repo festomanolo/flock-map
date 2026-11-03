@@ -7,3 +7,4 @@ TARGET=${1:-3672}
 LOG=meta/micro_commits.txt
 mkdir -p meta
 touch "$LOG"
+
