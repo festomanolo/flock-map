@@ -364,4 +364,4 @@ resizeAll(); bindPresets(); setV(AC.va); bankIn.dispatchEvent(new Event('input')
 document.fonts?.ready.then(() => { resizeAll(); ScrollTrigger.refresh(); });
 requestAnimationFrame(loop);
 // test hook: jump the damped camera, explode and reveals to their targets (used by scripts/shots.mjs)
-window.__fm = { S, ScrollTrigger };
+window.__fm = { S, ScrollTrigger, snap() { Object.assign(S.cur, S.view); exCur = S.view.preset === 'teardown' ? tdTarget : 0; $$('.reveal').forEach((e) => { e.style.opacity = 1; e.style.transform = 'none'; }); } };
