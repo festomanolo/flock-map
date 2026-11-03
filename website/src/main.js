@@ -303,7 +303,13 @@ let slow = 0;
 const forcedQ = new URLSearchParams(location.search).get('q');      // ?q=0|1|2 pins a quality tier (testing)
 if (forcedQ !== null) S.setQuality(+forcedQ);
 function loop(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const raw = (now - last) / 1000;
+  const dt = Math.min(0.05, raw); last = now;
+  // quality governor: sustained slow frames step the renderer down a tier (see scene.js setQuality)
+  if (forcedQ === null && S.cur.alpha > 0.05 && !document.hidden) {
+    slow = raw > 0.04 ? slow + 1 : Math.max(0, slow - 2);
+    if (slow >= 8 && S.tier < 2) { S.setQuality(S.tier + 1); slow = 0; }
+  }
   // teardown explode follows scroll with a light lag
   exCur += (tdTarget - exCur) * (1 - Math.exp(-(reduced ? 80 : 7) * dt));
   S.drone.setExplode(exCur);
