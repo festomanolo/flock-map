@@ -226,7 +226,7 @@ function drawStep() {
   x.strokeStyle = col.muted; x.setLineDash([5, 5]); x.beginPath(); x.moveTo(X(0), Y(ctrl.to)); x.lineTo(X(2), Y(ctrl.to)); x.stroke(); x.setLineDash([]);
   x.beginPath(); for (let t = 0; t <= 2.001; t += 0.02) { const v = ctrl.from + span * (1 - Math.exp(-t / AC.tauPhi)); t === 0 ? x.moveTo(X(t), Y(v)) : x.lineTo(X(t), Y(v)); } x.strokeStyle = col.ink; x.lineWidth = 2.2; x.stroke();
   x.strokeStyle = col.strong; x.beginPath(); x.moveTo(X(AC.tauPhi), m.t); x.lineTo(X(AC.tauPhi), h - m.b); x.stroke();
-  x.fillStyle = col.muted; x.font = '11px "Geist Mono Variable", monospace'; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText('τ = 0.25 s', X(AC.tauPhi) + 6, m.t + 2);
+  x.fillStyle = col.muted; x.font = '11px "Geist Mono Variable", monospace'; x.textAlign = 'left'; x.textBaseline = 'bottom'; x.fillText('τ = 0.25 s', X(AC.tauPhi) + 6, h - m.b - 4);
   const tt = Math.min(ctrl.t, 2); dot(x, X(tt), Y(ctrl.from + span * (1 - Math.exp(-tt / AC.tauPhi))), col.accent, 5);
 }
 
