@@ -100,7 +100,7 @@ def s_topdown():
     p = scene(2000, 2000, sky=("#cfd8c4", "#a9c4e0"))
     ground(p, alt=0.0, extent=300, n=520, amp=6.0)
     formation(p, alt=60.0, scale=7.0, trails=False)
-    render(p, "R2_topdown_survey", [(0, -25, 330), (0, -12, 60), (0, 1, 0)])
+    render(p, "R2_topdown_survey", [(0, -30, 190), (0, -14, 60), (0, 1, 0)])
 
 
 def s_low():
