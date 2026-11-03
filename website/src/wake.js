@@ -48,6 +48,11 @@ export function createWake() {
           const th = ph + (v === 0 ? 1 : -1) * om * (dist / V1);
           pts.push(new THREE.Vector3((v === 0 ? y1 : -y1) + r * Math.cos(th), r * Math.sin(th), Z0 + dist));
         }
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: acc0, transparent: true, opacity: 0.5 - k * 0.045, depthWrite: false }));
+        helices.add(line);
+      }
+    });
+  }
 
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
