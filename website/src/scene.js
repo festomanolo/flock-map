@@ -55,6 +55,18 @@ export function createScene(canvas) {
   let size = { w: 1, h: 1 };
   let dark = false;
 
+  // quality tiers: 0 full, 1 cheaper shadows and pixel ratio, 2 no shadows, half the wake particles
+  let tier = 0;
+  const TIER_DPR = [2, 1.25, 1];
+  function setQuality(t) {
+    tier = Math.min(2, t);
+    if (tier === 1) { renderer.shadowMap.type = THREE.PCFSoftShadowMap; sun.shadow.mapSize.set(1024, 1024); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+    if (tier === 2) { renderer.shadowMap.enabled = false; catcher.visible = false; }
+    wake.setLow(tier >= 2);
+    scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; });
+    resize();
+  }
+
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     size = { w, h };
