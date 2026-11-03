@@ -68,3 +68,11 @@ def vortex(p, start, length=90.0, sign=1, spread=0.9, color="#e9f0f7"):
         p.add_mesh(line.tube(radius=r * 1.0, n_sides=24), color=color, opacity=op, smooth_shading=True, lighting=False)
 
 
+def formation(p, alt, scale, dy=0.85, dx=3.0, accent=("#d4442c", "#2a78d6", "#1baf7a"), trails=True, bank=0.0):
+    s = scale
+    pos = [(0.0, 0.0, alt), (-dy * B * s, -dx * B * s, alt), (dy * B * s, -dx * B * s, alt)]
+    for q, c in zip(pos, accent):
+        uav(p, q, 0.0, bank, s, c)
+    if trails:
+        for q in pos:
+            for sg in (-1, 1):
