@@ -35,8 +35,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { S.
 
 // ------------------------------------------------------------------------------------------- camera presets (one table, scroll picks the row)
 const PRESET = {
-  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 8.6 : 6.4, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
-  teardown: () => ({ theta: 2.35, phi: 1.08, r: 9.4, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
+  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 4.7, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
+  teardown: () => ({ theta: 2.35, phi: 1.08, r: 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
   off: () => ({ alpha: 0 }),
   control: () => ({ theta: 0.28, phi: 1.32, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
   wake: () => ({ theta: -0.62, phi: 1.02, r: mobile() ? 21 : 14.5, tx: 0, ty: 0, tz: 3.2, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? -0.2 : 0, groundY: -1.6, alpha: 1, mode: 'formation', float: 0.6 }),
