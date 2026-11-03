@@ -91,3 +91,11 @@ def render(p, name, cam):
 
 def s_formation():
     p = scene()
+    ground(p, alt=0.0)
+    formation(p, alt=95.0, scale=4.0)
+    render(p, "R1_formation_chase", [(-16, -42, 101), (0, -8, 94), (0, 0, 1)])
+
+
+def s_topdown():
+    p = scene(2000, 2000, sky=("#cfd8c4", "#a9c4e0"))
+    ground(p, alt=0.0, extent=300, n=520, amp=6.0)
