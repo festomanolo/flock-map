@@ -66,6 +66,8 @@ export function createWake() {
   }
 
   const G0 = gamma(), V = AC.va, yv = AC.b0 / 2, rc0 = WK.rc0Frac * AC.b;
+  let low = false;
+  const setLow = (v) => { low = v; };
   function update(t) {
     const p = geo.getAttribute('position'), c = geo.getAttribute('color');
     for (let i = 0; i < total; i++) {
