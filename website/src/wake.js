@@ -29,8 +29,30 @@ export function createWake() {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
-  const mat = new THREE.PointsMaterial({ size: 0.055, map: softSprite(), vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
+  const mat = new THREE.PointsMaterial({ size: 0.085, map: softSprite(), vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
   const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; group.add(pts);
+
+  // exact helical streamlines of the rolled-up vortices (the particles ride on these families)
+  const acc0 = new THREE.Color(0xe8470f);
+  const helices = new THREE.Group(); group.add(helices);
+  {
+    const G1 = gamma(), V1 = AC.va, y1 = AC.b0 / 2, rc00 = WK.rc0Frac * AC.b;
+    [0.035, 0.07, 0.11, 0.16, 0.23, 0.32, 0.44].forEach((r0, k) => {
+      for (let v = 0; v < 2; v++) for (const ph of [0, Math.PI]) {
+        const pts = [];
+        for (let i = 0; i <= 140; i++) {
+          const dist = (i / 140) * L;
+          const rc = Math.sqrt(rc00 * rc00 + 4 * WK.nuEff * (dist / V1));
+          const r = r0 * Math.sqrt(rc / rc00) * 0.9;
+          const om = (G1 / (2 * Math.PI * r * r)) * (1 - Math.exp(-(r * r) / (rc * rc)));
+          const th = ph + (v === 0 ? 1 : -1) * om * (dist / V1);
+          pts.push(new THREE.Vector3((v === 0 ? y1 : -y1) + r * Math.cos(th), r * Math.sin(th), Z0 + dist));
+        }
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: acc0, transparent: true, opacity: 0.5 - k * 0.045, depthWrite: false }));
+        helices.add(line);
+      }
+    });
+  }
 
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
@@ -84,7 +106,7 @@ export function createWake() {
       p.setXYZ(i, y, r * Math.sin(th) + 0.0, Z0 + dist);
       const fade = Math.min(1, s * 8) * (1 - Math.pow(s, 3));
       const core = 1 - Math.min(1, r / 0.55);
-      c.setXYZW(i, acc.r, acc.g, acc.b, fade * (0.28 + 0.5 * core));
+      c.setXYZW(i, acc.r, acc.g, acc.b, fade * (0.45 + 0.55 * core));
     }
     p.needsUpdate = true; c.needsUpdate = true;
   }

@@ -156,11 +156,15 @@ canvas { display: block; width: 100%; height: 100%; }
 .big small { font: 500 1.1rem var(--font); letter-spacing: 0; color: var(--muted); }
 .bigsub { font: 500 1.1rem var(--mono); color: var(--muted); } .bigsub span { color: var(--ink); }
 .pack { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); padding: 22px; display: grid; gap: 20px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.cells { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; height: 96px; }
-.cell-b { border-radius: 8px; border: 1px solid var(--line-strong); position: relative; overflow: hidden; background: var(--panel-solid); }
-.cell-b i { position: absolute; inset: auto 0 0 0; height: 100%; background: var(--ink); transform-origin: bottom; transform: scaleY(var(--u, 1)); transition: transform .6s var(--ease-out); }
-.cell-b i + i { background: var(--accent); height: 20%; transform: none; opacity: .9; }
+.cells { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; height: 110px; padding: 0 6px; }
+.cell-b { border-radius: 10px; border: 1.5px solid var(--ink); position: relative; overflow: hidden; background: var(--panel-solid); }
+.cell-b::before { content: ''; position: absolute; left: 50%; top: -1.5px; width: 34%; height: 5px; transform: translateX(-50%); background: var(--ink); border-radius: 0 0 4px 4px; }
+.cell-b i { position: absolute; left: 0; right: 0; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px); opacity: .85; }
 .cell-b i:first-child { height: 80%; bottom: 20%; }
+.cell-b i + i { height: 20%; bottom: 0; background: var(--accent); opacity: 1; }
+.pack-legend { display: flex; gap: 22px; font-size: .8rem; color: var(--muted); }
+.pack-legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; background: var(--ink); }
+.pack-legend span + span::before { background: var(--accent); }
 .pack-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .pack-meta div { display: grid; } .pack-meta b { font: 500 1.4rem var(--mono); letter-spacing: -.03em; } .pack-meta span { font-size: .78rem; color: var(--muted); }
 

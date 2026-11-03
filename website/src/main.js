@@ -38,8 +38,8 @@ const PRESET = {
   hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.28, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
   teardown: () => ({ theta: 2.35, phi: 1.08, r: 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
   off: () => ({ alpha: 0 }),
-  control: () => ({ theta: 0.28, phi: 1.32, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
-  wake: () => ({ theta: -0.62, phi: 1.02, r: mobile() ? 21 : 14.5, tx: 0, ty: 0, tz: 3.2, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? -0.2 : 0, groundY: -1.6, alpha: 1, mode: 'formation', float: 0.6 }),
+  control: () => ({ theta: 0.08, phi: 1.46, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
+  wake: () => ({ theta: -0.4, phi: 1.0, r: mobile() ? 24 : 17.5, tx: 0, ty: 0, tz: 3.4, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? -0.2 : 0, groundY: -1.6, alpha: 1, mode: 'formation', float: 0.6 }),
 };
 function applyPreset(name) { Object.assign(S.view, PRESET[name]()); S.view.preset = name; }
 applyPreset('hero');
@@ -185,12 +185,12 @@ function drawLift() {
   line((v) => flight(v).pShaft, col.muted, 1.5, [7, 5]);
   line((v) => flight(v).pTotal, col.ink, 2.5);
   x.font = '11px "Geist Mono Variable", monospace'; x.fillStyle = col.muted; x.textAlign = 'left'; x.textBaseline = 'bottom';
-  x.fillText('hotel load 28 W', X(20.2), Y(AC.pHotel) - 6); x.fillText('propulsion', X(22.4), Y(flight(22.4).pShaft) - 8);
-  x.fillStyle = col.ink; x.fillText('total', X(23.6), Y(flight(23.6).pTotal) - 10);
+  x.fillText('hotel load 28 W', X(20.2), Y(AC.pHotel) - 6); x.textBaseline = 'top'; x.fillText('propulsion', X(22.6), Y(flight(22.6).pShaft) + 12);
+  x.fillStyle = col.ink; x.textBaseline = 'bottom'; x.textAlign = 'right'; x.fillText('total', X(23.2) - 6, Y(flight(23.2).pTotal) - 14); x.textAlign = 'left';
   x.strokeStyle = col.accent; x.lineWidth = 1.5; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(X(V), Y(f.pTotal)); x.lineTo(X(V), h - m.b); x.stroke(); x.setLineDash([]);
   dot(x, X(V), Y(f.pTotal), col.accent);
   x.strokeStyle = col.ink; x.lineWidth = 1.5; x.beginPath(); x.arc(X(pMin.V), Y(pMin.P), 4, 0, 7); x.stroke();
-  x.fillStyle = col.ink; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText(`minimum ${fmt(pMin.P, 0)} W at ${fmt(pMin.V, 1)} m/s`, X(pMin.V) + 10, Y(pMin.P) + 8);
+  x.fillStyle = col.ink; x.textAlign = 'left'; x.textBaseline = 'bottom'; x.fillText(`lowest in range: ${fmt(pMin.P, 0)} W at ${fmt(pMin.V, 0)} m/s`, X(pMin.V) + 4, Y(pMin.P) - 14);
 }
 
 // ------------------------------------------------------------------------------------------- energy
@@ -201,7 +201,7 @@ function drawEnergy() {
   $('#enMin').textContent = fmt(e.minutes, 1); $('#enKm').textContent = fmt(e.rangeKm, 1); $('#enV').textContent = fmt(V, 1); $('#vEnOut').textContent = `${fmt(V, 1)} m/s`;
   $('#enWh').textContent = fmt(BAT.usableWh, 0);
   const c = $('#enChart'); const { x, w, h } = prep(c); const col = css();
-  const m = { l: 40, r: 14, t: 22, b: 34 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 120];
+  const m = { l: 40, r: 14, t: 22, b: 34 }, xr = [AC.vaMin, AC.vaMax], yr = [0, 140];
   axes(x, w, h, m, xr, yr, [12, 16, 20, 24], [0, 40, 80, 120], col, 'airspeed m/s', 'minutes');
   const { X, Y } = mapper(w, h, m, xr, yr);
   x.beginPath(); for (let v = xr[0]; v <= xr[1]; v += 0.2) { const px = X(v), py = Y(energy(v).minutes); v === xr[0] ? x.moveTo(px, py) : x.lineTo(px, py); } x.strokeStyle = col.ink; x.lineWidth = 2.2; x.stroke();
@@ -226,7 +226,7 @@ function drawStep() {
   x.strokeStyle = col.muted; x.setLineDash([5, 5]); x.beginPath(); x.moveTo(X(0), Y(ctrl.to)); x.lineTo(X(2), Y(ctrl.to)); x.stroke(); x.setLineDash([]);
   x.beginPath(); for (let t = 0; t <= 2.001; t += 0.02) { const v = ctrl.from + span * (1 - Math.exp(-t / AC.tauPhi)); t === 0 ? x.moveTo(X(t), Y(v)) : x.lineTo(X(t), Y(v)); } x.strokeStyle = col.ink; x.lineWidth = 2.2; x.stroke();
   x.strokeStyle = col.strong; x.beginPath(); x.moveTo(X(AC.tauPhi), m.t); x.lineTo(X(AC.tauPhi), h - m.b); x.stroke();
-  x.fillStyle = col.muted; x.font = '11px "Geist Mono Variable", monospace'; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText('τ = 0.25 s', X(AC.tauPhi) + 6, m.t + 2);
+  x.fillStyle = col.muted; x.font = '11px "Geist Mono Variable", monospace'; x.textAlign = 'left'; x.textBaseline = 'bottom'; x.fillText('τ = 0.25 s', X(AC.tauPhi) + 6, h - m.b - 4);
   const tt = Math.min(ctrl.t, 2); dot(x, X(tt), Y(ctrl.from + span * (1 - Math.exp(-tt / AC.tauPhi))), col.accent, 5);
 }
 
