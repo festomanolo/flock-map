@@ -37,3 +37,10 @@ def scene(w=2400, h=1350, sky=("#f3e6cf", "#5f93cf")):
     p = pv.Plotter(off_screen=True, window_size=(w, h))
     p.set_background(sky[0], top=sky[1])
     p.enable_anti_aliasing("ssaa")
+    p.remove_all_lights()
+    sun = pv.Light(position=(-300, -200, 260), focal_point=(0, 0, 90), color="#fff1d8", intensity=1.15, light_type="scenelight")
+    fill = pv.Light(position=(300, 250, 120), focal_point=(0, 0, 90), color="#bcd4ff", intensity=0.35, light_type="scenelight")
+    bounce = pv.Light(position=(0, 0, -200), focal_point=(0, 0, 90), color="#9ab36a", intensity=0.30, light_type="scenelight")
+    head = pv.Light(color="#ffffff", intensity=0.45, light_type="headlight")
+    p.add_light(sun); p.add_light(fill); p.add_light(bounce); p.add_light(head)
+    return p
