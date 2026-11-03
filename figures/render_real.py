@@ -44,3 +44,11 @@ def scene(w=2400, h=1350, sky=("#f3e6cf", "#5f93cf")):
     head = pv.Light(color="#ffffff", intensity=0.45, light_type="headlight")
     p.add_light(sun); p.add_light(fill); p.add_light(bounce); p.add_light(head)
     return p
+
+
+def ground(p, alt=0.0, extent=900, **kw):
+    g = terrain(-extent, extent, -extent, extent, **kw)
+    g.points[:, 2] += alt
+    p.add_mesh(g, scalars="tint", cmap=EARTH, show_scalar_bar=False, smooth_shading=True, specular=0.05)
+    return g
+
