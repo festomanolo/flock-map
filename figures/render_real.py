@@ -93,21 +93,21 @@ def s_formation():
     p = scene()
     ground(p, alt=0.0)
     formation(p, alt=95.0, scale=4.0)
-    render(p, "R1_formation_chase", [(-16, -42, 101), (0, -8, 94), (0, 0, 1)])
+    render(p, "R1_formation_chase", [(10, -80, 106), (0, -10, 94), (0, 0, 1)])
 
 
 def s_topdown():
     p = scene(2000, 2000, sky=("#cfd8c4", "#a9c4e0"))
     ground(p, alt=0.0, extent=300, n=520, amp=6.0)
-    formation(p, alt=60.0, scale=4.0, trails=False)
-    render(p, "R2_topdown_survey", [(0, -25, 330), (0, -12, 60), (0, 1, 0)])
+    formation(p, alt=60.0, scale=7.0, trails=False)
+    render(p, "R2_topdown_survey", [(0, -30, 190), (0, -14, 60), (0, 1, 0)])
 
 
 def s_low():
     p = scene(2400, 1200, sky=("#ffb877", "#2b4a7a"))
     ground(p, alt=0.0)
     formation(p, alt=70.0, scale=5.0, bank=4.0)
-    render(p, "R3_low_angle_sunset", [(28, -38, 66), (0, -8, 70), (0, 0, 1)])
+    render(p, "R3_low_angle_sunset", [(34, -72, 74), (0, -12, 70), (0, 0, 1)])
 
 
 SCENES = {"formation": s_formation, "topdown": s_topdown, "low": s_low}
