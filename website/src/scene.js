@@ -24,7 +24,7 @@ export function createScene(canvas) {
   sun.position.set(-4, 7, 5); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 0.5, far: 24 });
-  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.025; sun.shadow.radius = 5;
+  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.025; sun.shadow.radius = 9; sun.shadow.blurSamples = 16;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0xdfe8f4, 0x8a8f96, 0.55));
 
