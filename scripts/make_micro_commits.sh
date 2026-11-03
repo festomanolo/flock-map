@@ -15,3 +15,4 @@ while [ "$CUR" -lt "$TARGET" ]; do
     "$CUR" "$TARGET" "$(date -u +%FT%TZ)" "$((CUR - 70))" >> "$LOG"
   git add -- "$LOG"
   git commit -q -m "chore(history): micro commit $CUR/$TARGET"
+done
