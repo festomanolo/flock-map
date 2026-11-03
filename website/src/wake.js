@@ -39,6 +39,11 @@ export function createWake() {
     const G1 = gamma(), V1 = AC.va, y1 = AC.b0 / 2, rc00 = WK.rc0Frac * AC.b;
     [0.035, 0.07, 0.11, 0.16, 0.23, 0.32, 0.44].forEach((r0, k) => {
       for (let v = 0; v < 2; v++) for (const ph of [0, Math.PI]) {
+        const pts = [];
+        for (let i = 0; i <= 140; i++) {
+          const dist = (i / 140) * L;
+          const rc = Math.sqrt(rc00 * rc00 + 4 * WK.nuEff * (dist / V1));
+          const r = r0 * Math.sqrt(rc / rc00) * 0.9;
 
   // upwash heat-plane at the follower station
   const NY = 90, NZ = 28;
