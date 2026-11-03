@@ -102,7 +102,7 @@ export function createWake() {
       const r = sd.r0 * Math.sqrt(rc / rc0) * 0.9;
       const om = (G0 / (2 * Math.PI * r * r)) * (1 - Math.exp(-(r * r) / (rc * rc)));
       const sign = sd.v === 0 ? 1 : -1;                       // v0 = starboard vortex (+y), v1 = port
-      const th = sd.th0 + sign * om * (dist / V);
+      const th = sd.th0 + sign * SWIRL_K * om * (dist / V);
       const y = (sd.v === 0 ? yv : -yv) + r * Math.cos(th);
       p.setXYZ(i, y, r * Math.sin(th) + 0.0, Z0 + dist);
       const fade = Math.min(1, s * 8) * (1 - Math.pow(s, 3));
