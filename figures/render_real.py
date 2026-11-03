@@ -107,3 +107,11 @@ def s_low():
     p = scene(2400, 1200, sky=("#ffb877", "#2b4a7a"))
     ground(p, alt=0.0)
     formation(p, alt=70.0, scale=5.0, bank=4.0)
+    render(p, "R3_low_angle_sunset", [(28, -38, 66), (0, -8, 70), (0, 0, 1)])
+
+
+SCENES = {"formation": s_formation, "topdown": s_topdown, "low": s_low}
+
+if __name__ == "__main__":
+    for k in (sys.argv[1:] or list(SCENES)):
+        SCENES[k]()
