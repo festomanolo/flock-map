@@ -299,6 +299,9 @@ dyIn.addEventListener('input', () => { dyb = +dyIn.value; drawWake(); });
 function redrawAll() { drawLift(); drawEnergy(); drawStep(); updateCamRead(); drawWake(); }
 
 let last = performance.now();
+let slow = 0;
+const forcedQ = new URLSearchParams(location.search).get('q');      // ?q=0|1|2 pins a quality tier (testing)
+if (forcedQ !== null) S.setQuality(+forcedQ);
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   // teardown explode follows scroll with a light lag
