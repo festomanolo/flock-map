@@ -5,6 +5,7 @@ import { createScene } from './scene.js';
 import { AC, BAT, CAM, flight, energy, rollResponse, camera as camGeo, gamma, followerUpwash, upwash, coreRadius, fmt } from './physics.js';
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.ticker.lagSmoothing(0);          // slow frames must not stretch entrance animations
 document.documentElement.classList.add('js');
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
