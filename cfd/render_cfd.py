@@ -24,8 +24,11 @@ def plotter(w=2000, h=1000):
     p = pv.Plotter(off_screen=True, window_size=(w, h)); p.set_background("#ffffff", top="#dfe3ea"); p.enable_anti_aliasing("ssaa"); return p
 
 
-def load(case):
-    v = vtkdir(case); I = pv.read(os.path.join(v, "internal.vtu")); meta = json.load(open(os.path.join(HERE, "cases", case, "case.json")))
+def load(case, need_internal=True):
+    v = vtkdir(case)
+    ivtu = os.path.join(v, "internal.vtu")
+    I = pv.read(ivtu) if (need_internal or os.path.exists(ivtu)) else None
+    meta = json.load(open(os.path.join(HERE, "cases", case, "case.json")))
     pa = {n: pv.read(os.path.join(v, "boundary", n + ".vtp")) for n in ("leader", "follower") if os.path.exists(os.path.join(v, "boundary", n + ".vtp"))}
     return I, pa, meta
 
