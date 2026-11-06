@@ -81,6 +81,7 @@ if len(sel):
     f85_row = d.set_index("case").loc["fol_dy085_dx3_L1"]
     lead_shift_rans = 100.0 * (f85_row.CL / i1.CL - 1.0)
     proj_part = -1e4 * sl["slope_vlm"] * b85.dCL_iso
+    tot_trim_rans = 1e4 * b85.dCD_iso + proj_part
     txt.append(r"\begin{table}[H]\centering\scriptsize\caption{Follower effect relative to the isolated wing (RANS L1 versus planform VLM, $\alpha=3^\circ$). $\Delta C_D$ columns are $\times10^{-4}$; the trimmed saving is the drag change at the isolated lift, as a percentage of the isolated RANS drag (RANS rows trimmed with the inviscid slope, see text; VLM rows use the same $C_D$ denominator). $\kappa_{\mathrm{eff}}$ brackets the ratio of the RANS to the VLM trimmed saving.}\label{tab:cfdformation}")
     txt.append(r"\resizebox{\textwidth}{!}{\begin{tabular}{@{}rrrrrrrrr@{}}\toprule $d_x/b$ & $d_y/b$ & $\Delta C_L$ RANS & $\Delta C_L$ VLM & $\Delta C_D$ RANS & $\Delta C_{D,i}$ VLM & trimmed RANS (\%) & trimmed VLM (\%) & $\kappa_{\mathrm{eff}}$\\\midrule")
     txt.append(r"\input{tables/tab_cfdformation.tex}\\\bottomrule\end{tabular}}\end{table}")
