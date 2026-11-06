@@ -235,6 +235,7 @@ def fig14():
     d = pd.read_csv("data/raw/control_trials.csv"); order = ["S1_turbulence", "S2_gust_doublet", "S3_braking_dropout", "S4_degraded_gnss", "S5_combined", "S6_overcapability"]
     short = ["S1\nturb.", "S2\ngust", "S3\nbrake", "S4\nGNSS", "S5\ncomb.", "S6\nover-cap."]
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     fig, axs = plt.subplots(2, 2, figsize=(7.4, 4.9)); axs = axs.ravel()
     def strip(ax, col, ylabel, log=False):
         for j, c in enumerate(cols):
