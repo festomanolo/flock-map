@@ -67,7 +67,7 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
 def cp_scene(case):
     _, pa, meta = load(case, need_internal=False); p = plotter()
     shown_bar = False
-    sbar = dict(title="Cp", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
+    sbar = dict(title="Cp", n_labels=5, vertical=False, position_x=0.33, position_y=0.06, width=0.34, height=0.07, title_font_size=22, label_font_size=18, color="black")
     for n, m in pa.items():
         m = m.cell_data_to_point_data(); cp = (np.asarray(m.point_data["p"])) / 0.5  # kinematic p -> Cp = p/(0.5 U^2)
         cp = cp / (18.0 ** 2) * 1.0; m.point_data["Cp"] = cp
