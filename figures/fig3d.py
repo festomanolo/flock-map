@@ -181,6 +181,7 @@ def trail(p, pts, colors=None, scalars=None, cmap=None, clim=None, radius=0.2, c
 def scene_safety():
     z = np.load("data/raw/cases3d.npz")
     cols = {"P": ORANGE, "NMPC": BLUE, "NMPC+CBF": VIOLET}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     p = pv.Plotter(off_screen=True, window_size=(2600, 950), shape=(1, 3))
     for k, (case, ttl, tw) in enumerate((("S3_braking_dropout", "S3: leader braking 4 m/s + 250 ms dropout", (14, 26)),
                                          ("S5_combined", "S5: combined disturbance", (14, 28)),
@@ -199,7 +200,7 @@ def scene_safety():
             m = (t >= tw[0]) & (t <= tw[1])
             pts = np.column_stack([-dxr[m], dyr[m], np.full(m.sum(), 0.05)])
             trail(p, pts, radius=0.07, color=cols[c])
-            i = np.argmin(d); mins.append((c, d[i]))
+            i = np.argmin(d); mins.append((clab[c], d[i]))
             add_uav(p, -dxr[i], dyr[i], 0.0, 90.0, bank_deg=0.0, accent=cols[c])
             p.add_mesh(pv.Sphere(radius=0.18, center=(-dxr[i], dyr[i], 0.2)), color=cols[c])
         txt = "\n".join(f"{c}: min separation {m:.2f} m" for c, m in mins)
