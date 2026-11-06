@@ -50,7 +50,7 @@ def X3_sens():
     order = t.assign(a=t.delta_Wh.abs()).groupby("factor").a.max().sort_values().index
     for i, f in enumerate(order):
         r_lo = t[(t.factor == f) & (t.setting == "low")].iloc[0]
-            if abs(r.delta_Wh) < 0.08:
+        r_hi = t[(t.factor == f) & (t.setting == "high")].iloc[0]
                 dx_txt = -0.14 if lab == "low" else 0.14
                 ha_txt = "right" if lab == "low" else "left"
             else:
