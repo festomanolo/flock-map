@@ -33,6 +33,6 @@ figures3d:
 docx:
 	cd manuscript && $(PY) make_docx.py
 paper:
-	cd manuscript && latexmk -pdf -interaction=nonstopmode main.tex
+	cd manuscript && (latexmk -pdf -interaction=nonstopmode main.tex || tectonic -k main.tex) && cp main.pdf ../outputs/FlockMap_manuscript.pdf
 clean:
 	rm -rf figures/out manuscript/*.aux manuscript/*.log manuscript/*.bbl manuscript/*.blg manuscript/*.fls manuscript/*.fdb_latexmk
