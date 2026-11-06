@@ -63,7 +63,8 @@ if os.path.exists(f"{P}/extra_cbf_ablation.csv"):
     a = pd.read_csv(f"{P}/extra_cbf_ablation.csv")
     put("cbfAblSeeds", int(a.seed.nunique()), "{:d}")
     for sc, K in (("S3_braking_dropout", "Three"), ("S5_combined", "Five"), ("S6_overcapability", "Six")):
-        for mg in (0.0, 0.5, 1.0, 2.0):
+        for mg, k in ((0.0, "Mzero"), (0.5, "Mhalf"), (1.0, "Mone"), (1.5, "Monehalf"), (2.0, "Mtwo")):
+            g = a[(a.scenario == sc) & (a.margin == mg)]
             g = a[(a.scenario == sc) & (a.margin == mg)]; k = {0.0:"Mzero",0.5:"Mhalf",1.0:"Mone",2.0:"Mtwo"}[mg]
             put(f"cbf{K}V{k}", 100 * g.violated.mean(), "{:.0f}"); put(f"cbf{K}E{k}", g.rms_ey.mean(), "{:.2f}"); put(f"cbf{K}S{k}", 1e4 * g.mean_dcd.mean(), "{:.1f}")
 if os.path.exists(f"{P}/extra_step.csv"):
