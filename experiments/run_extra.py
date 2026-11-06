@@ -186,7 +186,7 @@ def sec_ctl():
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
     with ctx.Pool(min(3, nw)) as p:
         st = list(p.imap(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)]))
-    pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done")
+    pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done", flush=True)
 
 
 if __name__ == "__main__":
