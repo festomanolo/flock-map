@@ -24,6 +24,7 @@ manuscript/*.fls
 manuscript/*.fdb_latexmk
 manuscript/*.spl
 manuscript/*.out
+manuscript/docx_build/
 manuscript/*.docx
 manuscript/main.pdf
 
