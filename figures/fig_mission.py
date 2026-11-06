@@ -262,7 +262,7 @@ def fig14():
     ax.bar(np.arange(6) + 0.15, [g[g.scenario == s].sat_frac.mean() * 100 for s in order], width=0.3, color=C["yellow"], label="input saturated (% of time)", edgecolor="white")
     ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.legend(fontsize=6.3); ax.set_ylabel("%")
     from matplotlib.lines import Line2D
-    fig.legend(handles=[Line2D([], [], marker="o", ls="", color=cols[c], label=c) for c in cols], ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.03), fontsize=7)
+    fig.legend(handles=[Line2D([], [], marker="o", ls="", color=cols[c], label=clab[c]) for c in cols], ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.03), fontsize=7)
     fig.tight_layout(); save(fig, "fig14_safety_tracking")
 
 
