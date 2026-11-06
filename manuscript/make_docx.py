@@ -454,6 +454,7 @@ t = replace_cmd_nargs(t, "num", 1, lambda args, pos: fmt_num_plain(args[0]))
 # Balanced unwrapping of \resizebox{w}{h}{content} -> content and removal of \renewcommand
 t = replace_cmd_nargs(t, "resizebox", 3, lambda args, _pos: args[2])
 t = replace_cmd_nargs(t, "renewcommand", 2, lambda _args, _pos: "")
+t = replace_cmd_nargs(t, "DeclareSIUnit", 2, lambda _args, _pos: "")
 
 # Clean layout commands
 for pat in (
