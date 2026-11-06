@@ -268,6 +268,11 @@ class PlanformWing(Wing):
         for j in range(n):
             A_LS_cp[:, j] = _horseshoe_pts(self.cp + off_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
             A_LS_bd[:, j] = _horseshoe_pts(self.bd + off_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+        rhs = -va * al * np.ones(n)
+        if two_way_leader:
+            # Influence of starboard + mirrored port follower on leader cp / bd:
+            A_FL_cp = np.zeros((n, n))
+            A_FL_bd = np.zeros((n, n))
 
 _PW = {}
 
