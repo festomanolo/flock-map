@@ -128,7 +128,7 @@ def fig04():
     DY, DX = np.meshgrid(dy, dx); ax.contourf(dy, dx, np.hypot(DX, DY), levels=[0, 2.0], colors="none", hatches=["////"])
     ax.contour(dy, dx, np.hypot(DX, DY), levels=[2.0], colors=C["red"], linewidths=1.2)
     ax.text(0.52, 1.65, "inside $D_{safe}=2b$", color=C["red"], fontsize=6.5)
-    ax.plot(0.80, 3.0, "k^", ms=6, label="manuscript optimum"); ax.plot(0.85, 3.0, "ko", ms=5, mfc="w", label="nominal slot (this study)")
+    ax.plot(0.80, 3.0, "k^", ms=6, label="preliminary optimum"); ax.plot(0.85, 3.0, "ko", ms=5, mfc="w", label="nominal slot (this study)")
     from matplotlib.patches import Ellipse
     ax.add_patch(Ellipse((0.85, 3.0), 2 * sy, 2 * sx, fill=False, ec=C["ink"], lw=0.8, ls="-"))
     ax.set_xlabel("lateral offset $d_y/b$"); ax.set_ylabel("longitudinal offset $d_x/b$"); ax.legend(loc="upper right", fontsize=6.5)
