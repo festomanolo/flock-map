@@ -204,7 +204,7 @@ def scene_safety():
             add_uav(p, -dxr[i], dyr[i], 0.0, 90.0, bank_deg=0.0, accent=cols[c])
             p.add_mesh(pv.Sphere(radius=0.18, center=(-dxr[i], dyr[i], 0.2)), color=cols[c])
         txt = "\n".join(f"{c}: min separation {m:.2f} m" for c, m in mins)
-        p.add_text(f"{ttl}\n{txt}", font_size=9, position="upper_left", color=INK)
+        p.add_text(f"{ttl}\n{txt}", font_size=13, position="upper_left", color=INK)
         p.camera_position = [(-22.0, -26.0, 17.0), (-3.0, 0.8, 0.0), (0, 0, 1)]
     save(p, "B1_safety_sphere")
 
