@@ -81,6 +81,10 @@ def cp_scene(case):
 
 
 def vortex_scene(case):
+    v = vtkdir(case)
+    if not os.path.exists(os.path.join(v, "internal.vtu")):
+        _enhance_archived_render(
+            f"K2_vortex_{case}.png",
     I, pa, meta = load(case)
     box = I.clip_box([-1.0, 13.0, 0.0, 3.2, -1.2, 1.2], invert=False).cell_data_to_point_data()
     d = box.compute_derivative(scalars="U", qcriterion=True, vorticity=True)
