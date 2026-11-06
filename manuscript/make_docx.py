@@ -365,7 +365,7 @@ def fmt_unit_plain(u: str) -> str:
     u = u.replace(r"\per", "/")
     u = u.replace(r"m\ohm", "mΩ").replace(r"\ohm", "Ω")
     u = u.replace(r"\micro", "μ")
-    u = u.replace(r"\degree", "°").replace(r"\percent", "%")
+    u = u.replace(r"\degree", "°").replace(r"\percent", r"\%")
     u = re.sub(r"\^\{([0-9+-]+)\}", lambda m: m.group(1).translate(SUP_MAP), u)
     u = re.sub(r"\^([0-9])", lambda m: m.group(1).translate(SUP_MAP), u)
     u = u.replace(r"\,", " ").replace("~", " ")
