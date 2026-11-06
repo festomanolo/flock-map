@@ -296,7 +296,7 @@ def scene_rollup():
         cs = pv.Spline(nodes[k], 100).tube(radius=0.08); p.add_mesh(cs, color=c)
     # leader, scaled for visibility
     p.add_mesh(pv.Sphere(radius=0.0001), color="w")
-    p.add_text("(a) free wake 0–115 m (0–54 b): sheet bows, tips start to curl; cross-sections at 10/40/80/110 m", font_size=10, position="upper_left", color=INK)
+    p.add_text("(a) free wake 0–115 m (0–54 b): sheet bows, tips start to curl; cross-sections at 10/40/80/110 m", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-34, -26, 11), (34, 0, -0.5), (0, 0, 1)]
     p.subplot(0, 1); p.set_background("white", top="#dfe3ea")
     for xs, c in ((5, "#7a8cff"), (10, BLUE), (40, AQUA), (80, YEL), (110, VIOLET)):
