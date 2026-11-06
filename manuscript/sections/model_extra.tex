@@ -22,7 +22,7 @@ The preliminary version used $2\pi/(bS)$ in front of the integral, which has dim
 The CFD campaign uses an idealized wing-only geometry (Table~\ref{tab:cfdgeom}) rather than the rectangular-equivalent wing of the earlier models, so that CFD and vortex-lattice results are comparable on identical planforms (distinct from the cambered physical Skywalker-X8 airframe characterised in wind-tunnel and flight-identification studies \cite{gryte2018,reinhardt2022}). The planform vortex lattice places one horseshoe per span station with the bound vortex on the local quarter-chord line (swept polyline) and control points at $3c/4$; trailing legs are planar and parallel to the freestream. Forces use the Kutta--Joukowski relation; evaluating induced drag on the swept bound-vortex midpoints with a single chordwise panel gives $C_L=\nplanCL$ at $\alpha=3^\circ$, $C_{L\alpha}=\nplanCla$\,rad$^{-1}$ ($AR=\nplanAR$), and an apparent near-field Oswald factor of \nplanE{} ($>1$ due to single-panel swept bound-vortex self-upwash bias across the root kink, whereas far-field Trefftz-plane integration of the same trailing wake gives $e_{\mathrm{TP}}=\nplanETP$); near-field integration is retained only so that isolated and follower induced drag share identical bound-vortex quadrature, using differences rather than absolute drag. In the baseline cross-check, a single follower is solved one-way in the Biot--Savart velocity field of the isolated leader ($\Delta C_L=\nplanOneDCL$ at $d_x=3b$, $d_y=0.85b$). Because the OpenFOAM half-model enforces a symmetry plane at $y=0$ (Sec.~\ref{sec:cfdsetup}), we also solve the coupled symmetric three-wing VLM including the mirror-image second follower at $-d_y$ (centre separation $2d_y=1.7b=\SI{3.60}{m}$ at the nominal slot) and two-way upstream induction on the leader: mutual follower-to-follower upwash increases the follower lift increment to $\Delta C_L=\nplanSymDCL$ ($\nplanSymPct$\,\%), while upstream induction changes the leader's $C_L$ by only $\nplanSymLeadPct$\,\% (Sec.~\ref{sec:cfd}).
 \begin{table}[H]\centering\small
 \caption{Geometry of the CFD wing (clean wing, symmetric section, no twist, no winglets, no pod).}\label{tab:cfdgeom}
-\begin{tabular}{@{}lll@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lll@{}}\toprule
 Quantity & Value & Note\\\midrule
 span $b$ & \SI{2.12}{m} & same as the aircraft model\\
 root / tip chord & \SI{0.52}{m} / \SI{0.25}{m} & linear taper\\
@@ -32,7 +32,7 @@ mean aerodynamic chord & \SI{\ncfdMAC}{m} & $Re=\Va\,\overline{c}/\nu=\nReMAC\ti
 aspect ratio & \ncfdAR & $b^2/S$\\
 section & NACA-0009-type thickness, blunt trailing edge at 98.5\,\% chord & thickness 9\,\% (root and tip)\\
 reference point for moments & root quarter chord (leader), follower root quarter chord (follower) & \\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}
 
 \subsection{OpenFOAM RANS set-up}\label{sec:cfdsetup}
 \paragraph{Solver and models} Steady incompressible RANS with \texttt{simpleFoam} (OpenFOAM v1912, ESI; Ubuntu package 1912.200626) in SIMPLEC mode, $k$--$\omega$ SST turbulence closure, wall functions (\texttt{nutkWallFunction}, \texttt{omegaWallFunction}, \texttt{kqRWallFunction}), freestream $U_\infty=\SI{18}{m/s}$, $\nu=\SI{1.5e-5}{m^2/s}$, $\rho=\SI{1.225}{kg/m^3}$, turbulence intensity 0.1\,\% (inlet $k=1.5(IU)^2$, $\omega=\sqrt{k}/(C_\mu^{1/4}\ell)$ with $\ell=\SI{0.01}{m}$). Convection of momentum uses \texttt{linearUpwindV} with a cell-limited gradient, turbulence quantities use bounded upwind, the pressure equation GAMG (tolerance $10^{-8}$, relative $0.05$). Relaxation factors are 0.9 with the consistent (SIMPLEC) formulation. Convergence is monitored by residuals ($p$, $U$, $k$, $\omega$) and, for key cases, by the force coefficients at saved iterations.
@@ -44,7 +44,7 @@ reference point for moments & root quarter chord (leader), follower root quarter
 \paragraph{Force post-processing without function objects} The OpenFOAM v1912 binaries shipped with Ubuntu~24.04 abort in \texttt{functionObjectList} (an \texttt{OSHA1stream} error) whenever \emph{any} function object is present in \texttt{controlDict}, in serial and in parallel. Forces are therefore computed in Python from the exported patch fields (\texttt{foamToVTK}): the pressure force is $\rho\sum p\,\mathbf{n}\,A$ over the wing faces (outward normal of the fluid domain), the viscous force $\rho\sum(\nu+\nu_{t,w})\,\mathbf{U}_t/y\;A$ with the tangential owner-cell velocity $\mathbf U_t$ and wall distance $y$ of the owner cell centre---the same expression OpenFOAM evaluates as $\nu_{\mathrm{eff}}\,\partial\mathbf{U}/\partial n$ for wall-function patches. Leader loads are doubled for the half model. The routine is exercised by the unit tests and cross-checked on the isolated wing against the vortex-lattice lift (Sec.~\ref{sec:cfd}).
 \begin{table}[H]\centering\small
 \caption{OpenFOAM meshes (isolated half-wing, $\alpha=3^\circ$) and wall-function resolution.}\label{tab:cfdmesh}
-\begin{tabular}{@{}lccccc@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccccc@{}}\toprule
 Level & surface levels (min,max) & wake box level & tip box level & cells (isolated) & $y^+$ mean (5--95\,\%)\\\midrule
 \input{tables/tab_cfdmesh.tex}\\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}

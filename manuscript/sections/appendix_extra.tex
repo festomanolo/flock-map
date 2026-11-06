@@ -2,7 +2,7 @@
 Every numerical input carries a provenance tag: \textbf{MS} -- taken from the preliminary manuscript and not independently re-measured on a specific test airframe (baseline aerodynamic values are cross-checked against published Skywalker-X8 wind-tunnel and flight-identification ranges \cite{gryte2018,reinhardt2022}); \textbf{DER} -- derived from other parameters; \textbf{ASM} -- an assumption introduced in this study that must be replaced by measurement. Values are those locked in \texttt{src/flockmap/config.py}.
 \begin{table}[H]\centering\small
 \caption{Aircraft, propulsion and battery parameters.}\label{tab:appparams1}
-\begin{tabular}{@{}llll@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}llll@{}}\toprule
 Quantity & Symbol & Value & Tag\\\midrule
 Mass & $m$ & \SI{3.5}{kg} & MS\\
 Span / area / aspect ratio & $b,\,S,\,AR$ & \SI{2.12}{m}, \SI{0.80}{m^2}, 5.62 & MS/DER\\
@@ -19,10 +19,10 @@ Battery & -- & 6S, \SI{10}{Ah}, 80\,\% usable & MS\\
 Pack internal resistance & $R_{\mathrm{int}}$ & \SI{20}{m\ohm} & ASM\\
 Wake core fraction (analytic) & $r_{c0}/b$ & 0.05 & MS\\
 Effective eddy viscosity & $\nu_{\mathrm{eff}}$ & \SI{0.002}{m^2/s} & MS (uncalibrated)\\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}
 \begin{table}[H]\centering\small
 \caption{Camera and survey parameters.}\label{tab:appparams2}
-\begin{tabular}{@{}llll@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}llll@{}}\toprule
 Quantity & Symbol & Value & Tag\\\midrule
 Sensor & -- & $5472\times3648$\,px, $13.2\times8.8$\,mm & MS\\
 Focal length & $f$ & \SI{9}{mm} & MS\\
@@ -32,12 +32,12 @@ Forward overlap & $o_f$ & 0.75 & MS\\
 Side overlap (baseline / claimed) & $o_s$ & 0.65 / 0.58 & MS (0.58 unverified)\\
 Survey block & -- & \SI{1}{km}$\times$\SI{1}{km} (\SI{100}{ha}) at \SI{2.5}{km} & MS\\
 Wind & $U$ & $\mathcal U(2,6)$\,m/s, uniform direction & ASM\\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}
 
 \section{Software and numerical environment}\label{app:software}
 \begin{table}[H]\centering\small
 \caption{Software used to produce and verify the results in this paper.}\label{tab:software}
-\begin{tabular}{@{}ll@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}ll@{}}\toprule
 Component & Version / setting\\\midrule
 Python & 3.12.8; NumPy 2.1.3, SciPy 1.18.0, pandas 3.1.1, matplotlib 3.11.2\\
 Optimal control & CasADi 3.8.2 with IPOPT; RK4 multiple shooting, $N=25$, $\Delta t=\SI{0.1}{s}$\\
@@ -49,7 +49,7 @@ Parallel decomposition & \texttt{simple}, 3 ranks (scotch unavailable in this bu
 Force post-processing & Python on \texttt{foamToVTK} patch fields (function objects unavailable, Sec.~\ref{sec:cfdsetup})\\
 Typesetting & \LaTeX\ (\texttt{elsarticle}, Tectonic 0.15.0); DOCX via pandoc 3.9 + \texttt{python-docx} 1.2.0\\
 Tests & \texttt{pytest} 9.1.1: 19 unit tests (closed-form limits, audit reproductions, artifact checks)\\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}
 
 \section{Reproducibility checklist}\label{app:repro}
 \begin{itemize}
