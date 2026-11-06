@@ -93,7 +93,7 @@ Flight tests & \textbf{Not executed} & --\\\bottomrule
 %==============================================================================================
 \section{System model}\label{sec:model}
 \subsection{Aircraft, propulsion and battery}
-The reference aircraft is a Skywalker-X8-class flying wing (mass \SI{3.5}{kg}, span $b=\SI{2.12}{m}$, area $S=\SI{0.80}{m^2}$, $AR=5.62$) with a parabolic polar $C_D=C_{D0}+k_0C_L^2$, $k_0=1/(\pi AR\,e_0)$. Table~\ref{tab:params} lists parameters with provenance; most values are taken from the preliminary version and have \emph{not} been independently measured. In level flight at $\Va=\SI{18}{m/s}$, $C_L=\nCLiso$, $L/D=\nLoverD$ and electrical load $P=\SI{\npIso}{W}$:
+The reference aircraft is a Skywalker-X8-class flying wing (mass \SI{3.5}{kg}, span $b=\SI{2.12}{m}$, area $S=\SI{0.80}{m^2}$, $AR=5.62$) with a parabolic polar $C_D=C_{D0}+k_0C_L^2$, $k_0=1/(\pi AR\,e_0)$. Table~\ref{tab:params} lists parameters with provenance; most values are taken from the preliminary version and have \emph{not} been independently measured on a specific test airframe, although cross-checking against published Skywalker-X8 wind-tunnel and flight-identification datasets \cite{gryte2018,reinhardt2022} confirms that the inherited zero-lift drag ($C_{D0}=0.024$, versus $0.021$--$0.026$ in wind-tunnel tests of an X8 airframe with fuselage pod and motor mount \cite{gryte2018}) and cruise lift-to-drag ratio ($L/D=\nLoverD$ at $C_L=\nCLiso$, where induced drag accounts for $\approx12.1\,\%$ of total drag) lie well within the published experimental envelope. In level flight at $\Va=\SI{18}{m/s}$, $C_L=\nCLiso$, $L/D=\nLoverD$ and electrical load $P=\SI{\npIso}{W}$:
 \begin{equation}
 P_{\mathrm{el}}=\frac{D\,\Va}{\eta_p}+P_{\mathrm{hotel}},\qquad D=\tfrac12\rho\Va^2S\,[C_{D0}+k_0C_L^2],\quad C_L=\frac{mg}{\tfrac12\rho\Va^2S\cos\phi}.
 \end{equation}
@@ -106,7 +106,7 @@ A banked turn at $\phi=\SI{25}{\degree}$ draws \SI{\npTurn}{W}. Battery energy i
 \toprule
 Parameter & Value & Tag & Note\\\midrule
 $m$, $b$, $S$ & \SI{3.5}{kg}, \SI{2.12}{m}, \SI{0.80}{m^2} & M &\\
-$C_{D0}$, $e_0$ & 0.024, 0.80 & M & ``wind-tunnel'' values, not re-verified\\
+$C_{D0}$, $e_0$ & 0.024, 0.80 & M & consistent with X8 wind-tunnel range \cite{gryte2018}; not re-measured\\
 $\eta_p$, $P_{\mathrm{hotel}}$ & 0.68, \SI{28}{W} & M & constant; real motor/prop efficiency varies\\
 $C_{l\delta_a}$, $k_{\mathrm{trim}}$ & \SI{0.15}{rad^{-1}}, \SI{0.035}{rad^{-2}} & M & trim-drag law unvalidated\\
 $\nu_{\mathrm{eff}}$, $r_{c0}$ & \SI{0.002}{m^2/s}, $0.05b$ & M & uncalibrated; varied in Sec.~\ref{sec:sens}\\
