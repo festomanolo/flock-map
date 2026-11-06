@@ -160,3 +160,8 @@ def test_compiled_manuscript_pdf_and_docx_completeness():
     docx_path = os.path.join(root, "FlockMap_manuscript.docx")
     assert os.path.exists(pdf_path) and os.path.exists(docx_path)
     with pymupdf.open(pdf_path) as pdf:
+        assert pdf.page_count >= 35
+        full_pdf = "\n".join(page.get_text("text") for page in pdf)
+        assert "??" not in full_pdf and "VLM rolled-up" in full_pdf
+    d = docx.Document(docx_path)
+    M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
