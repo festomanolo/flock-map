@@ -27,7 +27,117 @@ from docx.shared import Pt
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 
-def inline(s, depth=0):
+W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+
+
+def read(p: str) -> str:
+    with open(p, encoding="utf8") as f:
+        return f.read()
+
+
+# ---------------------------------------------------------------------------
+# 1. Balanced-brace scanning utilities
+# ---------------------------------------------------------------------------
+def parse_braced(s: str, pos: int) -> tuple[str, int] | None:
+    """If s[pos] == '{', return (inner_text, index_after_closing_brace)."""
+    if pos >= len(s) or s[pos] != "{":
+        return None
+    depth = 0
+    i = pos
+    while i < len(s):
+        ch = s[i]
+        if ch == "\\" and i + 1 < len(s):
+            i += 2
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return s[pos + 1 : i], i + 1
+        i += 1
+    return None
+
+
+def replace_cmd_nargs(s: str, cmd: str, nargs: int, repl_fn) -> str:
+    """Replace \\cmd{arg1}...{argN} (with balanced nested braces) using repl_fn(args, start_pos)."""
+    pat = re.compile(r"\\" + re.escape(cmd) + r"(?![A-Za-z])")
+    out = []
+    pos = 0
+    while True:
+        m = pat.search(s, pos)
+        if not m:
+            out.append(s[pos:])
+            break
+        cur = m.end()
+        # skip optional whitespace between command and {
+        args = []
+        ok = True
+        for _ in range(nargs):
+            while cur < len(s) and s[cur] in " \t":
+                cur += 1
+            res = parse_braced(s, cur)
+            if res is None:
+                ok = False
+                break
+            arg, cur = res
+            args.append(arg)
+        if not ok:
+            out.append(s[pos : m.end()])
+            pos = m.end()
+        else:
+            out.append(s[pos : m.start()])
+            out.append(repl_fn(args, m.start()))
+            pos = cur
+    return "".join(out)
+
+
+def compute_math_mask(s: str) -> bytearray:
+    """Return mask[i] == 1 where index i is inside inline $...$ or display math."""
+    mask = bytearray(len(s))
+    for pat in (
+        r"\\begin\{(?:equation\*?|align\*?|gather\*?|multline\*?)\}.*?\\end\{(?:equation\*?|align\*?|gather\*?|multline\*?)\}",
+        r"\\\[.*?\\\]",
+    ):
+        for m in re.finditer(pat, s, flags=re.S):
+            for k in range(m.start(), m.end()):
+                mask[k] = 1
+    i = 0
+    in_inline = False
+    start = 0
+    while i < len(s):
+        if mask[i]:
+            i += 1
+            continue
+        if s[i] == "\\" and i + 1 < len(s):
+            i += 2
+            continue
+        if s[i] == "$":
+            if not in_inline:
+                in_inline = True
+                start = i
+            else:
+                for k in range(start, i + 1):
+                    mask[k] = 1
+                in_inline = False
+        i += 1
+    return mask
+
+
+# ---------------------------------------------------------------------------
+# 2. Inline \input{...} and expand macros
+# ---------------------------------------------------------------------------
+macs: dict[str, str] = {}
+for fn in ("numbers.tex", "numbers_extra.tex"):
+    if os.path.exists(fn):
+        for m in re.finditer(r"\\newcommand\{\\(\w+)\}\{([^\n]*)\}\s*$", read(fn), re.M):
+            val = m.group(2).strip()
+            val = re.sub(r"\\ensuremath\{([^{}]*)\}", r"\1", val)
+            macs[m.group(1)] = val
+
+
+def inline_inputs(s: str) -> str:
     def rep(m):
         p = m.group(1) if m.group(1).endswith(".tex") else m.group(1) + ".tex"
         if os.path.basename(p) in ("numbers.tex", "numbers_extra.tex"): return ""
