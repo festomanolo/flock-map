@@ -196,6 +196,7 @@ def X12_cbf():
     fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.7)); cols = {"S3_braking_dropout": C["blue"], "S5_combined": C["orange"], "S6_overcapability": C["red"]}
     for ax, col, yl, l in ((axs[0], "violated", "trials with $h<0$ (%)", "a"), (axs[1], "rms_ey", "RMS lateral error (m)", "b"), (axs[2], "mean_dcd", "mean $\\Delta C_D \\times 10^4$", "c")):
         panel(ax, l)
+        mult = 100.0 if col == "violated" else (1e4 if col == "mean_dcd" else 1.0)
         for sc, cc in cols.items():
             g = d[d.scenario == sc].groupby("margin")[col].mean(); ax.plot(g.index, g.values * (100 if col == "violated" else 1), "o-", ms=3, color=cc, label=sc.split("_")[0])
         ax.set_xlabel("HOCBF margin $\\Delta D$ (m)"); ax.set_ylabel(yl)
