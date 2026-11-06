@@ -451,7 +451,7 @@ def _repl_si_unit(args, pos):
 t = replace_cmd_nargs(t, "si", 1, _repl_si_unit)
 t = replace_cmd_nargs(t, "num", 1, lambda args, pos: fmt_num_plain(args[0]))
 
-# Balanced unwrapping of \resizebox{w}{h}{content} -> content
+# Balanced unwrapping of \resizebox{w}{h}{content} -> content and removal of \renewcommand
 t = replace_cmd_nargs(t, "resizebox", 3, lambda args, _pos: args[2])
 
 # Clean layout commands
