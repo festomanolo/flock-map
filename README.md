@@ -21,6 +21,6 @@ Run `make test` (19 tests), `make reproduce` (~25 min, 4 cores). Python 3.12.8, 
 
 ## What this is and is not
 A simulation study with an independent aerodynamic cross-check and steady-RANS CFD (OpenFOAM, `make cfd`, ~1.5 h on 3 cores). **Not done:** PX4/Gazebo SITL, HITL, SfM
-reconstruction/checkpoint RMSE, flight tests, wind-tunnel validation. Parameters tagged `[MS]` in `src/flockmap/config.py` come from the preliminary manuscript and were not independently measured; `[ASM]` values are assumptions introduced here.
+reconstruction/checkpoint RMSE, flight tests, close-formation wind-tunnel validation. Parameters tagged `[MS]` in `src/flockmap/config.py` come from the preliminary manuscript (cross-checked against published Skywalker-X8 wind-tunnel and system-identification ranges, not re-measured on a specific airframe); `[ASM]` values are assumptions introduced here.
 
 CFD caveats: the OpenFOAM v1912 binaries shipped with Ubuntu crash on any function object, so forces are integrated in Python from `foamToVTK` patch fields (`cfd/postproc.py`); wall-function meshes without prism layers; the absolute drag is not mesh-converged (see manuscript Sec. 5.7), only differences between flows on the same mesh family are used.
