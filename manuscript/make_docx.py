@@ -24,11 +24,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
-t = read("main.tex")
-# ---- macros from number files
-macs = {}
-for f in ("numbers.tex", "numbers_extra.tex"):
-    for m in re.finditer(r"\\newcommand\{\\(\w+)\}\{([^\n]*)\}\s*$", read(f), re.M): macs[m.group(1)] = m.group(2)
+HERE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(HERE)
 
 def inline(s, depth=0):
     def rep(m):
