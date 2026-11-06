@@ -245,6 +245,10 @@ class PlanformWing(Wing):
         q = 0.5 * rho * va ** 2
         return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), Cl_roll=roll / (q * self.S * self.G.B), gamma=gam)
 
+    def coupled_symmetry_alpha(self, dx, dy, va, alpha_deg, dz=0.0, rho=1.225, two_way_leader=True):
+        """Symmetric 3-aircraft V-formation matching the OpenFOAM y=0 symmetry half-model:
+        leader at (0,0,0), starboard follower at (+dx,+dy,dz), port mirror follower at (+dx,-dy,dz)
+        with mirrored spanwise circulation gamma_port(y_j) = gamma_stbd(-y_j) = gamma_stbd[n-1-j]."""
 
 _PW = {}
 
