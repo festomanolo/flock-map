@@ -361,7 +361,7 @@ def fmt_unit_plain(u: str) -> str:
     if u in (r"\degree", "degree", "^\\circ"):
         return "°"
     if u in (r"\percent", r"\%", "percent"):
-        return "%"
+        return r"\%"
     u = u.replace(r"\per", "/")
     u = u.replace(r"m\ohm", "mΩ").replace(r"\ohm", "Ω")
     u = u.replace(r"\micro", "μ")
