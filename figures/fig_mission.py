@@ -90,7 +90,7 @@ def fig07():
     seed = 0
     for c in ("P", "NMPC", "NMPC+CBF"):
         g = lambda k: ts[f"S5_combined|{c}|{seed}|{k}"]
-        t = g("t"); axs[0].plot(t, g("dy"), color=cols[c], label=c); axs[1].plot(t, g("ex"), color=cols[c])
+        t = g("t"); axs[0].plot(t, g("dy"), color=cols[c], label=clab[c]); axs[1].plot(t, g("ex"), color=cols[c])
         axs[2].plot(t, g("dist"), color=cols[c]); axs[3].plot(t, g("phi"), color=cols[c]); axs[4].plot(t, g("V"), color=cols[c])
     t = ts[f"S5_combined|P|{seed}|t"]; axs[0].plot(t, np.full_like(t, 1.70), "k--", lw=0.8, label="commanded slot"); axs[2].axhline(4.24, color=C["red"], ls="--", lw=0.9)
     axs[2].text(1, 4.45, "$D_{safe}=4.24$ m", color=C["red"], fontsize=6.5)
