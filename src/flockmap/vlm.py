@@ -292,6 +292,11 @@ class PlanformWing(Wing):
             w_tot_L = self.Ab @ gl
         q = 0.5 * rho * va ** 2
         lift = rho * va * np.sum(gam * self.dy)
+        w_tot = (self.Ab + A_mir_bd) @ gam + A_LS_bd @ gl
+        drag_i = -rho * np.sum(gam * self.dy * w_tot)
+        roll = rho * va * np.sum(gam * self.dy * self.ym)
+        lift_L = rho * va * np.sum(gl * self.dy)
+        drag_i_L = -rho * np.sum(gl * self.dy * w_tot_L)
 
 _PW = {}
 
