@@ -105,3 +105,69 @@ def test_cfd_post_residual_parser(tmp_path):
     from postproc import residual_history
     (tmp_path / "log.simpleFoam").write_text("smoothSolver:  Solving for Ux, Initial residual = 0.5, Final residual = 1e-3, No Iterations 1\nGAMG:  Solving for p, Initial residual = 0.1, Final residual = 1e-3, No Iterations 3\n")
     r = residual_history(str(tmp_path)); assert r["Ux"] == [0.5] and r["p"] == [0.1]
+
+
+def test_station_keeping_error_no_singularity_and_monotonic():
+    import pandas as pd
+    p = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_skerr.csv")
+    df = pd.read_csv(p)
+    vs = df[df.model == "vlm_sheet"]
+    assert len(vs) > 0 and vs.mean_pct.max() < 6.0 and vs.mean_pct.min() > 0.0
+    for slot in (0.75, 0.85, 0.95):
+        g = vs[np.isclose(vs.slot_dy_b, slot)].sort_values("sigma_m")
+        diffs = np.diff(g.mean_pct.values)
+        assert np.all(diffs <= 1e-9), f"Non-monotonic station-keeping curve at slot {slot}: {g.mean_pct.values}"
+
+
+def test_planform_trefftz_oswald_and_symmetry_coupling():
+    from flockmap import cfdgeom as G
+    W = vlm.planform_wing(60)
+    iso = W.isolated_alpha(18.0, 3.0)
+    e_tp = iso["CL"] ** 2 / (np.pi * W.AR * iso["CDi_trefftz"])
+    assert 0.95 < e_tp <= 1.02 and iso["CDi_trefftz"] > iso["CDi"]
+    one = W.follower_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0)
+    sym = W.coupled_symmetry_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0, two_way_leader=True)
+    assert (sym["CL"] - iso["CL"]) > (one["CL"] - iso["CL"]) * 1.05
+    assert abs(sym["CL_leader"] - iso["CL"]) / iso["CL"] < 0.01
+
+
+def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
+    import pandas as pd
+    ab = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_cbf_ablation.csv"))
+    ctl = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "raw", "control_trials.csv"))
+    assert set(np.round(ab.margin_m.unique(), 2)) == {0.0, 0.5, 1.0, 1.5, 2.0}
+    for sc in ("S3_braking_dropout", "S5_combined"):
+        v_ab = ab[(ab.scenario == sc) & np.isclose(ab.margin_m, 0.5)].viol_pct.iloc[0]
+        v_ctl = 100.0 * ctl[(ctl.scenario == sc) & (ctl.controller == "NMPC+CBF")].violated.mean()
+        assert abs(v_ab - v_ctl) < 1e-6
+
+
+def test_number_macros_have_no_nan_and_five_paired_models():
+    root = os.path.join(os.path.dirname(__file__), "..", "manuscript")
+    for fn in ("numbers.tex", "numbers_extra.tex"):
+        txt = open(os.path.join(root, fn), encoding="utf8").read().lower()
+        assert "{nan}" not in txt
+    paired = open(os.path.join(root, "tables", "tab_paired.tex"), encoding="utf8").read().strip().splitlines()
+    assert len(paired) == 6
+    for row in paired:
+        assert row.count("&") == 5
+
+
+def test_compiled_manuscript_pdf_and_docx_completeness():
+    import docx, pymupdf
+    root = os.path.join(os.path.dirname(__file__), "..", "manuscript")
+    pdf_path = os.path.join(root, "main.pdf")
+    docx_path = os.path.join(root, "FlockMap_manuscript.docx")
+    assert os.path.exists(pdf_path) and os.path.exists(docx_path)
+    with pymupdf.open(pdf_path) as pdf:
+        assert pdf.page_count >= 35
+        full_pdf = "\n".join(page.get_text("text") for page in pdf)
+        assert "??" not in full_pdf and "VLM rolled-up" in full_pdf
+    d = docx.Document(docx_path)
+    M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+    assert len(d.element.body.findall(f".//{{{M_NS}}}oMath")) == 0
+    assert len(d.tables) >= 16
+    full_docx = "\n".join(p.text for p in d.paragraphs)
+    for req in ("Table 1.", "Table 4.", "Table 9.", "Algorithm 1.", "Figure 1.", "Figure 10.", "Figure 42.", "Figure 43.", "Figure A.1.", "RMSE"):
+        assert req in full_docx, f"Missing '{req}' in DOCX text"
+    assert "\\SI{" not in full_docx and " nan " not in full_docx.lower()
