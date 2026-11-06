@@ -254,6 +254,11 @@ class PlanformWing(Wing):
         off_s = np.array([dx, dy, dz])
         off_p = np.array([dx, -dy, dz])
         # Influence of port follower panel k (whose circulation equals starboard panel n-1-k) on starboard cp / bd:
+        # Relative position of starboard point (cp + off_s) in port follower's frame (origin off_p) is cp + (0, 2*dy, 0).
+        A_mir_cp = np.zeros((n, n))
+        A_mir_bd = np.zeros((n, n))
+        cp_from_port = self.cp + (off_s - off_p)
+        bd_from_port = self.bd + (off_s - off_p)
 
 _PW = {}
 
