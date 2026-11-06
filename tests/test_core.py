@@ -110,3 +110,9 @@ def test_cfd_post_residual_parser(tmp_path):
 def test_station_keeping_error_no_singularity_and_monotonic():
     import pandas as pd
     p = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_skerr.csv")
+    df = pd.read_csv(p)
+    vs = df[df.model == "vlm_sheet"]
+    assert len(vs) > 0 and vs.mean_pct.max() < 6.0 and vs.mean_pct.min() > 0.0
+    for slot in (0.75, 0.85, 0.95):
+        g = vs[np.isclose(vs.slot_dy_b, slot)].sort_values("sigma_m")
+        diffs = np.diff(g.mean_pct.values)
