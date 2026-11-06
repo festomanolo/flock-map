@@ -208,7 +208,7 @@ def fig13():
     cases = [("17 strips, 65 %", 17, 61.6), ("14 strips, 58 % (spec.)", 14, 73.92), ("14 strips, 57.95 %", 14, 74.0)]
     for k, (lab, n, s) in enumerate(cases):
         ax = fig.add_subplot(gs[k]); m = photo.multiplicity_map(photo.strip_centres(n, s), None)
-        im = ax.imshow(m, origin="lower", extent=[0, 1000, 0, 1000], cmap=plt.matplotlib.colors.ListedColormap(["#c3c2b7", "#b7d3f6", "#86b6ef", "#3987e5", "#256abf", "#184f95", "#0d366b"]) if False else "Blues", vmin=0, vmax=12)
+        im = ax.imshow(m, origin="lower", extent=[0, 1000, 0, 1000], cmap="Blues", vmin=0, vmax=12)
         acc, cov, d = photo.accepted_area(m)
         for i in range(10):
             for j in range(10):
