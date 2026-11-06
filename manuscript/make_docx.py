@@ -140,8 +140,9 @@ for fn in ("numbers.tex", "numbers_extra.tex"):
 def inline_inputs(s: str) -> str:
     def rep(m):
         p = m.group(1) if m.group(1).endswith(".tex") else m.group(1) + ".tex"
-        if os.path.basename(p) in ("numbers.tex", "numbers_extra.tex"): return ""
-        return inline(read(p), depth + 1) if os.path.exists(p) else ""
+        if os.path.basename(p) in ("numbers.tex", "numbers_extra.tex"):
+            return ""
+        return inline_inputs(read(p)) if os.path.exists(p) else ""
     return re.sub(r"\\input\{([^}]+)\}", rep, s)
 
 t = inline(t)
