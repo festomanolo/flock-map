@@ -57,6 +57,13 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
     ax.text(0.015, 0.965, title, transform=ax.transAxes, fontsize=22, fontweight="medium", color="#111827", va="top", ha="left")
     cax = fig.add_axes([0.58, 0.09, 0.36, 0.035])
     norm = mcolors.Normalize(vmin=clim[0], vmax=clim[1])
+    cb = fig.colorbar(cm.ScalarMappable(norm=norm, cmap="RdBu_r"), cax=cax, orientation="horizontal")
+    cb.set_label(cbar_label, fontsize=19, color="#111827")
+    cb.ax.tick_params(labelsize=16, colors="#111827")
+    fig.savefig(os.path.join(OUT, fname), dpi=dpi)
+    plt.close(fig)
+
+
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
     shown_bar = False
