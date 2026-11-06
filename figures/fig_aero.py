@@ -64,7 +64,7 @@ def fig01():
     ax.view_init(22, -62); ax.grid(False)
     for a_ in (ax.xaxis, ax.yaxis, ax.zaxis): a_.pane.set_alpha(0.0)
     sm = plt.cm.ScalarMappable(norm=norm, cmap=DIV)
-    cb = fig.colorbar(sm, ax=ax, orientation="horizontal", shrink=0.5, pad=0.02, aspect=30); cb.set_label("vertical induced velocity $w$ in the followers' plane, $d_x=3b$ (m/s); upwash $+$")
+    cb = fig.colorbar(sm, ax=ax, orientation="horizontal", shrink=0.5, pad=0.02, aspect=30); cb.set_label("vertical induced velocity $w$ (m/s) in the followers' plane ($d_x=3b$); upwash $+$")
     save(fig, "fig01_wake_3d")
 
 
