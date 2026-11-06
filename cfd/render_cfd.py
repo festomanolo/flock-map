@@ -39,7 +39,7 @@ def cp_scene(case):
             shown_bar = True
     xc = 0.5 * meta["follower"][1] * B if meta.get("follower") else 0.0
     p.camera_position = [(xc - 2.5, -5.5, 4.2), (xc, 0.0, 0.0), (0, 0, 1)]
-    p.add_text(f"{case}: surface pressure coefficient (RANS, k-omega SST)", font_size=11, color="black", position="upper_left")
+    p.add_text(f"{case}: surface pressure coefficient Cp (RANS, k-omega SST)", font_size=15, color="black", position="upper_left")
     p.screenshot(os.path.join(OUT, f"K1_cp_{case}.png")); p.close()
 
 
