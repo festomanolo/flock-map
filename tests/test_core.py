@@ -154,3 +154,9 @@ def test_number_macros_have_no_nan_and_five_paired_models():
 
 
 def test_compiled_manuscript_pdf_and_docx_completeness():
+    import docx, pymupdf
+    root = os.path.join(os.path.dirname(__file__), "..", "manuscript")
+    pdf_path = os.path.join(root, "main.pdf")
+    docx_path = os.path.join(root, "FlockMap_manuscript.docx")
+    assert os.path.exists(pdf_path) and os.path.exists(docx_path)
+    with pymupdf.open(pdf_path) as pdf:
