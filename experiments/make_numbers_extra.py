@@ -84,6 +84,11 @@ put("mcRange", np.ptp(pv_["S1_independent"].values), "{:.1f}"); put("mcSD1", pv_
 # ---- planform VLM (CFD geometry)
 Wp = vlm.planform_wing(80); r0 = Wp.isolated_alpha(18.0, 3.0); r1 = Wp.isolated_alpha(18.0, 0.0); r2_ = Wp.isolated_alpha(18.0, 6.0)
 put("planCL", r0["CL"], "{:.3f}"); put("planCla", (r2_["CL"] - r1["CL"]) / np.radians(6.0), "{:.2f}"); put("planAR", Wp.AR, "{:.2f}"); put("planE", r0["CL"] ** 2 / (np.pi * Wp.AR * r0["CDi"]), "{:.2f}")
+put("planETP", r0["CL"] ** 2 / (np.pi * Wp.AR * r0["CDi_trefftz"]), "{:.2f}")
+rf1 = Wp.follower_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0); rfs = Wp.coupled_symmetry_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0, two_way_leader=True)
+put("planOneDCL", rf1["CL"] - r0["CL"], "{:+.4f}"); put("planSymDCL", rfs["CL"] - r0["CL"], "{:+.4f}")
+put("planSymPct", 100.0 * ((rfs["CL"] - r0["CL"]) / (rf1["CL"] - r0["CL"]) - 1.0), "{:+.1f}")
+put("planSymLeadPct", 100.0 * (rfs["leader_CL"] / r0["CL"] - 1.0), "{:+.2f}")
 put("cfdS", G.area(), "{:.3f}"); put("cfdMAC", G.mac(), "{:.3f}"); put("cfdAR", G.B ** 2 / G.area(), "{:.2f}"); put("ReMAC", 18.0 * G.mac() / 1.5e-5 / 1e5, "{:.1f}")
 
 # ---- CFD campaign ------------------------------------------------------------------------------------------------
@@ -92,9 +97,10 @@ rows_tab = []
 if os.path.exists(cs):
     df = pd.read_csv(cs).set_index("case"); put("cfdNcases", len(df), "{:d}")
     iso_ = df[df.index.str.startswith("iso_a3_L")].sort_values("level")
-    labs = {0: "L0 (coarse)", 1: "L1 (medium)", 2: "L2 (fine)"}; sl = {0: "(4,5)", 1: "(5,6)", 2: "(6,7)"}; wl = {0: 2, 1: 3, 2: 3}; tl = {0: 3, 1: 4, 2: 5}
+    labs = {0: "L0 (coarse)", 1: "L1 (medium)", 2: "L2 (fine)"}; sl = {0: "(4, 5)", 1: "(5, 6)", 2: "(6, 7)"}; wl = {0: 2, 1: 3, 2: 3}; tl = {0: 3, 1: 4, 2: 5}
     for lv, r in iso_.iterrows():
-        L = int(r.level); rows_tab.append(f"{labs[L]} & {sl[L]} & {wl[L]} & {tl[L]} & {int(r.cells):,} & {r.yplus:.0f} ({r.yp05:.0f}--{r.yp95:.0f})".replace(",", "\\,"))
+        L = int(r.level); cells_s = f"{int(r.cells):,}".replace(",", "\\,")
+        rows_tab.append(f"{labs[L]} & {sl[L]} & {wl[L]} & {tl[L]} & {cells_s} & {r.yplus:.0f} ({r.yp05:.0f}--{r.yp95:.0f})")
         put(f"yplus{['Zero','One','Two'][L]}", r.yplus, "{:.0f}")
     open("manuscript/tables/tab_cfdmesh.tex", "w").write(" \\\\\n".join(rows_tab) + "\n")
     for L, K in ((0, "Zero"), (1, "One"), (2, "Two")):
