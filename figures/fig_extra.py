@@ -52,7 +52,6 @@ def X3_sens():
         r_lo = t[(t.factor == f) & (t.setting == "low")].iloc[0]
         r_hi = t[(t.factor == f) & (t.setting == "high")].iloc[0]
         for lab, r, c in (("low", r_lo, C["orange"]), ("high", r_hi, C["blue"])):
-                ha_txt = "right" if lab == "low" else "left"
             else:
                 dx_txt = 0.14 if r.delta_Wh >= 0 else -0.14
                 ha_txt = "left" if r.delta_Wh >= 0 else "right"
