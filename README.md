@@ -17,7 +17,7 @@ tests/             pytest (closed-form checks and audit findings)
 docs/              FIGURE_MAP.md, JOURNAL_FORMAT.md, NEXT_STEPS.md
 ```
 
-Run `make test` (14 tests), `make reproduce` (~25 min, 4 cores). Python 3.13, numpy 2.5, scipy 1.18, casadi 3.8.
+Run `make test` (19 tests), `make reproduce` (~25 min, 4 cores). Python 3.12.8, NumPy 2.1.3, SciPy 1.18.0, pandas 3.1.1, CasADi 3.8.2.
 
 ## What this is and is not
 A simulation study with an independent aerodynamic cross-check and steady-RANS CFD (OpenFOAM, `make cfd`, ~1.5 h on 3 cores). **Not done:** PX4/Gazebo SITL, HITL, SfM
