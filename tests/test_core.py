@@ -138,7 +138,7 @@ def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
     assert ab.seed.nunique() == 30
     assert set(np.round(ab.margin.unique(), 2)) == {0.0, 0.5, 1.0, 1.5, 2.0}
     for sc in ("S3_braking_dropout", "S5_combined"):
-        v_ab = ab[(ab.scenario == sc) & np.isclose(ab.margin_m, 0.5)].viol_pct.iloc[0]
+        v_ab = 100.0 * ab[(ab.scenario == sc) & np.isclose(ab.margin, 0.5)].violated.mean()
         v_ctl = 100.0 * ctl[(ctl.scenario == sc) & (ctl.controller == "NMPC+CBF")].violated.mean()
         assert abs(v_ab - v_ctl) < 1e-6
 
