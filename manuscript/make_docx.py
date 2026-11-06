@@ -150,7 +150,6 @@ t = inline_inputs(read("main.tex"))
 # Strip LaTeX comments (preserving \% escaped percent)
 t = re.sub(r"(?<!\\)%[^\n]*", "", t)
 t = re.sub(r"\\newcommand\{\\n\w+\}\{[^\n]*\}\s*", "", t)
-for k in sorted(macs, key=len, reverse=True): t = re.sub(r"\\" + k + r"(?![A-Za-z])\s?", lambda m: macs[k] + " ", t)
 
 # ---- cross-references from main.aux
 labels = dict(re.findall(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}", read("main.aux")))
