@@ -371,7 +371,8 @@ def fmt_unit_plain(u: str) -> str:
     u = u.replace(r"\,", " ").replace("~", " ")
     u = re.sub(r"\\mathrm\{([^{}]*)\}", r"\1", u)
     u = re.sub(r"\\text\{([^{}]*)\}", r"\1", u)
-    u = u.replace("{", "").replace("}", "").replace("\\", "")
+    u = u.replace("{", "").replace("}", "")
+    u = re.sub(r"\\(?!%)", "", u)
     return u.strip()
 
 
