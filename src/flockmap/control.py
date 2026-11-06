@@ -13,7 +13,6 @@ Controllers:          "P"        proportional-derivative lateral/longitudinal la
 from __future__ import annotations
 import dataclasses, math, time
 import numpy as np
-import casadi as ca
 from scipy.optimize import minimize
 from .config import AC, G
 
