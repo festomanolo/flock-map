@@ -133,7 +133,7 @@ def scene_wake():
     gl = sub.glyph(orient="vec", scale=False, factor=0.28, geom=pv.Arrow(tip_length=0.4, tip_radius=0.12, shaft_radius=0.04))
     p.add_mesh(gl, color=INK)
     for sgn in (-1, 1): viz3d.add_x8(p, (-dx, sgn * dy, 0), accent=AQUA)
-    p.add_text("(c) rear view: cross-flow (v,w) at the followers' plane", font_size=10, position="upper_left", color=INK)
+    p.add_text("(c) rear view: cross-flow (v,w) at the followers' plane", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-dx - 9.0, 0.0, 0.6), (-dx, 0.0, 0.0), (0, 0, 1)]
     # (d) follower wing loading
     p.subplot(1, 1); p.set_background("white", top="#dfe3ea")
