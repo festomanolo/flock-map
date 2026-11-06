@@ -44,7 +44,9 @@ def be(col, kap):
         if y[i] < 0 <= y[i + 1]: return math.exp(np.interp(0, [y[i], y[i + 1]], np.log([D[i], D[i + 1]]))) / 1000.0
     return float("nan")
 for kap, K in ((0.3, "Low"), (0.7, "Free"), (1.0, "One"), (1.5, "High")):
-    put(f"kmBe17{K}", be("saving17_Wh", kap), "{:.1f}"); put(f"kmBe14{K}", be("saving14_Wh", kap), "{:.1f}")
+    v17, v14 = be("saving17_Wh", kap), be("saving14_Wh", kap)
+    put(f"kmBe17{K}", ">20" if np.isnan(v17) else f"{v17:.1f}")
+    put(f"kmBe14{K}", ">20" if np.isnan(v14) else f"{v14:.1f}")
 put("kmAt25", km[(np.isclose(km.kappa, 1.0)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}"); put("kmAt25Low", km[(np.isclose(km.kappa, 0.3)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}")
 put("kmAt25High", km[(np.isclose(km.kappa, 1.5)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}"); put("kmAt20k", km[(np.isclose(km.kappa, 1.0)) & (km.D == 20000)].saving17_Wh.iloc[0], "{:+.1f}")
 # ---- tornado / Sobol / CBF / step (if present)
@@ -59,10 +61,12 @@ if os.path.exists(f"{P}/extra_sobol.csv"):
     put("sobSumS", s.S1.sum(), "{:.2f}")
 if os.path.exists(f"{P}/extra_cbf_ablation.csv"):
     a = pd.read_csv(f"{P}/extra_cbf_ablation.csv")
+    put("cbfAblSeeds", int(a.seed.nunique()), "{:d}")
     for sc, K in (("S3_braking_dropout", "Three"), ("S5_combined", "Five"), ("S6_overcapability", "Six")):
-        for mg in (0.0, 0.5, 1.0, 2.0):
-            g = a[(a.scenario == sc) & (a.margin == mg)]; k = {0.0:"Mzero",0.5:"Mhalf",1.0:"Mone",2.0:"Mtwo"}[mg]
-            put(f"cbf{K}V{k}", 100 * g.violated.mean(), "{:.0f}"); put(f"cbf{K}E{k}", g.rms_ey.mean(), "{:.2f}"); put(f"cbf{K}S{k}", 1e4 * g.mean_dcd.mean(), "{:.1f}")
+        for mg, k in ((0.0, "Mzero"), (0.5, "Mhalf"), (1.0, "Mone"), (1.5, "Monehalf"), (2.0, "Mtwo")):
+            g = a[(a.scenario == sc) & (a.margin == mg)]
+            if len(g):
+                put(f"cbf{K}V{k}", 100 * g.violated.mean(), "{:.0f}"); put(f"cbf{K}E{k}", g.rms_ey.mean(), "{:.2f}"); put(f"cbf{K}S{k}", 1e4 * g.mean_dcd.mean(), "{:.1f}")
 if os.path.exists(f"{P}/extra_step.csv"):
     s = pd.read_csv(f"{P}/extra_step.csv").groupby("controller").mean(numeric_only=True)
     for ctl, K in (("P", "P"), ("NMPC", "N"), ("NMPC+CBF", "C")):

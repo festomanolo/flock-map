@@ -97,14 +97,29 @@ def sec_tor():
 
 # ------------------------------------------------------------------------------------------------------------- station-keeping error
 def sec_skerr():
+    """Expected follower electrical-power saving under Gaussian lateral error N(0, sigma_y^2).
+    Evaluates the static saving curve on the Lifanov Cauchy-midpoint lattice dy/b = m/n (m = 0..150, n = 60 panels)
+    so collocation points never land on singular 1/r trailing vortex filaments, then integrates via 61-point
+    Gauss-Hermite quadrature."""
     rows = []
-    rng = np.random.default_rng(1)
+    n_pan = 60
+    xg, wg = np.polynomial.hermite.hermgauss(61)
+    wg = wg / np.sqrt(np.pi)
     for model, kw in (("vlm_sheet", dict(wake="sheet")), ("vlm_free", dict(wake="free")), ("strip_corrected", None)):
+        g_abs = np.arange(0, 51) * 0.05 if model == "vlm_free" else np.arange(0, int(2.5 * n_pan) + 1) / float(n_pan)
+        curve = np.array([
+            (vlm.follower(3.0, float(d), 0.0, 18.0, n=n_pan, **kw)["pct_power"] if kw
+             else aero.strip_follower(3.0, float(d), 0.0, 18.0, variant="corrected")["pct_power"])
+            for d in g_abs
+        ])
         for dyb in (0.80, 0.85, 0.90):
             for sig in (0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.60):
-                z = rng.standard_normal(60) * sig if sig > 0 else np.zeros(1)
-                vals = [(vlm.follower(3.0, dyb, 0.0, 18.0, y_err=e, **kw)["pct_power"] if kw else aero.strip_follower(3.0, dyb, 0.0, 18.0, variant="corrected", y_err=e)["pct_power"]) for e in z]
-                rows.append(dict(model=model, dy_b=dyb, sigma_m=sig, saving_pct=float(np.mean(vals))))
+                if sig > 0.0:
+                    pts = np.abs(dyb + np.sqrt(2.0) * (sig / AC.b) * xg)
+                    sv = float(np.sum(wg * np.interp(pts, g_abs, curve)))
+                else:
+                    sv = float(np.interp(dyb, g_abs, curve))
+                rows.append(dict(model=model, dy_b=dyb, sigma_m=sig, saving_pct=sv))
     pd.DataFrame(rows).to_csv(f"{OUT}/extra_skerr.csv", index=False); print("skerr done")
 
 
@@ -158,10 +173,11 @@ def _step_job(a):
 
 def sec_ctl():
     from multiprocessing import Pool
-    jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 2.0) for s in range(16)]
-    with Pool(1) as p: res = p.map(_cbf_job, jobs)
+    nw = min(8, os.cpu_count() or 1)
+    jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 1.5, 2.0) for s in range(30)]
+    with Pool(nw) as p: res = p.map(_cbf_job, jobs)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
-    with Pool(1) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
+    with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
     pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done")
 
 
