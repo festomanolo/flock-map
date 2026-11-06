@@ -29,9 +29,9 @@ def fig05():
     ax.annotate("", (-dx, -3.75), (0, -3.75), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx / 2, -4.22, f"$d_x=3b={dx:.2f}$ m", ha="center", fontsize=7)
     ax.annotate("", (-dx - 0.95, -dy), (-dx - 0.95, dy), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx - 1.25, 0, f"$2d_y=1.7b={2*dy:.2f}$ m", rotation=90, va="center", ha="left", fontsize=7)
     ax.annotate("", (-0.3, 0.0), (-0.3, AC.b0 / 2), arrowprops=dict(arrowstyle="<->", lw=0.6)); ax.text(0.6, AC.b0 / 4, "$b_0/2$", fontsize=6.5)
-    ax.annotate("", (1.2, B / 2), (1.2, -B / 2), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(1.35, 0, f"$b={B}$ m", rotation=90, va="center", fontsize=7)
-    ax.text(0, -B / 2 - 0.45, "Leader", ha="center", fontsize=7); ax.text(-dx, dy + B / 2 + 0.25, "Follower 2", ha="center", fontsize=7); ax.text(-dx, -dy - B / 2 - 0.55 + 0.15, "Follower 1", ha="center", fontsize=7)
-    ax.set_xlim(-dx - 3.8, 3); ax.set_ylim(-4.6, 4.2); ax.invert_xaxis(); ax.set_aspect("equal"); ax.set_xlabel("flight direction  →  (x, m; leader at 0)"); ax.set_ylabel("$y$ (m)"); ax.grid(False)
+    ax.annotate("", (1.15, B / 2), (1.15, -B / 2), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(1.45, 0, f"$b={B}$ m", rotation=90, va="center", ha="right", fontsize=7)
+    ax.text(0, -B / 2 - 0.48, "Leader", ha="center", fontsize=7); ax.text(-dx, dy + B / 2 + 0.25, "Follower 2", ha="center", fontsize=7); ax.text(-dx, -dy - B / 2 - 0.35, "Follower 1", ha="center", fontsize=7)
+    ax.set_xlim(-dx - 3.8, 3.2); ax.set_ylim(-4.65, 4.2); ax.invert_xaxis(); ax.set_aspect("equal"); ax.set_xlabel("flight direction  →  (x, m; leader at 0)"); ax.set_ylabel("$y$ (m)"); ax.grid(False)
     ax.set_title("Top view (planform schematic, not the exact X8 outline)", fontsize=7.5); panel(ax, "a")
     ax = axs[1]
     for (x0, c, lab) in ((0, C["violet"], "L"), (-dx, C["aqua"], "F")):
