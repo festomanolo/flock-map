@@ -52,7 +52,7 @@ def X3_sens():
         r_lo = t[(t.factor == f) & (t.setting == "low")].iloc[0]
         r_hi = t[(t.factor == f) & (t.setting == "high")].iloc[0]
         for lab, r, c in (("low", r_lo, C["orange"]), ("high", r_hi, C["blue"])):
-            else:
+            ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
                 dx_txt = 0.14 if r.delta_Wh >= 0 else -0.14
                 ha_txt = "left" if r.delta_Wh >= 0 else "right"
             ax.text(r.delta_Wh + dx_txt, i, f"{r.value:g}", fontsize=6, va="center", ha=ha_txt, color=C["ink2"])
