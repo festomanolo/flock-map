@@ -198,7 +198,8 @@ def X12_cbf():
         panel(ax, l)
         mult = 100.0 if col == "violated" else (1e4 if col == "mean_dcd" else 1.0)
         for sc, cc in cols.items():
-            g = d[d.scenario == sc].groupby("margin")[col].mean(); ax.plot(g.index, g.values * (100 if col == "violated" else 1), "o-", ms=3, color=cc, label=sc.split("_")[0])
+            g = d[d.scenario == sc].groupby("margin")[col].mean(); ax.plot(g.index, g.values * mult, "o-", ms=3.5, color=cc, label=sc.split("_")[0])
+        ax.axvline(0.5, color=C["ink2"], ls=":", lw=0.8)
         ax.set_xlabel("HOCBF margin $\\Delta D$ (m)"); ax.set_ylabel(yl)
     axs[0].legend(fontsize=6.3)
     save(fig, "X12_cbf_margin_ablation")
