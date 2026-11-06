@@ -178,7 +178,7 @@ def X11_control_stats():
     clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     ax = axs[0]; panel(ax, "a")
     for k, cc in cols.items():
-        v = np.sort(c[(c.controller == k) & (c.scenario == "S5_combined")].rms_ey.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cc, label=k)
+        v = np.sort(c[(c.controller == k) & (c.scenario == "S5_combined")].rms_ey.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cc, label=clab[k])
     ax.set_xlabel("RMS lateral error, S5 (m)"); ax.set_ylabel("empirical CDF"); ax.legend(fontsize=6.3)
     ax = axs[1]; panel(ax, "b")
     for k in ("NMPC", "NMPC+CBF"):
