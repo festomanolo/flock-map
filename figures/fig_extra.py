@@ -175,6 +175,7 @@ def X10_soc():
 def X11_control_stats():
     c = pd.read_csv("data/raw/control_trials.csv"); fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.7))
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     ax = axs[0]; panel(ax, "a")
     for k, cc in cols.items():
         v = np.sort(c[(c.controller == k) & (c.scenario == "S5_combined")].rms_ey.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cc, label=k)
