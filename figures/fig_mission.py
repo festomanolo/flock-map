@@ -204,7 +204,7 @@ def fig12():
 
 # --------------------------------------------------------------------------------------------- Fig 13 mapping
 def fig13():
-    fig = plt.figure(figsize=(7.4, 3.5)); gs = fig.add_gridspec(1, 5, width_ratios=[1, 1, 1, 0.06, 1.35], wspace=0.35)
+    fig = plt.figure(figsize=(7.6, 3.5)); gs = fig.add_gridspec(1, 6, width_ratios=[1, 1, 1, 0.06, 0.52, 1.35], wspace=0.26)
     cases = [("17 strips, 65 %", 17, 61.6), ("14 strips, 58 % (spec.)", 14, 73.92), ("14 strips, 57.95 %", 14, 74.0)]
     for k, (lab, n, s) in enumerate(cases):
         ax = fig.add_subplot(gs[k]); m = photo.multiplicity_map(photo.strip_centres(n, s), None)
