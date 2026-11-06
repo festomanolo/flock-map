@@ -178,6 +178,7 @@ def sec_ctl():
     nw = min(8, os.cpu_count() or 1)
     jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 1.5, 2.0) for s in range(30)]
     res = []
+    with ctx.Pool(nw) as p:
     with Pool(nw) as p: res = p.map(_cbf_job, jobs)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
     with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
