@@ -51,6 +51,12 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
     h, w = img.shape[:2]
     dpi = 100
     fig = plt.figure(figsize=(w / dpi, h / dpi), dpi=dpi)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.imshow(img)
+    ax.axis("off")
+    ax.text(0.015, 0.965, title, transform=ax.transAxes, fontsize=22, fontweight="medium", color="#111827", va="top", ha="left")
+    cax = fig.add_axes([0.58, 0.09, 0.36, 0.035])
+    norm = mcolors.Normalize(vmin=clim[0], vmax=clim[1])
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
     shown_bar = False
