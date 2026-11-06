@@ -177,7 +177,7 @@ def sec_ctl():
     jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 1.5, 2.0) for s in range(30)]
     with Pool(nw) as p: res = p.map(_cbf_job, jobs)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
-    with Pool(1) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
+    with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
     pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done")
 
 
