@@ -58,5 +58,5 @@ Tests & \texttt{pytest} 9.1.1: 17 unit tests (closed-form limits, audit reproduc
 \item \textbf{Raw data:} \texttt{data/raw/} (trial-level CSV), \texttt{data/processed/} (aggregates, free-wake field, CFD summary).
 \item \textbf{CFD:} case generators (\texttt{cfd/make\_case.py}), orchestrator (\texttt{cfd/run\_all.py}), solver logs, timing, per-case \texttt{summary.json} and extracted VTK data are included; large mesh and processor directories are excluded and regenerate in minutes.
 \item \textbf{Environment:} \texttt{cfd/env.sh} sets the minimal OpenFOAM environment needed on this Debian/Ubuntu build.
-\item \textbf{What is \emph{not} reproducible from this repository:} flight data, photogrammetric reconstructions and wind-tunnel data do not exist for this study.
+\item \textbf{What is \emph{not} reproducible from this repository:} formation flight-test logs, photogrammetric SfM reconstructions and close-formation wind-tunnel data do not exist for this study (isolated Skywalker-X8 wind-tunnel and system-identification data are available in the literature \cite{gryte2018,reinhardt2022}).
 \end{itemize}
