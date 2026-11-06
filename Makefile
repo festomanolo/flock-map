@@ -25,7 +25,7 @@ extra:
 cfd:
 	cd cfd && $(PY) run_all.py && cd .. && $(PY) cfd/analyze_cfd.py && $(PY) figures/fig_cfd.py && xvfb-run -a $(PY) cfd/render_cfd.py
 numbers:
-	$(PY) experiments/make_numbers.py && $(PY) experiments/make_numbers_extra.py
+	$(PY) experiments/make_numbers.py && $(PY) experiments/make_numbers_extra.py && $(PY) experiments/make_cfd_section.py
 figures:
 	$(PY) figures/fig_aero.py && $(PY) figures/fig_mission.py && $(PY) figures/fig_extra.py && cp figures/out/*.pdf figures/out/*.png manuscript/figures/
 figures3d:
@@ -33,6 +33,6 @@ figures3d:
 docx:
 	cd manuscript && $(PY) make_docx.py
 paper:
-	cd manuscript && latexmk -pdf -interaction=nonstopmode main.tex
+	cd manuscript && (latexmk -pdf -interaction=nonstopmode main.tex || tectonic -k main.tex) && cp main.pdf ../outputs/FlockMap_manuscript.pdf
 clean:
 	rm -rf figures/out manuscript/*.aux manuscript/*.log manuscript/*.bbl manuscript/*.blg manuscript/*.fls manuscript/*.fdb_latexmk

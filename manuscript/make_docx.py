@@ -153,10 +153,10 @@ t = re.sub(r"\\newcommand\{\\n\w+\}\{[^\n]*\}\s*", "", t)
 
 # Expand custom shorthand macros into math-safe forms
 custom_macs = {
-    "Va": "V_a",
-    "dx": "d_x",
-    "dy": "d_y",
-    "Earea": r"E_{\mathrm{area}}",
+    "Va": " V_a",
+    "dx": " d_x",
+    "dy": " d_y",
+    "Earea": r" E_{\mathrm{area}}",
 }
 for k in sorted(macs, key=len, reverse=True):
     val = macs[k]
@@ -361,17 +361,18 @@ def fmt_unit_plain(u: str) -> str:
     if u in (r"\degree", "degree", "^\\circ"):
         return "°"
     if u in (r"\percent", r"\%", "percent"):
-        return "%"
+        return r"\%"
     u = u.replace(r"\per", "/")
     u = u.replace(r"m\ohm", "mΩ").replace(r"\ohm", "Ω")
     u = u.replace(r"\micro", "μ")
-    u = u.replace(r"\degree", "°").replace(r"\percent", "%")
+    u = u.replace(r"\degree", "°").replace(r"\percent", r"\%")
     u = re.sub(r"\^\{([0-9+-]+)\}", lambda m: m.group(1).translate(SUP_MAP), u)
     u = re.sub(r"\^([0-9])", lambda m: m.group(1).translate(SUP_MAP), u)
     u = u.replace(r"\,", " ").replace("~", " ")
     u = re.sub(r"\\mathrm\{([^{}]*)\}", r"\1", u)
     u = re.sub(r"\\text\{([^{}]*)\}", r"\1", u)
-    u = u.replace("{", "").replace("}", "").replace("\\", "")
+    u = u.replace("{", "").replace("}", "")
+    u = re.sub(r"\\(?!%)", "", u)
     return u.strip()
 
 
@@ -418,7 +419,7 @@ def _repl_sirange(args, pos):
         um = fmt_unit_math(u)
         return f"{a}\\text{{--}}{b}{um}"
     up = fmt_unit_plain(u)
-    sep = "" if up in ("°", "%") else " "
+    sep = "" if up in ("°", r"\%", "%") else " "
     return f"{fmt_num_plain(a)}–{fmt_num_plain(b)}{sep}{up}"
 
 
@@ -432,7 +433,7 @@ def _repl_si_val(args, pos):
         return f"{v}{fmt_unit_math(u)}"
     up = fmt_unit_plain(u)
     vp = fmt_num_plain(v)
-    sep = "" if up in ("°", "%") else " "
+    sep = "" if up in ("°", r"\%", "%") else " "
     return f"{vp}{sep}{up}"
 
 
@@ -450,8 +451,9 @@ def _repl_si_unit(args, pos):
 t = replace_cmd_nargs(t, "si", 1, _repl_si_unit)
 t = replace_cmd_nargs(t, "num", 1, lambda args, pos: fmt_num_plain(args[0]))
 
-# Balanced unwrapping of \resizebox{w}{h}{content} -> content
+# Balanced unwrapping of \resizebox{w}{h}{content} -> content and removal of \renewcommand
 t = replace_cmd_nargs(t, "resizebox", 3, lambda args, _pos: args[2])
+t = replace_cmd_nargs(t, "renewcommand", 2, lambda _args, _pos: "")
 
 # Clean layout commands
 for pat in (
@@ -463,8 +465,6 @@ for pat in (
     r"\\biboptions\{[^}]*\}",
     r"\\journal\{[^}]*\}",
     r"\\graphicspath\{\{[^}]*\}\}",
-    r"\\renewcommand\{\\theHfigure\}\{[^}]*\}",
-    r"\\renewcommand\{\\theHtable\}\{[^}]*\}",
     r"\\setcounter\{(figure|table)\}\{0\}",
 ):
     t = re.sub(pat, "", t)
