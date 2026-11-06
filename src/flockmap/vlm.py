@@ -221,7 +221,7 @@ class PlanformWing(Wing):
             w_tp += gam[j] / (2.0 * np.pi) * (1.0 / (self.ym - self.edges[j + 1]) - 1.0 / (self.ym - self.edges[j]))
         drag_i_tp = -0.5 * rho * np.sum(gam * self.dy * w_tp)
         q = 0.5 * rho * va ** 2
-        return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), gamma=gam)
+        return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), CDi_trefftz=drag_i_tp / (q * self.S), gamma=gam)
 
     def sheet_field(self, gam, pts):
         v = np.zeros_like(pts)
