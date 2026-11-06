@@ -249,6 +249,11 @@ class PlanformWing(Wing):
         """Symmetric 3-aircraft V-formation matching the OpenFOAM y=0 symmetry half-model:
         leader at (0,0,0), starboard follower at (+dx,+dy,dz), port mirror follower at (+dx,-dy,dz)
         with mirrored spanwise circulation gamma_port(y_j) = gamma_stbd(-y_j) = gamma_stbd[n-1-j]."""
+        al = np.radians(alpha_deg)
+        n = self.n
+        off_s = np.array([dx, dy, dz])
+        off_p = np.array([dx, -dy, dz])
+        # Influence of port follower panel k (whose circulation equals starboard panel n-1-k) on starboard cp / bd:
 
 _PW = {}
 
