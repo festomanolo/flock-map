@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Compose manuscript/sections/res_cfd.tex (+ tables) from the CFD campaign results. Run from the repository root."""
+import json, os, sys
 import json, os
 import numpy as np, pandas as pd
 P = "data/processed"
