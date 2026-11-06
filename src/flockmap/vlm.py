@@ -302,6 +302,11 @@ class PlanformWing(Wing):
             CDi=drag_i / (q * self.S),
             Cl_roll=roll / (q * self.S * self.G.B),
             leader_CL=lift_L / (q * self.S),
+            leader_CDi=drag_i_L / (q * self.S),
+            gamma=gam,
+            leader_gamma=gl,
+        )
+
 
 _PW = {}
 
