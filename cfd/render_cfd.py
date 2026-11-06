@@ -60,7 +60,7 @@ def vortex_scene(case):
         p.add_mesh(iso, scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, smooth_shading=True, show_scalar_bar=True, scalar_bar_args=sbar)
         p.add_mesh(iso.copy().transform(np.diag([1, -1, 1, 1]), inplace=False), scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, show_scalar_bar=False)
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
-    p.add_text(f"{case}: Q-criterion iso-surface coloured by streamwise vorticity", font_size=11, color="black", position="upper_left")
+    p.add_text(f"{case}: Q-criterion iso-surface coloured by streamwise vorticity", font_size=15, color="black", position="upper_left")
     p.screenshot(os.path.join(OUT, f"K2_vortex_{case}.png")); p.close()
 
 
