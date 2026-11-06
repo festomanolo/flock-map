@@ -49,15 +49,13 @@ def X3_sens():
     ax = axs[0]; panel(ax, "a"); base = t.base_Wh.iloc[0]
     order = t.assign(a=t.delta_Wh.abs()).groupby("factor").a.max().sort_values().index
     for i, f in enumerate(order):
-        for lab, c in (("low", C["orange"]), ("high", C["blue"])):
-            r = t[(t.factor == f) & (t.setting == lab)].iloc[0]; ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
-            if abs(r.delta_Wh) < 0.08:
-                dx_txt = -0.14 if lab == "low" else 0.14
-                ha_txt = "right" if lab == "low" else "left"
-            else:
-                dx_txt = 0.14 if r.delta_Wh >= 0 else -0.14
-                ha_txt = "left" if r.delta_Wh >= 0 else "right"
-            ax.text(r.delta_Wh + dx_txt, i, f"{r.value:g}", fontsize=6, va="center", ha=ha_txt, color=C["ink2"])
+        r_lo = t[(t.factor == f) & (t.setting == "low")].iloc[0]
+        r_hi = t[(t.factor == f) & (t.setting == "high")].iloc[0]
+        for lab, r, c in (("low", r_lo, C["orange"]), ("high", r_hi, C["blue"])):
+            ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
+            put_right = (lab == "high") if (r_lo.delta_Wh == 0 and r_hi.delta_Wh == 0) else (r.delta_Wh >= (r_hi.delta_Wh if lab == "low" else r_lo.delta_Wh))
+            x_txt = (max(0.0, r.delta_Wh) + 0.14) if put_right else (min(0.0, r.delta_Wh) - 0.14)
+            ax.text(x_txt, i, f"{r.value:g}", fontsize=6, va="center", ha="left" if put_right else "right", color=C["ink2"])
     ax.set_xlim(-4.35, 5.1)
     ax.set_yticks(range(len(order))); ax.set_yticklabels(order, fontsize=6.5); ax.axvline(0, color=C["ink"], lw=0.8); ax.set_xlabel(f"change in fleet saving S3 vs S1 (Wh); baseline {base:.2f} Wh"); ax.grid(axis="y", visible=False)
     ax = axs[1]; panel(ax, "b"); y = np.arange(len(s)); o = np.argsort(s.ST.values)
@@ -193,7 +191,7 @@ def X11_control_stats():
 
 def X12_cbf():
     d = pd.read_csv(f"{P}/extra_cbf_ablation.csv"); s = pd.read_csv(f"{P}/extra_step.csv")
-    fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.7)); cols = {"S3_braking_dropout": C["blue"], "S5_combined": C["orange"], "S6_overcapability": C["red"]}
+    fig, axs = plt.subplots(1, 3, figsize=(7.6, 2.7), gridspec_kw=dict(wspace=0.36)); cols = {"S3_braking_dropout": C["blue"], "S5_combined": C["orange"], "S6_overcapability": C["red"]}
     for ax, col, yl, l in ((axs[0], "violated", "trials with $h<0$ (%)", "a"), (axs[1], "rms_ey", "RMS lateral error (m)", "b"), (axs[2], "mean_dcd", "mean $\\Delta C_D \\times 10^4$", "c")):
         panel(ax, l)
         mult = 100.0 if col == "violated" else (1e4 if col == "mean_dcd" else 1.0)
