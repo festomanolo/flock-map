@@ -203,9 +203,9 @@ def X12_cbf():
         ax.set_xlabel("HOCBF margin $\\Delta D$ (m)"); ax.set_ylabel(yl)
     axs[0].legend(fontsize=6.3)
     save(fig, "X12_cbf_margin_ablation")
-    fig, ax = plt.subplots(figsize=(3.6, 2.4)); g = s.groupby("controller")[["overshoot_pct", "settle2_s"]].mean()
+    fig, ax = plt.subplots(figsize=(3.8, 2.5)); g = s.groupby("controller")[["overshoot_pct", "settle2_s"]].mean().reindex(["P", "NMPC", "NMPC+CBF"])
     ax.bar(np.arange(3) - 0.2, g.overshoot_pct, width=0.38, color=C["blue"], label="overshoot (%)"); ax.bar(np.arange(3) + 0.2, g.settle2_s, width=0.38, color=C["orange"], label="2 % settling time (s)")
-    ax.set_xticks(range(3)); ax.set_xticklabels(g.index, fontsize=7); ax.legend(fontsize=6.5); save(fig, "X12b_step_response")
+    ax.set_xticks(range(3)); ax.set_xticklabels(["PD", "NMPC", "NMPC+HOCBF"], fontsize=7); ax.legend(fontsize=6.5); save(fig, "X12b_step_response")
 
 
 if __name__ == "__main__":
