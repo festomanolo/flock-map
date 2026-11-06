@@ -215,6 +215,11 @@ class PlanformWing(Wing):
         lift = rho * va * np.sum(gam * self.dy)
         w_self = self.Ab @ gam
         drag_i = -rho * np.sum(gam * self.dy * w_self)
+        # Far-field Trefftz-plane induced drag (Munk stagger-invariant, free of single-panel swept bound-vortex bias)
+        w_tp = np.zeros(self.n)
+        for j in range(self.n):
+            w_tp += gam[j] / (2.0 * np.pi) * (1.0 / (self.ym - self.edges[j + 1]) - 1.0 / (self.ym - self.edges[j]))
+        drag_i_tp = -0.5 * rho * np.sum(gam * self.dy * w_tp)
         q = 0.5 * rho * va ** 2
         return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), gamma=gam)
 
