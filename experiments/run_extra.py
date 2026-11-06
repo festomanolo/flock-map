@@ -97,6 +97,8 @@ def sec_tor():
 
 # ------------------------------------------------------------------------------------------------------------- station-keeping error
 def sec_skerr():
+    """Expected follower electrical-power saving under Gaussian lateral error N(0, sigma_y^2).
+    Evaluates the static saving curve on the Lifanov Cauchy-midpoint lattice dy/b = m/n (m = 0..150, n = 60 panels)
     rows = []
     rng = np.random.default_rng(1)
     for model, kw in (("vlm_sheet", dict(wake="sheet")), ("vlm_free", dict(wake="free")), ("strip_corrected", None)):
