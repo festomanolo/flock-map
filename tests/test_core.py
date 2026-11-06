@@ -115,7 +115,7 @@ def test_station_keeping_error_no_singularity_and_monotonic():
     assert len(vs) > 0 and vs.saving_pct.max() < 6.0 and vs.saving_pct.min() > 0.0
     for slot in (0.80, 0.85, 0.90):
         g = vs[np.isclose(vs.dy_b, slot)].sort_values("sigma_m")
-        diffs = np.diff(g.mean_pct.values)
+        diffs = np.diff(g.saving_pct.values)
         assert np.all(diffs <= 1e-9), f"Non-monotonic station-keeping curve at slot {slot}: {g.mean_pct.values}"
 
 
