@@ -154,7 +154,7 @@ t = re.sub(r"\\newcommand\{\\n\w+\}\{[^\n]*\}\s*", "", t)
 # Expand custom shorthand macros into math-safe forms
 custom_macs = {
     "Va": " V_a",
-    "dx": "d_x",
+    "dx": " d_x",
     "dy": "d_y",
     "Earea": r"E_{\mathrm{area}}",
 }
