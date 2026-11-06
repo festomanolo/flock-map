@@ -59,7 +59,6 @@ def vortex_scene(case):
         sbar = dict(title="wx b / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
         p.add_mesh(iso, scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, smooth_shading=True, show_scalar_bar=True, scalar_bar_args=sbar)
         p.add_mesh(iso.copy().transform(np.diag([1, -1, 1, 1]), inplace=False), scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, show_scalar_bar=False)
-    seeds = pv.Line((-0.8, 0.05, -0.05), (-0.8, 1.6, 0.05), resolution=24)
     st = I.cell_data_to_point_data().streamlines_from_source(seeds, vectors="U", max_length=20, integration_direction="forward", initial_step_length=0.5, terminal_speed=1e-3)
     pass
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
