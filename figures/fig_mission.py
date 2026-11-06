@@ -217,7 +217,8 @@ def fig13():
         if k == 0: ax.set_ylabel("$y$ (m)")
         ax.set_xlabel("$x$ (m)")
     fig.colorbar(im, cax=fig.add_subplot(gs[3])).set_label("images per cell")
-    ax = fig.add_subplot(gs[4]); panel(ax, "d")
+    fig.add_subplot(gs[4]).axis("off")
+    ax = fig.add_subplot(gs[5]); panel(ax, "d")
     crabs = np.arange(0, 21, 1.0)
     for (lab, n, s), lc in zip(cases[:3], (C["blue"], C["orange"], C["violet"])):
         acc = []
