@@ -1,7 +1,7 @@
 \subsection{Formation guidance: NMPC formulation}\label{sec:nmpc}
 Each follower is modelled as a point mass in the horizontal plane at constant altitude with state $\mathbf x=[p_x,p_y,V,\chi,\phi,a]^\top$ (north, east, airspeed, course, bank, along-track acceleration) and inputs $\mathbf u=[a_{\mathrm{cmd}},\phi_{\mathrm{cmd}}]^\top$:
 \begin{equation}
-\dot p_x=V\cos\chi+w_x,\ \ \dot p_y=V\sin\chi+w_y,\ \ \dot V=a,\ \ \dot\chi=\frac{g\tan\phi}{V},\ \ \dot\phi=\frac{\phi_{\mathrm{cmd}}-\phi}{\tau_\phi},\ \ \dot a=\frac{a_{\mathrm{cmd}}-a}{\tau_a},
+\dot p_x=V\cos\chi+w_x,\;\dot p_y=V\sin\chi+w_y,\;\dot V=a,\;\dot\chi=\tfrac{g\tan\phi}{V},\;\dot\phi=\tfrac{\phi_{\mathrm{cmd}}-\phi}{\tau_\phi},\;\dot a=\tfrac{a_{\mathrm{cmd}}-a}{\tau_a},
 \end{equation}
 with $\tau_\phi=\SI{0.25}{s}$, $\tau_a=\SI{0.30}{s}$ and the aircraft's effective wind $\mathbf w_{\mathrm{eff}}$ a first-order lag ($\tau_g=\SI{1}{s}$) of the instantaneous wind, so that a sudden gust accelerates the aircraft over about a second instead of changing its ground velocity instantaneously. The wind consists of a common component (speed $U(2,6)$\,m/s, uniform direction), an individual Ornstein--Uhlenbeck component per aircraft ($\sigma=\SI{0.4}{m/s}$, correlation time \SI{2}{s}) and, in the gust scenarios, a differential lateral doublet applied to the follower only.
 
