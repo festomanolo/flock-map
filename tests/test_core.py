@@ -135,6 +135,7 @@ def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
     import pandas as pd
     ab = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_cbf_ablation.csv"))
     ctl = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "raw", "control_trials.csv"))
+    assert ab.seed.nunique() == 30
     assert set(np.round(ab.margin_m.unique(), 2)) == {0.0, 0.5, 1.0, 1.5, 2.0}
     for sc in ("S3_braking_dropout", "S5_combined"):
         v_ab = ab[(ab.scenario == sc) & np.isclose(ab.margin_m, 0.5)].viol_pct.iloc[0]
