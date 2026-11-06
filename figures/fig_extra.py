@@ -49,7 +49,7 @@ def X3_sens():
     ax = axs[0]; panel(ax, "a"); base = t.base_Wh.iloc[0]
     order = t.assign(a=t.delta_Wh.abs()).groupby("factor").a.max().sort_values().index
     for i, f in enumerate(order):
-            r = t[(t.factor == f) & (t.setting == lab)].iloc[0]; ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
+        r_lo = t[(t.factor == f) & (t.setting == "low")].iloc[0]
             if abs(r.delta_Wh) < 0.08:
                 dx_txt = -0.14 if lab == "low" else 0.14
                 ha_txt = "right" if lab == "low" else "left"
