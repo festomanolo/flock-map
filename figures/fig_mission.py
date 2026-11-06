@@ -245,8 +245,12 @@ def fig14():
                 ax.scatter(x + np.random.default_rng(i).uniform(-0.07, 0.07, len(v)), v, s=8, color=cols[c], alpha=0.68, lw=0)
                 ax.plot([x - 0.1, x + 0.1], [np.median(v)] * 2, color=C["ink"], lw=1.2)
         ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.set_ylabel(ylabel)
-        if log: ax.set_yscale("log")
-    strip(axs[0], "min_sep", "minimum true separation (m)"); axs[0].axhline(4.24, color=C["red"], ls="--", lw=0.9); panel(axs[0], "a")
+        if log:
+            ax.set_yscale("log")
+            ax.set_yticks([0.1, 0.2, 0.5, 1.0, 2.0, 3.0])
+            ax.set_yticklabels(["0.1", "0.2", "0.5", "1.0", "2.0", "3.0"])
+            ax.yaxis.set_minor_formatter(plt.NullFormatter())
+    strip(axs[0], "min_sep", "minimum true separation (m)"); axs[0].axhline(4.24, color=C["red"], ls="--", lw=0.9); axs[0].set_ylim(-0.25, 6.8); panel(axs[0], "a")
     strip(axs[1], "rms_ey", "RMS lateral tracking error (m)", log=True); panel(axs[1], "b")
     ax = axs[2]; panel(ax, "c")
     for j, c in enumerate(cols):
