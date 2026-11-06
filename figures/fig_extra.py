@@ -51,7 +51,14 @@ def X3_sens():
     for i, f in enumerate(order):
         for lab, c in (("low", C["orange"]), ("high", C["blue"])):
             r = t[(t.factor == f) & (t.setting == lab)].iloc[0]; ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
-            ax.text(r.delta_Wh + (0.15 if r.delta_Wh >= 0 else -0.15), i, f"{r.value:g}", fontsize=6, va="center", ha="left" if r.delta_Wh >= 0 else "right", color=C["ink2"])
+            if abs(r.delta_Wh) < 0.08:
+                dx_txt = -0.14 if lab == "low" else 0.14
+                ha_txt = "right" if lab == "low" else "left"
+            else:
+                dx_txt = 0.14 if r.delta_Wh >= 0 else -0.14
+                ha_txt = "left" if r.delta_Wh >= 0 else "right"
+            ax.text(r.delta_Wh + dx_txt, i, f"{r.value:g}", fontsize=6, va="center", ha=ha_txt, color=C["ink2"])
+    ax.set_xlim(-4.35, 5.1)
     ax.set_yticks(range(len(order))); ax.set_yticklabels(order, fontsize=6.5); ax.axvline(0, color=C["ink"], lw=0.8); ax.set_xlabel(f"change in fleet saving S3 vs S1 (Wh); baseline {base:.2f} Wh"); ax.grid(axis="y", visible=False)
     ax = axs[1]; panel(ax, "b"); y = np.arange(len(s)); o = np.argsort(s.ST.values)
     ax.barh(y - 0.18, s.S1.values[o], height=0.34, color=C["blue"], label="first order $S_i$"); ax.barh(y + 0.18, s.ST.values[o], height=0.34, color=C["aqua"], label="total $S_{Ti}$")
