@@ -173,6 +173,7 @@ def _step_job(a):
 
 def sec_ctl():
     import multiprocessing as mp
+    E.table("vlm_sheet", 18.0)  # pre-compute aerodynamic SavingTable once before forking workers
     from multiprocessing import Pool
     nw = min(8, os.cpu_count() or 1)
     jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 1.5, 2.0) for s in range(30)]
