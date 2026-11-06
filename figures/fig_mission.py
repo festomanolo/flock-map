@@ -26,12 +26,12 @@ def fig05():
     ax.plot([0, -dx], [0, dy], color=C["ink2"], lw=0.8, ls="--"); ax.plot([0, -dx], [0, -dy], color=C["ink2"], lw=0.8, ls="--")
     ax.add_patch(plt.Circle((0, 0), 2 * B, fill=False, ec=C["red"], ls=":", lw=1)); ax.text(-2 * B * 0.7, 2 * B * 0.78, "$D_{safe}=2b$", color=C["red"], fontsize=7)
     for sgn in (-1, 1): ax.plot([0, -9], [sgn * AC.b0 / 2] * 2, color=C["red"], lw=1.2, alpha=0.8)
-    ax.annotate("", (-dx, -dy - 1.35), (0, -dy - 1.35), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx / 2, -dy - 1.8, f"$d_x=3b={dx:.2f}$ m", ha="center", fontsize=7)
-    ax.annotate("", (-dx - 1.0, -dy), (-dx - 1.0, dy), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx - 1.15, 0, f"$2d_y=1.7b={2*dy:.2f}$ m", rotation=90, va="center", ha="right", fontsize=7)
+    ax.annotate("", (-dx, -3.75), (0, -3.75), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx / 2, -4.22, f"$d_x=3b={dx:.2f}$ m", ha="center", fontsize=7)
+    ax.annotate("", (-dx - 0.95, -dy), (-dx - 0.95, dy), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(-dx - 1.25, 0, f"$2d_y=1.7b={2*dy:.2f}$ m", rotation=90, va="center", ha="left", fontsize=7)
     ax.annotate("", (-0.3, 0.0), (-0.3, AC.b0 / 2), arrowprops=dict(arrowstyle="<->", lw=0.6)); ax.text(0.6, AC.b0 / 4, "$b_0/2$", fontsize=6.5)
-    ax.annotate("", (1.2, B / 2), (1.2, -B / 2), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(1.35, 0, f"$b={B}$ m", rotation=90, va="center", fontsize=7)
-    ax.text(0, -B / 2 - 0.45, "Leader", ha="center", fontsize=7); ax.text(-dx, dy + B / 2 + 0.25, "Follower 2", ha="center", fontsize=7); ax.text(-dx, -dy - B / 2 - 0.55 + 0.15, "Follower 1", ha="center", fontsize=7)
-    ax.set_xlim(-dx - 3.8, 3); ax.set_ylim(-4.6, 4.2); ax.invert_xaxis(); ax.set_aspect("equal"); ax.set_xlabel("flight direction  →  (x, m; leader at 0)"); ax.set_ylabel("$y$ (m)"); ax.grid(False)
+    ax.annotate("", (1.15, B / 2), (1.15, -B / 2), arrowprops=dict(arrowstyle="<->", lw=0.8)); ax.text(1.45, 0, f"$b={B}$ m", rotation=90, va="center", ha="right", fontsize=7)
+    ax.text(0, -B / 2 - 0.48, "Leader", ha="center", fontsize=7); ax.text(-dx, dy + B / 2 + 0.25, "Follower 2", ha="center", fontsize=7); ax.text(-dx, -dy - B / 2 - 0.35, "Follower 1", ha="center", fontsize=7)
+    ax.set_xlim(-dx - 3.8, 3.2); ax.set_ylim(-4.65, 4.2); ax.invert_xaxis(); ax.set_aspect("equal"); ax.set_xlabel("flight direction  →  (x, m; leader at 0)"); ax.set_ylabel("$y$ (m)"); ax.grid(False)
     ax.set_title("Top view (planform schematic, not the exact X8 outline)", fontsize=7.5); panel(ax, "a")
     ax = axs[1]
     for (x0, c, lab) in ((0, C["violet"], "L"), (-dx, C["aqua"], "F")):
@@ -86,10 +86,11 @@ def fig07():
     ts = np.load("data/raw/control_ts.npz")
     fig, axs = plt.subplots(3, 2, figsize=(7.2, 6.0)); axs = axs.ravel()
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     seed = 0
     for c in ("P", "NMPC", "NMPC+CBF"):
         g = lambda k: ts[f"S5_combined|{c}|{seed}|{k}"]
-        t = g("t"); axs[0].plot(t, g("dy"), color=cols[c], label=c); axs[1].plot(t, g("ex"), color=cols[c])
+        t = g("t"); axs[0].plot(t, g("dy"), color=cols[c], label=clab[c]); axs[1].plot(t, g("ex"), color=cols[c])
         axs[2].plot(t, g("dist"), color=cols[c]); axs[3].plot(t, g("phi"), color=cols[c]); axs[4].plot(t, g("V"), color=cols[c])
     t = ts[f"S5_combined|P|{seed}|t"]; axs[0].plot(t, np.full_like(t, 1.70), "k--", lw=0.8, label="commanded slot"); axs[2].axhline(4.24, color=C["red"], ls="--", lw=0.9)
     axs[2].text(1, 4.45, "$D_{safe}=4.24$ m", color=C["red"], fontsize=6.5)
@@ -135,14 +136,14 @@ def fig10():
     ax = axs[1]; panel(ax, "b")
     pt = PT[(PT.metric == "e_area_Wh_ha") & PT.comparison.str.startswith(("A:", "B:", "E:", "F:"))]
     labs = {"A:": "S4 vs S1 (all)", "B:": "S3 vs S1 (formation)", "E:": "S4 vs D1 (formation)", "F:": "D1 vs S1 (route)"}
-    mk = {"published": "x", "strip_corrected": "s", "vlm_free": "D", "vlm_sheet": "o"}; y0 = {k: i for i, k in enumerate(labs)}
+    mk = {"published": "x", "strip_corrected": "s", "vlm_free": "D", "vlm_rolled": "^", "vlm_sheet": "o"}; y0 = {k: i for i, k in enumerate(labs)}
     for m, mm in mk.items():
         for k, l in labs.items():
             r = pt[(pt.model == m) & pt.comparison.str.startswith(k)].iloc[0]
-            ax.errorbar(r.rel_change_pct, y0[k] + (0.0 if m == "vlm_sheet" else 0.0) + (list(mk).index(m) - 1.5) * 0.12, xerr=[[r.rel_change_pct - r.rel_p05_pct], [r.rel_p95_pct - r.rel_change_pct]], fmt=mm, color=MODEL[m][1], ms=4, lw=1)
+            ax.errorbar(r.rel_change_pct, y0[k] + (list(mk).index(m) - 2.0) * 0.11, xerr=[[r.rel_change_pct - r.rel_p05_pct], [r.rel_p95_pct - r.rel_change_pct]], fmt=mm, color=MODEL[m][1], ms=4, lw=1)
     ax.axvline(0, color=C["ink"], lw=0.8); ax.set_yticks(list(y0.values())); ax.set_yticklabels(list(labs.values())); ax.invert_yaxis(); ax.set_xlabel("change in $E_{area}$ vs reference (%); <0 = saving\n(markers: mean; bars: 5–95 % of trials)"); ax.grid(axis="y", visible=False)
     from matplotlib.lines import Line2D
-    ax.legend(handles=[Line2D([], [], marker=mk[m], color=MODEL[m][1], ls="", label=MODEL[m][0].replace("VLM follower, ", "VLM ").replace("Manuscript equations (as published)", "As published").replace("Strip theory, corrected", "Strip, corrected").replace("VLM follower, free wake", "VLM free wake")) for m in mk], fontsize=6, loc="lower right")
+    ax.legend(handles=[Line2D([], [], marker=mk[m], color=MODEL[m][1], ls="", label=MODEL[m][0].replace("VLM follower, ", "VLM ").replace("Manuscript equations (as published)", "As published").replace("Strip theory, corrected", "Strip, corrected").replace("VLM follower, free wake", "VLM free wake")) for m in mk], fontsize=5.6, loc="lower right")
     fig.tight_layout(); save(fig, "fig10_energy_efficiency")
 
 
@@ -156,7 +157,7 @@ def fig15():
             r = d[(d.model == m) & (d.component == c)].iloc[0]
             ax.bar(i + (j - 1.5) * w, r.saving_pct, width=w * 0.9, color=cl[i], alpha=min(1.0, 0.35 + 0.2 * j), edgecolor="white")
     ax.axhline(0, color=C["ink"], lw=0.8); ax.set_xticks(range(4)); ax.set_xticklabels(["route / overlap\nonly (D1 vs S1)", "formation transit\nonly (S3 vs S1)", "interaction", "total\n(S4 vs S1)"])
-    ax.set_ylabel("energy saving vs S1 (%)"); ax.text(0.99, 0.97, "bars within a group: published → strip-corrected → VLM free wake → VLM sheet (darker = more independent model)", transform=ax.transAxes, ha="right", va="top", fontsize=6.2, color=C["ink2"])
+    ax.set_ylabel("energy saving vs S1 (%, + = saving)"); ax.text(0.99, 0.97, "bars within a group: preliminary → strip-corrected → VLM free wake → VLM sheet (+ = saving)", transform=ax.transAxes, ha="right", va="top", fontsize=6.1, color=C["ink2"])
     fig.tight_layout(); save(fig, "fig15_decomposition")
 
 
@@ -203,11 +204,11 @@ def fig12():
 
 # --------------------------------------------------------------------------------------------- Fig 13 mapping
 def fig13():
-    fig = plt.figure(figsize=(7.4, 3.5)); gs = fig.add_gridspec(1, 5, width_ratios=[1, 1, 1, 0.06, 1.35], wspace=0.35)
+    fig = plt.figure(figsize=(7.6, 3.5)); gs = fig.add_gridspec(1, 6, width_ratios=[1, 1, 1, 0.06, 0.52, 1.35], wspace=0.26)
     cases = [("17 strips, 65 %", 17, 61.6), ("14 strips, 58 % (spec.)", 14, 73.92), ("14 strips, 57.95 %", 14, 74.0)]
     for k, (lab, n, s) in enumerate(cases):
         ax = fig.add_subplot(gs[k]); m = photo.multiplicity_map(photo.strip_centres(n, s), None)
-        im = ax.imshow(m, origin="lower", extent=[0, 1000, 0, 1000], cmap=plt.matplotlib.colors.ListedColormap(["#c3c2b7", "#b7d3f6", "#86b6ef", "#3987e5", "#256abf", "#184f95", "#0d366b"]) if False else "Blues", vmin=0, vmax=12)
+        im = ax.imshow(m, origin="lower", extent=[0, 1000, 0, 1000], cmap="Blues", vmin=0, vmax=12)
         acc, cov, d = photo.accepted_area(m)
         for i in range(10):
             for j in range(10):
@@ -216,7 +217,8 @@ def fig13():
         if k == 0: ax.set_ylabel("$y$ (m)")
         ax.set_xlabel("$x$ (m)")
     fig.colorbar(im, cax=fig.add_subplot(gs[3])).set_label("images per cell")
-    ax = fig.add_subplot(gs[4]); panel(ax, "d")
+    fig.add_subplot(gs[4]).axis("off")
+    ax = fig.add_subplot(gs[5]); panel(ax, "d")
     crabs = np.arange(0, 21, 1.0)
     for (lab, n, s), lc in zip(cases[:3], (C["blue"], C["orange"], C["violet"])):
         acc = []
@@ -233,29 +235,34 @@ def fig14():
     d = pd.read_csv("data/raw/control_trials.csv"); order = ["S1_turbulence", "S2_gust_doublet", "S3_braking_dropout", "S4_degraded_gnss", "S5_combined", "S6_overcapability"]
     short = ["S1\nturb.", "S2\ngust", "S3\nbrake", "S4\nGNSS", "S5\ncomb.", "S6\nover-cap."]
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     fig, axs = plt.subplots(2, 2, figsize=(7.4, 4.9)); axs = axs.ravel()
     def strip(ax, col, ylabel, log=False):
         for j, c in enumerate(cols):
             for i, s in enumerate(order):
                 v = d[(d.scenario == s) & (d.controller == c)][col].values
                 x = i + (j - 1) * 0.26
-                ax.scatter(x + np.random.default_rng(i).uniform(-0.07, 0.07, len(v)), v, s=4, color=cols[c], alpha=0.5, lw=0)
+                ax.scatter(x + np.random.default_rng(i).uniform(-0.07, 0.07, len(v)), v, s=8, color=cols[c], alpha=0.68, lw=0)
                 ax.plot([x - 0.1, x + 0.1], [np.median(v)] * 2, color=C["ink"], lw=1.2)
         ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.set_ylabel(ylabel)
-        if log: ax.set_yscale("log")
-    strip(axs[0], "min_sep", "minimum true separation (m)"); axs[0].axhline(4.24, color=C["red"], ls="--", lw=0.9); panel(axs[0], "a")
+        if log:
+            ax.set_yscale("log")
+            ax.set_yticks([0.1, 0.2, 0.5, 1.0, 2.0, 3.0])
+            ax.set_yticklabels(["0.1", "0.2", "0.5", "1.0", "2.0", "3.0"])
+            ax.yaxis.set_minor_formatter(plt.NullFormatter())
+    strip(axs[0], "min_sep", "minimum true separation (m)"); axs[0].axhline(4.24, color=C["red"], ls="--", lw=0.9); axs[0].set_ylim(-0.25, 6.8); panel(axs[0], "a")
     strip(axs[1], "rms_ey", "RMS lateral tracking error (m)", log=True); panel(axs[1], "b")
     ax = axs[2]; panel(ax, "c")
     for j, c in enumerate(cols):
         v = [d[(d.scenario == s) & (d.controller == c)].violated.mean() * 100 for s in order]
-        ax.bar(np.arange(6) + (j - 1) * 0.27, v, width=0.25, color=cols[c], label=c, edgecolor="white")
+        ax.bar(np.arange(6) + (j - 1) * 0.27, v, width=0.25, color=cols[c], label=clab[c], edgecolor="white")
     ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.set_ylabel("trials with $h<0$ (%)"); ax.legend(fontsize=6.5, loc="upper left")
     ax = axs[3]; panel(ax, "d"); g = d[d.controller == "NMPC+CBF"]
     ax.bar(np.arange(6) - 0.15, [g[g.scenario == s].cbf_active_frac.mean() * 100 for s in order], width=0.3, color=C["violet"], label="filter active (% of time)", edgecolor="white")
     ax.bar(np.arange(6) + 0.15, [g[g.scenario == s].sat_frac.mean() * 100 for s in order], width=0.3, color=C["yellow"], label="input saturated (% of time)", edgecolor="white")
     ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.legend(fontsize=6.3); ax.set_ylabel("%")
     from matplotlib.lines import Line2D
-    fig.legend(handles=[Line2D([], [], marker="o", ls="", color=cols[c], label=c) for c in cols], ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.03), fontsize=7)
+    fig.legend(handles=[Line2D([], [], marker="o", ls="", color=cols[c], label=clab[c]) for c in cols], ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.03), fontsize=7)
     fig.tight_layout(); save(fig, "fig14_safety_tracking")
 
 
