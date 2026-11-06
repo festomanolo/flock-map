@@ -99,7 +99,8 @@ if os.path.exists(cs):
     iso_ = df[df.index.str.startswith("iso_a3_L")].sort_values("level")
     labs = {0: "L0 (coarse)", 1: "L1 (medium)", 2: "L2 (fine)"}; sl = {0: "(4, 5)", 1: "(5, 6)", 2: "(6, 7)"}; wl = {0: 2, 1: 3, 2: 3}; tl = {0: 3, 1: 4, 2: 5}
     for lv, r in iso_.iterrows():
-        L = int(r.level); rows_tab.append(f"{labs[L]} & {sl[L]} & {wl[L]} & {tl[L]} & {int(r.cells):,} & {r.yplus:.0f} ({r.yp05:.0f}--{r.yp95:.0f})".replace(",", "\\,"))
+        L = int(r.level); cells_s = f"{int(r.cells):,}".replace(",", "\\,")
+        rows_tab.append(f"{labs[L]} & {sl[L]} & {wl[L]} & {tl[L]} & {cells_s} & {r.yplus:.0f} ({r.yp05:.0f}--{r.yp95:.0f})")
         put(f"yplus{['Zero','One','Two'][L]}", r.yplus, "{:.0f}")
     open("manuscript/tables/tab_cfdmesh.tex", "w").write(" \\\\\n".join(rows_tab) + "\n")
     for L, K in ((0, "Zero"), (1, "One"), (2, "Two")):
