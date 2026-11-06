@@ -1,13 +1,13 @@
 \section{Parameter register}\label{app:params}
-Every numerical input carries a provenance tag: \textbf{MS} -- taken from the preliminary manuscript and not independently verified; \textbf{DER} -- derived from other parameters; \textbf{ASM} -- an assumption introduced in this study that must be replaced by measurement. Values are those locked in \texttt{src/flockmap/config.py}.
+Every numerical input carries a provenance tag: \textbf{MS} -- taken from the preliminary manuscript and not independently re-measured on a specific test airframe (baseline aerodynamic values are cross-checked against published Skywalker-X8 wind-tunnel and flight-identification ranges \cite{gryte2018,reinhardt2022}); \textbf{DER} -- derived from other parameters; \textbf{ASM} -- an assumption introduced in this study that must be replaced by measurement. Values are those locked in \texttt{src/flockmap/config.py}.
 \begin{table}[H]\centering\small
 \caption{Aircraft, propulsion and battery parameters.}\label{tab:appparams1}
 \begin{tabular}{@{}llll@{}}\toprule
 Quantity & Symbol & Value & Tag\\\midrule
 Mass & $m$ & \SI{3.5}{kg} & MS\\
 Span / area / aspect ratio & $b,\,S,\,AR$ & \SI{2.12}{m}, \SI{0.80}{m^2}, 5.62 & MS/DER\\
-Zero-lift drag coefficient & $C_{D0}$ & 0.0240 & MS (unverified)\\
-Oswald factor & $e_0$ & 0.80 & MS\\
+Zero-lift drag coefficient & $C_{D0}$ & 0.0240 & MS (within X8 WT range \cite{gryte2018})\\
+Oswald factor & $e_0$ & 0.80 & MS (cf.\ \cite{gryte2018,reinhardt2022})\\
 Propulsive efficiency & $\eta_p$ & 0.68 (constant) & MS\\
 Hotel load & $P_{\mathrm{hotel}}$ & \SI{28}{W} & MS\\
 Cruise / minimum / maximum airspeed & $V_a$ & 18 / 12 / \SI{26}{m/s} & MS\\
@@ -27,7 +27,7 @@ Quantity & Symbol & Value & Tag\\\midrule
 Sensor & -- & $5472\times3648$\,px, $13.2\times8.8$\,mm & MS\\
 Focal length & $f$ & \SI{9}{mm} & MS\\
 Height above ground & $h$ & \SI{120}{m} & MS\\
-Ground sample distance & GSD & \SI{3.3}{cm} & DER\\
+Ground sample distance & GSD & \SI{\ngsd}{cm} & DER\\
 Forward overlap & $o_f$ & 0.75 & MS\\
 Side overlap (baseline / claimed) & $o_s$ & 0.65 / 0.58 & MS (0.58 unverified)\\
 Survey block & -- & \SI{1}{km}$\times$\SI{1}{km} (\SI{100}{ha}) at \SI{2.5}{km} & MS\\
@@ -36,19 +36,19 @@ Wind & $U$ & $\mathcal U(2,6)$\,m/s, uniform direction & ASM\\\bottomrule
 
 \section{Software and numerical environment}\label{app:software}
 \begin{table}[H]\centering\small
-\caption{Software used to produce every result in this paper.}\label{tab:software}
+\caption{Software used to produce and verify the results in this paper.}\label{tab:software}
 \begin{tabular}{@{}ll@{}}\toprule
 Component & Version / setting\\\midrule
-Python & 3.13; NumPy 2.5, SciPy 1.18, pandas 3.0, matplotlib 3.11\\
-Optimal control & CasADi 3.8 with IPOPT; RK4 multiple shooting, $N=25$, $\Delta t=\SI{0.1}{s}$\\
-Safety-filter QP & relative-degree-3 HOCBF, 50\,Hz\\
-3-D rendering & PyVista 0.49 (VTK), off-screen via \texttt{xvfb}\\
+Python & 3.12.8; NumPy 2.1.3, SciPy 1.18.0, pandas 3.1.1, matplotlib 3.11.2\\
+Optimal control & CasADi 3.8.2 with IPOPT; RK4 multiple shooting, $N=25$, $\Delta t=\SI{0.1}{s}$\\
+Safety-filter QP & relative-degree-3 HOCBF (SciPy SLSQP; OSQP 1.1.3 available), 50\,Hz\\
+3-D rendering & PyVista 0.49.2 (VTK), off-screen OpenGL / \texttt{xvfb}\\
 CFD & OpenFOAM v1912 (ESI, Ubuntu 1912.200626), \texttt{simpleFoam}, $k$--$\omega$ SST\\
 Meshing & \texttt{blockMesh}, \texttt{snappyHexMesh} (no layers)\\
 Parallel decomposition & \texttt{simple}, 3 ranks (scotch unavailable in this build)\\
 Force post-processing & Python on \texttt{foamToVTK} patch fields (function objects unavailable, Sec.~\ref{sec:cfdsetup})\\
-Typesetting & \LaTeX\ with \texttt{elsarticle}; DOCX via pandoc 3.1\\
-Tests & \texttt{pytest}: 12 unit tests (closed-form limits, audit reproductions)\\\bottomrule
+Typesetting & \LaTeX\ (\texttt{elsarticle}, Tectonic 0.15.0); DOCX via pandoc 3.9 + \texttt{python-docx} 1.2.0\\
+Tests & \texttt{pytest} 9.1.1: 17 unit tests (closed-form limits, audit reproductions, artifact checks)\\\bottomrule
 \end{tabular}\end{table}
 
 \section{Reproducibility checklist}\label{app:repro}
@@ -58,5 +58,5 @@ Tests & \texttt{pytest}: 12 unit tests (closed-form limits, audit reproductions)
 \item \textbf{Raw data:} \texttt{data/raw/} (trial-level CSV), \texttt{data/processed/} (aggregates, free-wake field, CFD summary).
 \item \textbf{CFD:} case generators (\texttt{cfd/make\_case.py}), orchestrator (\texttt{cfd/run\_all.py}), solver logs, timing, per-case \texttt{summary.json} and extracted VTK data are included; large mesh and processor directories are excluded and regenerate in minutes.
 \item \textbf{Environment:} \texttt{cfd/env.sh} sets the minimal OpenFOAM environment needed on this Debian/Ubuntu build.
-\item \textbf{What is \emph{not} reproducible from this repository:} flight data, photogrammetric reconstructions and wind-tunnel data do not exist for this study.
+\item \textbf{What is \emph{not} reproducible from this repository:} formation flight-test logs, photogrammetric SfM reconstructions and close-formation wind-tunnel data do not exist for this study (isolated Skywalker-X8 wind-tunnel and system-identification data are available in the literature \cite{gryte2018,reinhardt2022}).
 \end{itemize}
