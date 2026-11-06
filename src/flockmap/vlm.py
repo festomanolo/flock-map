@@ -215,8 +215,13 @@ class PlanformWing(Wing):
         lift = rho * va * np.sum(gam * self.dy)
         w_self = self.Ab @ gam
         drag_i = -rho * np.sum(gam * self.dy * w_self)
+        # Far-field Trefftz-plane induced drag (Munk stagger-invariant, free of single-panel swept bound-vortex bias)
+        w_tp = np.zeros(self.n)
+        for j in range(self.n):
+            w_tp += gam[j] / (2.0 * np.pi) * (1.0 / (self.ym - self.edges[j + 1]) - 1.0 / (self.ym - self.edges[j]))
+        drag_i_tp = -0.5 * rho * np.sum(gam * self.dy * w_tp)
         q = 0.5 * rho * va ** 2
-        return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), gamma=gam)
+        return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), CDi_trefftz=drag_i_tp / (q * self.S), gamma=gam)
 
     def sheet_field(self, gam, pts):
         v = np.zeros_like(pts)
@@ -239,6 +244,68 @@ class PlanformWing(Wing):
         roll = rho * va * np.sum(gam * self.dy * self.ym)
         q = 0.5 * rho * va ** 2
         return dict(CL=lift / (q * self.S), CDi=drag_i / (q * self.S), Cl_roll=roll / (q * self.S * self.G.B), gamma=gam)
+
+    def coupled_symmetry_alpha(self, dx, dy, va, alpha_deg, dz=0.0, rho=1.225, two_way_leader=True):
+        """Symmetric 3-aircraft V-formation matching the OpenFOAM y=0 symmetry half-model:
+        leader at (0,0,0), starboard follower at (+dx,+dy,dz), port mirror follower at (+dx,-dy,dz)
+        with mirrored spanwise circulation gamma_port(y_j) = gamma_stbd(-y_j) = gamma_stbd[n-1-j]."""
+        al = np.radians(alpha_deg)
+        n = self.n
+        off_s = np.array([dx, dy, dz])
+        off_p = np.array([dx, -dy, dz])
+        # Influence of port follower panel k (whose circulation equals starboard panel n-1-k) on starboard cp / bd:
+        # Relative position of starboard point (cp + off_s) in port follower's frame (origin off_p) is cp + (0, 2*dy, 0).
+        A_mir_cp = np.zeros((n, n))
+        A_mir_bd = np.zeros((n, n))
+        cp_from_port = self.cp + (off_s - off_p)
+        bd_from_port = self.bd + (off_s - off_p)
+        for k in range(n):
+            col = n - 1 - k
+            A_mir_cp[:, col] += _horseshoe_pts(cp_from_port, self.nodesA[k], self.nodesB[k], self.core)[:, 2]
+            A_mir_bd[:, col] += _horseshoe_pts(bd_from_port, self.nodesA[k], self.nodesB[k], self.core)[:, 2]
+        A_LS_cp = np.zeros((n, n))
+        A_LS_bd = np.zeros((n, n))
+        for j in range(n):
+            A_LS_cp[:, j] = _horseshoe_pts(self.cp + off_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+            A_LS_bd[:, j] = _horseshoe_pts(self.bd + off_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+        rhs = -va * al * np.ones(n)
+        if two_way_leader:
+            # Influence of starboard + mirrored port follower on leader cp / bd:
+            A_FL_cp = np.zeros((n, n))
+            A_FL_bd = np.zeros((n, n))
+            cpL_from_s = self.cp - off_s
+            cpL_from_p = self.cp - off_p
+            bdL_from_s = self.bd - off_s
+            bdL_from_p = self.bd - off_p
+            for j in range(n):
+                A_FL_cp[:, j] += _horseshoe_pts(cpL_from_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+                A_FL_bd[:, j] += _horseshoe_pts(bdL_from_s, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+                A_FL_cp[:, n - 1 - j] += _horseshoe_pts(cpL_from_p, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+                A_FL_bd[:, n - 1 - j] += _horseshoe_pts(bdL_from_p, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
+            M = np.block([[self.A, A_FL_cp], [A_LS_cp, self.A + A_mir_cp]])
+            sol = np.linalg.solve(M, np.concatenate([rhs, rhs]))
+            gl, gam = sol[:n], sol[n:]
+            w_tot_L = self.Ab @ gl + A_FL_bd @ gam
+        else:
+            gl = self.Ainv @ rhs
+            gam = np.linalg.solve(self.A + A_mir_cp, rhs - A_LS_cp @ gl)
+            w_tot_L = self.Ab @ gl
+        q = 0.5 * rho * va ** 2
+        lift = rho * va * np.sum(gam * self.dy)
+        w_tot = (self.Ab + A_mir_bd) @ gam + A_LS_bd @ gl
+        drag_i = -rho * np.sum(gam * self.dy * w_tot)
+        roll = rho * va * np.sum(gam * self.dy * self.ym)
+        lift_L = rho * va * np.sum(gl * self.dy)
+        drag_i_L = -rho * np.sum(gl * self.dy * w_tot_L)
+        return dict(
+            CL=lift / (q * self.S),
+            CDi=drag_i / (q * self.S),
+            Cl_roll=roll / (q * self.S * self.G.B),
+            leader_CL=lift_L / (q * self.S),
+            leader_CDi=drag_i_L / (q * self.S),
+            gamma=gam,
+            leader_gamma=gl,
+        )
 
 
 _PW = {}

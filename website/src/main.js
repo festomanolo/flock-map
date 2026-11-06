@@ -35,10 +35,10 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { S.
 
 // ------------------------------------------------------------------------------------------- camera presets (one table, scroll picks the row)
 const PRESET = {
-  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 7.4 : 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.28, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
-  teardown: () => ({ theta: 2.35, phi: 1.08, r: 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
+  hero: () => ({ theta: 2.55, phi: 1.2, r: mobile() ? 9.4 : 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.28, shiftY: mobile() ? 0.17 : 0, groundY: -1.15, alpha: 1, mode: 'single', bank: 0, float: 1 }),
+  teardown: () => ({ theta: 2.35, phi: 1.08, r: mobile() ? 8.6 : 5.6, tx: 0, ty: 0.05, tz: 0.3, shiftX: mobile() ? 0 : 0.17, shiftY: mobile() ? 0.12 : 0, groundY: -1.55, alpha: 1, mode: 'single', bank: 0, float: 0 }),
   off: () => ({ alpha: 0 }),
-  control: () => ({ theta: 0.08, phi: 1.46, r: 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
+  control: () => ({ theta: 0.08, phi: 1.46, r: mobile() ? 8 : 5.6, tx: 0, ty: 0, tz: 0.05, shiftX: mobile() ? 0 : 0.22, shiftY: mobile() ? -0.2 : 0, groundY: -1.05, alpha: 1, mode: 'single', float: 0 }),
   wake: () => ({ theta: -0.4, phi: 1.0, r: mobile() ? 24 : 17.5, tx: 0, ty: 0, tz: 3.4, shiftX: mobile() ? 0 : 0.2, shiftY: mobile() ? -0.2 : 0, groundY: -1.6, alpha: 1, mode: 'formation', float: 0.6 }),
 };
 function applyPreset(name) { Object.assign(S.view, PRESET[name]()); S.view.preset = name; }
@@ -120,7 +120,7 @@ function tdUpdate(p) {
   let idx = 0; STAGES.forEach((s, i) => { if (tdTarget >= s.at) idx = i; });
   showStage(idx);
   $('#tdBar').style.width = `${(p * 100).toFixed(1)}%`;
-  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = 5.4 + 1.9 * Math.min(1, tdTarget * 1.4); S.view.phi = 1.18 - 0.1 * tdTarget; }
+  if (S.view.preset === 'teardown') { S.view.theta = 2.35 + tdTarget * 0.7; S.view.r = (5.4 + 1.9 * Math.min(1, tdTarget * 1.4)) * (mobile() ? 1.6 : 1); S.view.phi = 1.18 - 0.1 * tdTarget; }
 }
 ScrollTrigger.create({ trigger: tdSection, start: 'top top', end: 'bottom bottom', onUpdate: (self) => tdUpdate(self.progress), onRefresh: (self) => tdUpdate(self.progress) });
 let exCur = 0;
