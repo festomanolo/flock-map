@@ -109,6 +109,9 @@ def sec_skerr():
         g_abs = np.arange(0, 51) * 0.05 if model == "vlm_free" else np.arange(0, int(2.5 * n_pan) + 1) / float(n_pan)
         curve = np.array([
             (vlm.follower(3.0, float(d), 0.0, 18.0, n=n_pan, **kw)["pct_power"] if kw
+             else aero.strip_follower(3.0, float(d), 0.0, 18.0, variant="corrected")["pct_power"])
+            for d in g_abs
+        ])
         for dyb in (0.80, 0.85, 0.90):
             for sig in (0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.60):
                 z = rng.standard_normal(60) * sig if sig > 0 else np.zeros(1)
