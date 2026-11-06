@@ -145,7 +145,10 @@ def inline_inputs(s: str) -> str:
         return inline_inputs(read(p)) if os.path.exists(p) else ""
     return re.sub(r"\\input\{([^}]+)\}", rep, s)
 
-t = inline(t)
+
+t = inline_inputs(read("main.tex"))
+# Strip LaTeX comments (preserving \% escaped percent)
+t = re.sub(r"(?<!\\)%[^\n]*", "", t)
 t = re.sub(r"\\newcommand\{\\n\w+\}\{[^\n]*\}\s*", "", t)
 for k in sorted(macs, key=len, reverse=True): t = re.sub(r"\\" + k + r"(?![A-Za-z])\s?", lambda m: macs[k] + " ", t)
 
