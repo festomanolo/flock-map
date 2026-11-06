@@ -112,11 +112,11 @@ def test_station_keeping_error_no_singularity_and_monotonic():
     p = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_skerr.csv")
     df = pd.read_csv(p)
     vs = df[df.model == "vlm_sheet"]
-    assert len(vs) > 0 and vs.mean_pct.max() < 6.0 and vs.mean_pct.min() > 0.0
-    for slot in (0.75, 0.85, 0.95):
-        g = vs[np.isclose(vs.slot_dy_b, slot)].sort_values("sigma_m")
-        diffs = np.diff(g.mean_pct.values)
-        assert np.all(diffs <= 1e-9), f"Non-monotonic station-keeping curve at slot {slot}: {g.mean_pct.values}"
+    assert len(vs) > 0 and vs.saving_pct.max() < 6.0 and vs.saving_pct.min() > 0.0
+    for slot in (0.80, 0.85, 0.90):
+        g = vs[np.isclose(vs.dy_b, slot)].sort_values("sigma_m")
+        diffs = np.diff(g.saving_pct.values)
+        assert np.all(diffs <= 1e-9), f"Non-monotonic station-keeping curve at slot {slot}: {g.saving_pct.values}"
 
 
 def test_planform_trefftz_oswald_and_symmetry_coupling():
@@ -135,9 +135,10 @@ def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
     import pandas as pd
     ab = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_cbf_ablation.csv"))
     ctl = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "raw", "control_trials.csv"))
-    assert set(np.round(ab.margin_m.unique(), 2)) == {0.0, 0.5, 1.0, 1.5, 2.0}
+    assert ab.seed.nunique() == 30
+    assert set(np.round(ab.margin.unique(), 2)) == {0.0, 0.5, 1.0, 1.5, 2.0}
     for sc in ("S3_braking_dropout", "S5_combined"):
-        v_ab = ab[(ab.scenario == sc) & np.isclose(ab.margin_m, 0.5)].viol_pct.iloc[0]
+        v_ab = 100.0 * ab[(ab.scenario == sc) & np.isclose(ab.margin, 0.5)].violated.mean()
         v_ctl = 100.0 * ctl[(ctl.scenario == sc) & (ctl.controller == "NMPC+CBF")].violated.mean()
         assert abs(v_ab - v_ctl) < 1e-6
 
