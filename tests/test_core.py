@@ -127,3 +127,8 @@ def test_planform_trefftz_oswald_and_symmetry_coupling():
     assert 0.95 < e_tp <= 1.02 and iso["CDi_trefftz"] > iso["CDi"]
     one = W.follower_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0)
     sym = W.coupled_symmetry_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0, two_way_leader=True)
+    assert (sym["CL"] - iso["CL"]) > (one["CL"] - iso["CL"]) * 1.05
+    assert abs(sym["CL_leader"] - iso["CL"]) / iso["CL"] < 0.01
+
+
+def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
