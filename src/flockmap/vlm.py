@@ -259,6 +259,11 @@ class PlanformWing(Wing):
         A_mir_bd = np.zeros((n, n))
         cp_from_port = self.cp + (off_s - off_p)
         bd_from_port = self.bd + (off_s - off_p)
+        for k in range(n):
+            col = n - 1 - k
+            A_mir_cp[:, col] += _horseshoe_pts(cp_from_port, self.nodesA[k], self.nodesB[k], self.core)[:, 2]
+            A_mir_bd[:, col] += _horseshoe_pts(bd_from_port, self.nodesA[k], self.nodesB[k], self.core)[:, 2]
+        A_LS_cp = np.zeros((n, n))
 
 _PW = {}
 
