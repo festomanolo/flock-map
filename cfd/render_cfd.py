@@ -39,6 +39,12 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import matplotlib.cm as cm
+    import matplotlib.colors as mcolors
+
+    src = os.path.join(FALLBACK_DIR, fname)
+    if not os.path.exists(src):
+        raise FileNotFoundError(src)
+    img = plt.imread(src).copy()
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
     shown_bar = False
