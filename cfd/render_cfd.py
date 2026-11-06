@@ -65,7 +65,7 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
 
 
 def cp_scene(case):
-    I, pa, meta = load(case); p = plotter()
+    _, pa, meta = load(case, need_internal=False); p = plotter()
     shown_bar = False
     sbar = dict(title="Cp", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
     for n, m in pa.items():
