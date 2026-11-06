@@ -32,7 +32,7 @@ mean aerodynamic chord & \SI{\ncfdMAC}{m} & $Re=\Va\,\overline{c}/\nu=\nReMAC\ti
 aspect ratio & \ncfdAR & $b^2/S$\\
 section & NACA-0009-type thickness, blunt trailing edge at 98.5\,\% chord & thickness 9\,\% (root and tip)\\
 reference point for moments & root quarter chord (leader), follower root quarter chord (follower) & \\\bottomrule
-\end{tabular}\end{table}
+\end{tabular}}\end{table}
 
 \subsection{OpenFOAM RANS set-up}\label{sec:cfdsetup}
 \paragraph{Solver and models} Steady incompressible RANS with \texttt{simpleFoam} (OpenFOAM v1912, ESI; Ubuntu package 1912.200626) in SIMPLEC mode, $k$--$\omega$ SST turbulence closure, wall functions (\texttt{nutkWallFunction}, \texttt{omegaWallFunction}, \texttt{kqRWallFunction}), freestream $U_\infty=\SI{18}{m/s}$, $\nu=\SI{1.5e-5}{m^2/s}$, $\rho=\SI{1.225}{kg/m^3}$, turbulence intensity 0.1\,\% (inlet $k=1.5(IU)^2$, $\omega=\sqrt{k}/(C_\mu^{1/4}\ell)$ with $\ell=\SI{0.01}{m}$). Convection of momentum uses \texttt{linearUpwindV} with a cell-limited gradient, turbulence quantities use bounded upwind, the pressure equation GAMG (tolerance $10^{-8}$, relative $0.05$). Relaxation factors are 0.9 with the consistent (SIMPLEC) formulation. Convergence is monitored by residuals ($p$, $U$, $k$, $\omega$) and, for key cases, by the force coefficients at saved iterations.
