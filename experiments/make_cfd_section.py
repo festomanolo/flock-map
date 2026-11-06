@@ -3,6 +3,7 @@
 import json, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 import numpy as np, pandas as pd
+from flockmap import vlm, cfdgeom as G
 P = "data/processed"
 d = pd.read_csv(f"{P}/cfd_summary.csv"); d["dx_b"] = d.dx_b.fillna(0)
 ft = pd.read_csv(f"{P}/cfd_formation_table.csv"); sl = json.load(open(f"{P}/cfd_slopes.json")); fit = json.load(open(f"{P}/cfd_polar_fit.json")) if os.path.exists(f"{P}/cfd_polar_fit.json") else {}
