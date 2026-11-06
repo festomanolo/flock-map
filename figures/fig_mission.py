@@ -136,7 +136,7 @@ def fig10():
     ax = axs[1]; panel(ax, "b")
     pt = PT[(PT.metric == "e_area_Wh_ha") & PT.comparison.str.startswith(("A:", "B:", "E:", "F:"))]
     labs = {"A:": "S4 vs S1 (all)", "B:": "S3 vs S1 (formation)", "E:": "S4 vs D1 (formation)", "F:": "D1 vs S1 (route)"}
-    mk = {"published": "x", "strip_corrected": "s", "vlm_free": "D", "vlm_sheet": "o"}; y0 = {k: i for i, k in enumerate(labs)}
+    mk = {"published": "x", "strip_corrected": "s", "vlm_free": "D", "vlm_rolled": "^", "vlm_sheet": "o"}; y0 = {k: i for i, k in enumerate(labs)}
     for m, mm in mk.items():
         for k, l in labs.items():
             r = pt[(pt.model == m) & pt.comparison.str.startswith(k)].iloc[0]
