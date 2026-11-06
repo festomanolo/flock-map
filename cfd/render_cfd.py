@@ -125,7 +125,7 @@ def slices_scene(case):
     for n, m in pa.items():
         for s in (m, mirror(m)): p.add_mesh(s, color="#52514e", smooth_shading=True)
     shown_bar = False
-    sbar = dict(title="w / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
+    sbar = dict(title="w / U", n_labels=5, vertical=False, position_x=0.58, position_y=0.06, width=0.35, height=0.07, title_font_size=22, label_font_size=18, color="black")
     for xs in (1.0, 3.0 * B, 5.0 * B, 8.0 * B):
         sl = Ip.slice(normal="x", origin=(xs, 0, 0)).clip_box([xs - 1, xs + 1, 0.0, 3.4, -1.0, 1.0], invert=False)
         if sl.n_points:
