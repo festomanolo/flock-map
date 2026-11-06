@@ -86,6 +86,7 @@ def fig07():
     ts = np.load("data/raw/control_ts.npz")
     fig, axs = plt.subplots(3, 2, figsize=(7.2, 6.0)); axs = axs.ravel()
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     seed = 0
     for c in ("P", "NMPC", "NMPC+CBF"):
         g = lambda k: ts[f"S5_combined|{c}|{seed}|{k}"]
