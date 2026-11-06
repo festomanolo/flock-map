@@ -287,6 +287,11 @@ class PlanformWing(Wing):
             gl, gam = sol[:n], sol[n:]
             w_tot_L = self.Ab @ gl + A_FL_bd @ gam
         else:
+            gl = self.Ainv @ rhs
+            gam = np.linalg.solve(self.A + A_mir_cp, rhs - A_LS_cp @ gl)
+            w_tot_L = self.Ab @ gl
+        q = 0.5 * rho * va ** 2
+        lift = rho * va * np.sum(gam * self.dy)
 
 _PW = {}
 
