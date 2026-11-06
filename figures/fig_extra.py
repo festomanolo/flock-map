@@ -45,7 +45,7 @@ def X2_kappa():
 
 def X3_sens():
     t = pd.read_csv(f"{P}/extra_tornado.csv"); s = pd.read_csv(f"{P}/extra_sobol.csv")
-    fig, axs = plt.subplots(1, 2, figsize=(7.4, 2.8), gridspec_kw=dict(width_ratios=[1.3, 1]))
+    fig, axs = plt.subplots(1, 2, figsize=(7.6, 2.9), gridspec_kw=dict(width_ratios=[1.32, 1], wspace=0.52))
     ax = axs[0]; panel(ax, "a"); base = t.base_Wh.iloc[0]
     order = t.assign(a=t.delta_Wh.abs()).groupby("factor").a.max().sort_values().index
     for i, f in enumerate(order):
