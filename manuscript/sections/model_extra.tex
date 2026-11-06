@@ -44,7 +44,7 @@ reference point for moments & root quarter chord (leader), follower root quarter
 \paragraph{Force post-processing without function objects} The OpenFOAM v1912 binaries shipped with Ubuntu~24.04 abort in \texttt{functionObjectList} (an \texttt{OSHA1stream} error) whenever \emph{any} function object is present in \texttt{controlDict}, in serial and in parallel. Forces are therefore computed in Python from the exported patch fields (\texttt{foamToVTK}): the pressure force is $\rho\sum p\,\mathbf{n}\,A$ over the wing faces (outward normal of the fluid domain), the viscous force $\rho\sum(\nu+\nu_{t,w})\,\mathbf{U}_t/y\;A$ with the tangential owner-cell velocity $\mathbf U_t$ and wall distance $y$ of the owner cell centre---the same expression OpenFOAM evaluates as $\nu_{\mathrm{eff}}\,\partial\mathbf{U}/\partial n$ for wall-function patches. Leader loads are doubled for the half model. The routine is exercised by the unit tests and cross-checked on the isolated wing against the vortex-lattice lift (Sec.~\ref{sec:cfd}).
 \begin{table}[H]\centering\small
 \caption{OpenFOAM meshes (isolated half-wing, $\alpha=3^\circ$) and wall-function resolution.}\label{tab:cfdmesh}
-\begin{tabular}{@{}lccccc@{}}\toprule
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccccc@{}}\toprule
 Level & surface levels (min,max) & wake box level & tip box level & cells (isolated) & $y^+$ mean (5--95\,\%)\\\midrule
 \input{tables/tab_cfdmesh.tex}\\\bottomrule
 \end{tabular}\end{table}
