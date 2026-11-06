@@ -149,3 +149,8 @@ def test_number_macros_have_no_nan_and_five_paired_models():
         assert "{nan}" not in txt
     paired = open(os.path.join(root, "tables", "tab_paired.tex"), encoding="utf8").read().strip().splitlines()
     assert len(paired) == 6
+    for row in paired:
+        assert row.count("&") == 5
+
+
+def test_compiled_manuscript_pdf_and_docx_completeness():
