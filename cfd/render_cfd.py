@@ -29,15 +29,17 @@ def load(case):
 
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
+    shown_bar = False
+    sbar = dict(title="Cp", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
     for n, m in pa.items():
         m = m.cell_data_to_point_data(); cp = (np.asarray(m.point_data["p"])) / 0.5  # kinematic p -> Cp = p/(0.5 U^2)
         cp = cp / (18.0 ** 2) * 1.0; m.point_data["Cp"] = cp
         for s in (m, mirror(m)):
-            p.add_mesh(s, scalars="Cp", cmap="RdBu_r", clim=(-1.0, 0.6), smooth_shading=True, show_scalar_bar=False)
-    p.add_scalar_bar("Cp", title="Cp", n_labels=5, vertical=False, position_x=0.35, position_y=0.04, width=0.3, height=0.05, title_font_size=18, label_font_size=14, color="black") if False else None
+            p.add_mesh(s, scalars="Cp", cmap="RdBu_r", clim=(-1.0, 0.6), smooth_shading=True, show_scalar_bar=not shown_bar, scalar_bar_args=sbar if not shown_bar else None)
+            shown_bar = True
     xc = 0.5 * meta["follower"][1] * B if meta.get("follower") else 0.0
     p.camera_position = [(xc - 2.5, -5.5, 4.2), (xc, 0.0, 0.0), (0, 0, 1)]
-    p.add_text(f"{case}: surface pressure coefficient (RANS, k-omega SST)", font_size=11, color="black", position="upper_left")
+    p.add_text(f"{case}: surface pressure coefficient Cp (RANS, k-omega SST)", font_size=15, color="black", position="upper_left")
     p.screenshot(os.path.join(OUT, f"K1_cp_{case}.png")); p.close()
 
 
@@ -54,13 +56,11 @@ def vortex_scene(case):
     for n, m in pa.items():
         for s in (m, mirror(m)): p.add_mesh(s, color="#52514e", smooth_shading=True)
     if iso.n_points:
-        p.add_mesh(iso, scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, smooth_shading=True, show_scalar_bar=False)
+        sbar = dict(title="wx b / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
+        p.add_mesh(iso, scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, smooth_shading=True, show_scalar_bar=True, scalar_bar_args=sbar)
         p.add_mesh(iso.copy().transform(np.diag([1, -1, 1, 1]), inplace=False), scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, show_scalar_bar=False)
-    seeds = pv.Line((-0.8, 0.05, -0.05), (-0.8, 1.6, 0.05), resolution=24)
-    st = I.cell_data_to_point_data().streamlines_from_source(seeds, vectors="U", max_length=20, integration_direction="forward", initial_step_length=0.5, terminal_speed=1e-3)
-    pass
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
-    p.add_text(f"{case}: Q-criterion iso-surface coloured by streamwise vorticity", font_size=11, color="black", position="upper_left")
+    p.add_text(f"{case}: Q-criterion iso-surface coloured by streamwise vorticity", font_size=15, color="black", position="upper_left")
     p.screenshot(os.path.join(OUT, f"K2_vortex_{case}.png")); p.close()
 
 
@@ -69,11 +69,15 @@ def slices_scene(case):
     p = plotter()
     for n, m in pa.items():
         for s in (m, mirror(m)): p.add_mesh(s, color="#52514e", smooth_shading=True)
+    shown_bar = False
+    sbar = dict(title="w / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
     for xs in (1.0, 3.0 * B, 5.0 * B, 8.0 * B):
         sl = Ip.slice(normal="x", origin=(xs, 0, 0)).clip_box([xs - 1, xs + 1, 0.0, 3.4, -1.0, 1.0], invert=False)
-        if sl.n_points: p.add_mesh(sl, scalars="w", cmap="RdBu_r", clim=(-0.06, 0.06), opacity=0.9, show_scalar_bar=False)
+        if sl.n_points:
+            p.add_mesh(sl, scalars="w", cmap="RdBu_r", clim=(-0.06, 0.06), opacity=0.9, show_scalar_bar=not shown_bar, scalar_bar_args=sbar if not shown_bar else None)
+            shown_bar = True
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
-    p.add_text(f"{case}: vertical velocity w/U at x = 1 m, 3b, 5b, 8b", font_size=11, color="black", position="upper_left")
+    p.add_text(f"{case}: vertical velocity w/U at x = 1 m, 3b, 5b, 8b", font_size=15, color="black", position="upper_left")
     p.screenshot(os.path.join(OUT, f"K3_wslices_{case}.png")); p.close()
 
 
