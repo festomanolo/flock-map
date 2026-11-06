@@ -297,6 +297,11 @@ class PlanformWing(Wing):
         roll = rho * va * np.sum(gam * self.dy * self.ym)
         lift_L = rho * va * np.sum(gl * self.dy)
         drag_i_L = -rho * np.sum(gl * self.dy * w_tot_L)
+        return dict(
+            CL=lift / (q * self.S),
+            CDi=drag_i / (q * self.S),
+            Cl_roll=roll / (q * self.S * self.G.B),
+            leader_CL=lift_L / (q * self.S),
 
 _PW = {}
 
