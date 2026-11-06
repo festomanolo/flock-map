@@ -16,7 +16,7 @@ Table~\ref{tab:rq} restates the research questions of the preliminary version in
 \begin{tabular}{@{}p{0.5cm}p{5.0cm}p{3.1cm}p{5.0cm}@{}}\toprule
 ID & Question / hypothesis & Evidence used & Status\\\midrule
 RQ1 & How do offset and airspeed set the follower's induced-drag change, rolling moment, trim drag and electrical power? & strip theory, VLM, free wake, RANS CFD & Answered at model level; magnitude differs between models (spread reported)\\
-RQ2 & Can NMPC + barrier-function filter keep separation and tracking under wind, delay and manoeuvres? & 540 guidance-level runs, step tests, ablation & Answered in simulation; filter is conditional, fails beyond actuator authority\\
+RQ2 & Can NMPC + barrier-function filter keep separation and tracking under wind, delay and manoeuvres? & 540 guidance-level runs, step tests, ablation & Answered in simulation; myopic radial filter is conditional, fails under longitudinal deceleration saturation\\
 RQ3 & Does a wake-aware adaptive formation reduce fleet energy per accepted hectare versus independent flight? & 200 paired mission trials $\times$ 5 models & Reduction found (\nabsASheet\,\%) but attributable to route/overlap planning, not to the wake\\
 RQ4 & Does the formation/stereo geometry preserve photogrammetric quality (RMSE$_{H,V}$)? & geometry only & \textbf{Not answered} (no reconstruction)\\
 RQ5 & Which factors govern the break-even regime? & Monte-Carlo sweeps, SRC, Sobol, tornado & Answered: distance, airspeed and wake effectiveness dominate\\\midrule
