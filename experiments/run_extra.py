@@ -172,13 +172,21 @@ def _step_job(a):
 
 
 def sec_ctl():
-    from multiprocessing import Pool
+    import multiprocessing as mp
+    E.table("vlm_sheet", 18.0)  # pre-compute aerodynamic SavingTable once before forking workers
+    ctx = mp.get_context("fork") if "fork" in mp.get_all_start_methods() else mp.get_context()
     nw = min(8, os.cpu_count() or 1)
     jobs = [(n, m, s) for n in ("S3_braking_dropout", "S5_combined", "S6_overcapability") for m in (0.0, 0.5, 1.0, 1.5, 2.0) for s in range(30)]
-    with Pool(nw) as p: res = p.map(_cbf_job, jobs)
+    res = []
+    with ctx.Pool(nw) as p:
+        for idx, item in enumerate(p.imap(_cbf_job, jobs, chunksize=4), 1):
+            res.append(item)
+            if idx % 45 == 0 or idx == len(jobs):
+                print(f"cbf_ablation {idx}/{len(jobs)}", flush=True)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
-    with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
-    pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done")
+    with ctx.Pool(min(3, nw)) as p:
+        st = list(p.imap(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)]))
+    pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done", flush=True)
 
 
 if __name__ == "__main__":
