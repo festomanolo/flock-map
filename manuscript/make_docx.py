@@ -490,11 +490,31 @@ kw = re.search(r"\\begin\{keyword\}(.*?)\\end\{keyword\}", t, re.S).group(1).rep
 hl = re.search(r"(\\subsection\*\{Highlights\}.*?\\end\{itemize\})", t, re.S).group(1)
 body = t[t.index("\\end{frontmatter}") + len("\\end{frontmatter}") :]
 body = re.sub(r"\\bibliographystyle\{[^}]*\}|\\bibliography\{[^}]*\}", "", body)
-body = body.replace("\\appendix", "\\section*{Appendices}")
-doc = (r"\documentclass{article}\usepackage{amsmath,amssymb,bm,graphicx,booktabs,multirow,array}" "\n" r"\newcommand{\Va}{V_a}\newcommand{\dx}{d_x}\newcommand{\dy}{d_y}\newcommand{\Earea}{E_{\mathrm{area}}}" "\n"
-       r"\begin{document}" "\n"
-       f"\\title{{{title}}}\\author{{[Author One], [Author Two] ([Institution])}}\\date{{}}\\maketitle\n"
-       f"\\begin{{abstract}}{abstract}\\end{{abstract}}\n\\textbf{{Keywords:}} {kw}\n\n{hl}\n{body}\n\\section*{{References}}\n\\end{{document}}\n")
+
+# Replace \appendix sections with explicit Appendix A/B/C headings
+if "\\appendix" in body:
+    pre_app, post_app = body.split("\\appendix", 1)
+    app_idx = [0]
+
+    def _app_sec(m):
+        app_idx[0] += 1
+        letter = chr(ord("A") + app_idx[0] - 1)
+        return f"\\section*{{Appendix {letter}. {m.group(1)}}}"
+
+    post_app = re.sub(r"\\section\{([^}]*)\}", _app_sec, post_app)
+    body = pre_app + "\n\\section*{Appendices}\n" + post_app
+
+doc_tex = (
+    r"\documentclass{article}"
+    "\n"
+    r"\usepackage{amsmath,amssymb,bm,graphicx,booktabs,multirow,array}"
+    "\n"
+    r"\begin{document}"
+    "\n"
+    f"\\title{{{title}}}\\author{{[Author One], [Author Two] ([Institution])}}\\date{{}}\\maketitle\n"
+    f"\\begin{{abstract}}{abstract}\\end{{abstract}}\n\\textbf{{Keywords:}} {kw}\n\n{hl}\n{body}\n\\section*{{References}}\n\\end{{document}}\n"
+)
+
 os.makedirs("docx_build/figures", exist_ok=True)
 for f in glob.glob("figures/*.png"): shutil.copy(f, "docx_build/figures/")
 for f in glob.glob("tables/*"): pass
