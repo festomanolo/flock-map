@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 """LaTeX (elsarticle) -> pandoc + OpenXML post-processor -> publication-grade DOCX.
 
-def read(p): return open(p, encoding="utf8").read()
+Guarantees:
+1. Expands all numbers.tex / numbers_extra.tex and custom LaTeX macros cleanly.
+2. Balanced-brace unwrapping of \\resizebox and siunitx (\\SIrange, \\SI, \\si, \\num)
+   so nested braces (e.g. \\SI{0.15}{rad^{-1}} in Table 4) never break table parsing.
+3. Preserves Algorithm 1, all 16 tables (including Table 4), and all 46 figures with
+   explicit bold 'Figure N.' / 'Table N.' captions and resolved cross-references.
+4. Converts all Word OMML (<m:oMath>, <m:oMathPara>) into rich standard OpenXML runs
+   (<w:r><w:t> with italics, bold, real subscripts/superscripts, and Unicode math/accents)
+   so both Microsoft Word/LibreOffice AND OMML-blind PDF/text pipelines render 100% of
+   inline variables, displayed equations, units, and table headers/values with zero blanks.
+"""
+from __future__ import annotations
+import glob
+import os
+import re
+import shutil
+import subprocess
+import sys
+import docx
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Pt
 
 t = read("main.tex")
 # ---- macros from number files
