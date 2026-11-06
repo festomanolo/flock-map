@@ -23,6 +23,7 @@ manuscript/*.blg
 manuscript/*.fls
 manuscript/*.fdb_latexmk
 manuscript/*.spl
+manuscript/*.out
 manuscript/*.docx
 manuscript/main.pdf
 
