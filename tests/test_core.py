@@ -121,3 +121,9 @@ def test_station_keeping_error_no_singularity_and_monotonic():
 
 def test_planform_trefftz_oswald_and_symmetry_coupling():
     from flockmap import cfdgeom as G
+    W = vlm.planform_wing(60)
+    iso = W.isolated_alpha(18.0, 3.0)
+    e_tp = iso["CL"] ** 2 / (np.pi * W.AR * iso["CDi_trefftz"])
+    assert 0.95 < e_tp <= 1.02 and iso["CDi_trefftz"] > iso["CDi"]
+    one = W.follower_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0)
+    sym = W.coupled_symmetry_alpha(3.0 * G.B, 0.85 * G.B, 18.0, 3.0, two_way_leader=True)
