@@ -4,7 +4,10 @@ Writes figures/out3d/K1_cp_<case>.png, K2_vortex_<case>.png, K3_wslices_<case>.p
 import sys, os, glob, json
 import numpy as np, pyvista as pv
 pv.OFF_SCREEN = True
-HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "..", "figures", "out3d"); os.makedirs(OUT, exist_ok=True)
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "..", "figures", "out3d")
+FALLBACK_DIR = os.path.join(HERE, "..", "manuscript", "figures")
+os.makedirs(OUT, exist_ok=True)
 B = 2.12; Q0 = 0.5 * 1.225 * 18.0 ** 2
 
 
