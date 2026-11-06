@@ -115,6 +115,11 @@ def slices_scene(case):
     if not os.path.exists(os.path.join(v, "internal.vtu")):
         _enhance_archived_render(
             f"K3_wslices_{case}.png",
+            f"{case}: vertical velocity w/U at x = 1 m, 3b, 5b, 8b",
+            r"vertical velocity $w / U_\infty$",
+            (-0.06, 0.06),
+        )
+        return
     I, pa, meta = load(case); Ip = I.cell_data_to_point_data(); w = np.asarray(Ip.point_data["U"])[:, 2] / 18.0; Ip.point_data["w"] = w
     p = plotter()
     for n, m in pa.items():
