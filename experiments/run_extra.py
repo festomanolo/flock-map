@@ -184,6 +184,7 @@ def sec_ctl():
             if idx % 45 == 0 or idx == len(jobs):
                 print(f"cbf_ablation {idx}/{len(jobs)}", flush=True)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
+    with ctx.Pool(min(3, nw)) as p:
     with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
     pd.DataFrame(st).to_csv(f"{OUT}/extra_step.csv", index=False); print("ctl done")
 
