@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""LaTeX (elsarticle) -> pandoc-friendly LaTeX -> DOCX.  Usage: python3 make_docx.py  (run inside manuscript/)"""
-import re, os, subprocess, glob, shutil
+"""LaTeX (elsarticle) -> pandoc + OpenXML post-processor -> publication-grade DOCX.
 
 def read(p): return open(p, encoding="utf8").read()
 
