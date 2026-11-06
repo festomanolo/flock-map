@@ -255,7 +255,7 @@ def fig14():
     ax = axs[2]; panel(ax, "c")
     for j, c in enumerate(cols):
         v = [d[(d.scenario == s) & (d.controller == c)].violated.mean() * 100 for s in order]
-        ax.bar(np.arange(6) + (j - 1) * 0.27, v, width=0.25, color=cols[c], label=c, edgecolor="white")
+        ax.bar(np.arange(6) + (j - 1) * 0.27, v, width=0.25, color=cols[c], label=clab[c], edgecolor="white")
     ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.set_ylabel("trials with $h<0$ (%)"); ax.legend(fontsize=6.5, loc="upper left")
     ax = axs[3]; panel(ax, "d"); g = d[d.controller == "NMPC+CBF"]
     ax.bar(np.arange(6) - 0.15, [g[g.scenario == s].cbf_active_frac.mean() * 100 for s in order], width=0.3, color=C["violet"], label="filter active (% of time)", edgecolor="white")
