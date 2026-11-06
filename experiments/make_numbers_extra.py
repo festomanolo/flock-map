@@ -45,7 +45,8 @@ def be(col, kap):
     return float("nan")
 for kap, K in ((0.3, "Low"), (0.7, "Free"), (1.0, "One"), (1.5, "High")):
     v17, v14 = be("saving17_Wh", kap), be("saving14_Wh", kap)
-    put(f"kmBe17{K}", be("saving17_Wh", kap), "{:.1f}"); put(f"kmBe14{K}", be("saving14_Wh", kap), "{:.1f}")
+    put(f"kmBe17{K}", ">20" if np.isnan(v17) else f"{v17:.1f}")
+    put(f"kmBe14{K}", ">20" if np.isnan(v14) else f"{v14:.1f}")
 put("kmAt25", km[(np.isclose(km.kappa, 1.0)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}"); put("kmAt25Low", km[(np.isclose(km.kappa, 0.3)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}")
 put("kmAt25High", km[(np.isclose(km.kappa, 1.5)) & (km.D == 2500)].saving17_Wh.iloc[0], "{:+.2f}"); put("kmAt20k", km[(np.isclose(km.kappa, 1.0)) & (km.D == 20000)].saving17_Wh.iloc[0], "{:+.1f}")
 # ---- tornado / Sobol / CBF / step (if present)
