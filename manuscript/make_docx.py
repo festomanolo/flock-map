@@ -516,9 +516,411 @@ doc_tex = (
 )
 
 os.makedirs("docx_build/figures", exist_ok=True)
-for f in glob.glob("figures/*.png"): shutil.copy(f, "docx_build/figures/")
-for f in glob.glob("tables/*"): pass
-open("docx_build/main_docx.tex", "w", encoding="utf8").write(doc)
-cmd = ["pandoc", "docx_build/main_docx.tex", "-f", "latex+raw_tex", "-o", "FlockMap_manuscript.docx", "--citeproc", "--bibliography=references.bib",
-       "--resource-path=docx_build", "--metadata", "link-citations=true"]
-r = subprocess.run(cmd, capture_output=True, text=True); print(r.stderr[-2500:]); print("docx rc", r.returncode)
+for f in glob.glob("figures/*.png"):
+    shutil.copy(f, "docx_build/figures/")
+with open("docx_build/main_docx.tex", "w", encoding="utf8") as f:
+    f.write(doc_tex)
+
+pandoc_bin = shutil.which("pandoc")
+if not pandoc_bin:
+    import pypandoc
+    pandoc_bin = pypandoc.get_pandoc_path()
+
+cmd = [
+    pandoc_bin,
+    "docx_build/main_docx.tex",
+    "-f",
+    "latex+raw_tex",
+    "-o",
+    "FlockMap_manuscript.docx",
+    "--citeproc",
+    "--bibliography=references.bib",
+    "--resource-path=docx_build",
+    "--metadata",
+    "link-citations=true",
+]
+r = subprocess.run(cmd, capture_output=True, text=True)
+if r.stderr:
+    print(r.stderr[-2500:])
+if r.returncode != 0:
+    raise RuntimeError(f"pandoc failed with rc={r.returncode}")
+
+
+# ---------------------------------------------------------------------------
+# 5. OpenXML post-processing:
+#    (a) Convert all <m:oMath> / <m:oMathPara> to standard <w:r><w:t> runs
+#    (b) Ensure every embedded figure has its explicit Figure N. caption paragraph
+#    (c) Style all tables with booktabs horizontal borders and bold headers
+# ---------------------------------------------------------------------------
+ACCENT_MAP = {
+    "\u0307": "\u0307",
+    "˙": "\u0307",
+    ".": "\u0307",
+    "\u0308": "\u0308",
+    "¨": "\u0308",
+    "\u0304": "\u0304",
+    "¯": "\u0304",
+    "\u00af": "\u0304",
+    "\u203e": "\u0304",
+    "\u0305": "\u0304",
+    "\u0302": "\u0302",
+    "^": "\u0302",
+    "ˆ": "\u0302",
+    "\u0303": "\u0303",
+    "~": "\u0303",
+    "˜": "\u0303",
+    "\u20d7": "\u20d7",
+    "→": "\u20d7",
+}
+
+UPRIGHT_WORDS = {
+    "sin", "cos", "tan", "arctan", "atan2", "exp", "ln", "log", "min", "max",
+    "arg", "sup", "inf", "lim", "diag", "RMSE", "AGL", "GSD", "SST", "Wh", "ha",
+}
+
+
+def local_tag(el) -> str:
+    tname = el.tag
+    return tname.split("}", 1)[1] if "}" in tname else tname
+
+
+def m_attr(el, name: str, default: str = "") -> str:
+    return el.get(f"{{{M_NS}}}{name}") or el.get(name) or default
+
+
+class RunSpec:
+    __slots__ = ("text", "italic", "bold", "valign")
+
+    def __init__(self, text: str, italic: bool = False, bold: bool = False, valign: str | None = None):
+        self.text = text
+        self.italic = italic
+        self.bold = bold
+        self.valign = valign
+
+
+def is_simple_tokens(specs: list[RunSpec]) -> bool:
+    txt = "".join(s.text for s in specs).strip()
+    return len(txt) <= 4 and not any(op in txt for op in ("+", "−", "-", "=", " "))
+
+
+def omath_to_specs(el, valign: str | None = None) -> list[RunSpec]:
+    tag = local_tag(el)
+    if tag == "r":
+        nor = el.find(f"{{{M_NS}}}rPr/{{{M_NS}}}nor") is not None
+        sty = el.find(f"{{{M_NS}}}rPr/{{{M_NS}}}sty")
+        sty_val = m_attr(sty, "val") if sty is not None else ""
+        bold = sty_val in ("b", "bi")
+        txt = "".join((t_el.text or "") for t_el in el.findall(f"{{{M_NS}}}t"))
+        if not txt:
+            return []
+        # Determine italic: standard math variables (Latin/Greek letters) unless upright
+        has_alpha = any(ch.isalpha() for ch in txt)
+        italic = (not nor) and (sty_val != "p") and has_alpha and (txt.strip() not in UPRIGHT_WORDS)
+        return [RunSpec(txt, italic=italic, bold=bold, valign=valign)]
+
+    if tag == "sSub":
+        base = el.find(f"{{{M_NS}}}e")
+        sub = el.find(f"{{{M_NS}}}sub")
+        out = omath_to_specs(base, valign=valign) if base is not None else []
+        if sub is not None:
+            out.extend(omath_to_specs(sub, valign="subscript"))
+        return out
+
+    if tag == "sSup":
+        base = el.find(f"{{{M_NS}}}e")
+        sup = el.find(f"{{{M_NS}}}sup")
+        out = omath_to_specs(base, valign=valign) if base is not None else []
+        if sup is not None:
+            out.extend(omath_to_specs(sup, valign="superscript"))
+        return out
+
+    if tag == "sSubSup":
+        base = el.find(f"{{{M_NS}}}e")
+        sub = el.find(f"{{{M_NS}}}sub")
+        sup = el.find(f"{{{M_NS}}}sup")
+        out = omath_to_specs(base, valign=valign) if base is not None else []
+        if sub is not None:
+            out.extend(omath_to_specs(sub, valign="subscript"))
+        if sup is not None:
+            out.extend(omath_to_specs(sup, valign="superscript"))
+        return out
+
+    if tag == "f":
+        num_el = el.find(f"{{{M_NS}}}num")
+        den_el = el.find(f"{{{M_NS}}}den")
+        num = omath_to_specs(num_el, valign=valign) if num_el is not None else []
+        den = omath_to_specs(den_el, valign=valign) if den_el is not None else []
+        out: list[RunSpec] = []
+        if is_simple_tokens(num):
+            out.extend(num)
+        else:
+            out.append(RunSpec("(", valign=valign))
+            out.extend(num)
+            out.append(RunSpec(")", valign=valign))
+        out.append(RunSpec("/", valign=valign))
+        if is_simple_tokens(den):
+            out.extend(den)
+        else:
+            out.append(RunSpec("(", valign=valign))
+            out.extend(den)
+            out.append(RunSpec(")", valign=valign))
+        return out
+
+    if tag == "rad":
+        deg_el = el.find(f"{{{M_NS}}}deg")
+        e_el = el.find(f"{{{M_NS}}}e")
+        out = []
+        if deg_el is not None:
+            deg_specs = omath_to_specs(deg_el, valign="superscript")
+            if any(s.text.strip() for s in deg_specs):
+                out.extend(deg_specs)
+        out.append(RunSpec("√(", valign=valign))
+        if e_el is not None:
+            out.extend(omath_to_specs(e_el, valign=valign))
+        out.append(RunSpec(")", valign=valign))
+        return out
+
+    if tag == "d":
+        dpr = el.find(f"{{{M_NS}}}dPr")
+        beg = "("
+        end = ")"
+        sep = "|"
+        if dpr is not None:
+            b_el = dpr.find(f"{{{M_NS}}}begChr")
+            e_el = dpr.find(f"{{{M_NS}}}endChr")
+            s_el = dpr.find(f"{{{M_NS}}}sepChr")
+            if b_el is not None:
+                beg = m_attr(b_el, "val", "")
+            if e_el is not None:
+                end = m_attr(e_el, "val", "")
+            if s_el is not None:
+                sep = m_attr(s_el, "val", "|")
+        elems = el.findall(f"{{{M_NS}}}e")
+        out = [RunSpec(beg, valign=valign)] if beg else []
+        for idx, sub_e in enumerate(elems):
+            if idx > 0 and sep:
+                out.append(RunSpec(sep, valign=valign))
+            out.extend(omath_to_specs(sub_e, valign=valign))
+        if end:
+            out.append(RunSpec(end, valign=valign))
+        return out
+
+    if tag == "nary":
+        npr = el.find(f"{{{M_NS}}}naryPr")
+        chr_val = "∫"
+        if npr is not None:
+            c_el = npr.find(f"{{{M_NS}}}chr")
+            if c_el is not None:
+                chr_val = m_attr(c_el, "val", "∫")
+        sub_el = el.find(f"{{{M_NS}}}sub")
+        sup_el = el.find(f"{{{M_NS}}}sup")
+        e_el = el.find(f"{{{M_NS}}}e")
+        out = [RunSpec(chr_val, valign=valign)]
+        if sub_el is not None:
+            out.extend(omath_to_specs(sub_el, valign="subscript"))
+        if sup_el is not None:
+            out.extend(omath_to_specs(sup_el, valign="superscript"))
+        if e_el is not None:
+            out.append(RunSpec(" ", valign=valign))
+            out.extend(omath_to_specs(e_el, valign=valign))
+        return out
+
+    if tag in ("limLow", "limUpp"):
+        e_el = el.find(f"{{{M_NS}}}e")
+        lim_el = el.find(f"{{{M_NS}}}lim")
+        out = omath_to_specs(e_el, valign=valign) if e_el is not None else []
+        if lim_el is not None:
+            v = "subscript" if tag == "limLow" else "superscript"
+            out.extend(omath_to_specs(lim_el, valign=v))
+        return out
+
+    if tag in ("acc", "bar"):
+        comb = "\u0304" if tag == "bar" else "\u0307"
+        apr = el.find(f"{{{M_NS}}}accPr")
+        if apr is not None:
+            c_el = apr.find(f"{{{M_NS}}}chr")
+            if c_el is not None:
+                raw_c = m_attr(c_el, "val", "")
+                comb = ACCENT_MAP.get(raw_c, "\u0304" if raw_c else "\u0307")
+        e_el = el.find(f"{{{M_NS}}}e")
+        inner = omath_to_specs(e_el, valign=valign) if e_el is not None else []
+        if inner:
+            inner[0].text = inner[0].text[:1] + comb + inner[0].text[1:]
+        return inner
+
+    if tag == "func":
+        fn_el = el.find(f"{{{M_NS}}}fName")
+        e_el = el.find(f"{{{M_NS}}}e")
+        out = []
+        if fn_el is not None:
+            for sp in omath_to_specs(fn_el, valign=valign):
+                sp.italic = False
+                out.append(sp)
+        if e_el is not None:
+            e_specs = omath_to_specs(e_el, valign=valign)
+            if out and e_specs and e_specs[0].text[:1].isalnum():
+                out.append(RunSpec(" ", valign=valign))
+            out.extend(e_specs)
+        return out
+
+    if tag == "m":
+        rows = el.findall(f"{{{M_NS}}}mr")
+        out = [RunSpec("[", valign=valign)]
+        for r_idx, mr in enumerate(rows):
+            if r_idx > 0:
+                out.append(RunSpec("; ", valign=valign))
+            cells = mr.findall(f"{{{M_NS}}}e")
+            for c_idx, cell in enumerate(cells):
+                if c_idx > 0:
+                    out.append(RunSpec(", ", valign=valign))
+                out.extend(omath_to_specs(cell, valign=valign))
+        out.append(RunSpec("]", valign=valign))
+        return out
+
+    # Generic container fallback: visit all children in order so zero <m:t> nodes are ever dropped
+    out = []
+    for child in el:
+        out.extend(omath_to_specs(child, valign=valign))
+    return out
+
+
+def specs_to_w_runs(specs: list[RunSpec]) -> list[OxmlElement]:
+    # Merge adjacent runs with identical formatting
+    merged: list[RunSpec] = []
+    for sp in specs:
+        if not sp.text:
+            continue
+        if (
+            merged
+            and merged[-1].italic == sp.italic
+            and merged[-1].bold == sp.bold
+            and merged[-1].valign == sp.valign
+        ):
+            merged[-1].text += sp.text
+        else:
+            merged.append(sp)
+    els = []
+    for sp in merged:
+        r_el = OxmlElement("w:r")
+        if sp.italic or sp.bold or sp.valign:
+            rpr = OxmlElement("w:rPr")
+            if sp.bold:
+                rpr.append(OxmlElement("w:b"))
+            if sp.italic:
+                rpr.append(OxmlElement("w:i"))
+            if sp.valign:
+                va = OxmlElement("w:vertAlign")
+                va.set(qn("w:val"), sp.valign)
+                rpr.append(va)
+            r_el.append(rpr)
+        t_el = OxmlElement("w:t")
+        if sp.text[:1] == " " or sp.text[-1:] == " ":
+            t_el.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+        t_el.text = sp.text
+        r_el.append(t_el)
+        els.append(r_el)
+    return els
+
+
+def convert_omath_in_paragraph(p_el) -> None:
+    # Handle <m:oMathPara> (display equation) -> center paragraph & replace with <w:r> runs
+    for mpara in list(p_el.findall(f".//{{{M_NS}}}oMathPara")):
+        ppr = p_el.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = OxmlElement("w:pPr")
+            p_el.insert(0, ppr)
+        jc = ppr.find(qn("w:jc"))
+        if jc is None:
+            jc = OxmlElement("w:jc")
+            ppr.append(jc)
+        jc.set(qn("w:val"), "center")
+        parent = mpara.getparent()
+        idx = list(parent).index(mpara)
+        specs: list[RunSpec] = []
+        for om in mpara.findall(f"{{{M_NS}}}oMath"):
+            specs.extend(omath_to_specs(om))
+        for w_run in reversed(specs_to_w_runs(specs)):
+            parent.insert(idx, w_run)
+        parent.remove(mpara)
+
+    # Handle inline <m:oMath>
+    for om in list(p_el.findall(f".//{{{M_NS}}}oMath")):
+        parent = om.getparent()
+        idx = list(parent).index(om)
+        specs = omath_to_specs(om)
+        for w_run in reversed(specs_to_w_runs(specs)):
+            parent.insert(idx, w_run)
+        parent.remove(om)
+
+
+def set_cell_border(tc, **kwargs):
+    tcPr = tc.get_or_add_tcPr()
+    tcBorders = tcPr.first_child_found_in("w:tcBorders")
+    if tcBorders is None:
+        tcBorders = OxmlElement("w:tcBorders")
+        tcPr.append(tcBorders)
+    for edge, attrs in kwargs.items():
+        edge_el = tcBorders.find(qn(f"w:{edge}"))
+        if edge_el is None:
+            edge_el = OxmlElement(f"w:{edge}")
+            tcBorders.append(edge_el)
+        for k, v in attrs.items():
+            edge_el.set(qn(f"w:{k}"), str(v))
+
+
+def style_table_booktabs(tbl):
+    tblPr = tbl._tbl.tblPr
+    borders = tblPr.find(qn("w:tblBorders"))
+    if borders is None:
+        borders = OxmlElement("w:tblBorders")
+        tblPr.append(borders)
+    for edge, val, sz, col in (
+        ("top", "single", "8", "1F2937"),
+        ("bottom", "single", "8", "1F2937"),
+        ("insideH", "single", "2", "D1D5DB"),
+        ("left", "none", "0", "auto"),
+        ("right", "none", "0", "auto"),
+        ("insideV", "none", "0", "auto"),
+    ):
+        el = borders.find(qn(f"w:{edge}"))
+        if el is None:
+            el = OxmlElement(f"w:{edge}")
+            borders.append(el)
+        el.set(qn("w:val"), val)
+        el.set(qn("w:sz"), sz)
+        el.set(qn("w:space"), "0")
+        el.set(qn("w:color"), col)
+    if tbl.rows:
+        for cell in tbl.rows[0].cells:
+            set_cell_border(cell._tc, bottom={"val": "single", "sz": "6", "space": "0", "color": "1F2937"})
+            for p in cell.paragraphs:
+                for run in p.runs:
+                    run.bold = True
+
+
+d = docx.Document("FlockMap_manuscript.docx")
+
+# Convert all OMML in body paragraphs and table cells
+for p_el in d.element.body.findall(f".//{{{W_NS}}}p"):
+    convert_omath_in_paragraph(p_el)
+
+# Keep image paragraphs glued to their captions directly below
+for p in d.paragraphs:
+    if p._p.findall(".//" + qn("w:drawing")):
+        p.paragraph_format.keep_with_next = True
+        p.paragraph_format.space_after = Pt(2)
+
+# Style all tables cleanly
+for tbl in d.tables:
+    style_table_booktabs(tbl)
+
+rem_omath = len(d.element.body.findall(f".//{{{M_NS}}}oMath"))
+if rem_omath != 0:
+    raise RuntimeError(f"Expected 0 remaining oMath nodes, found {rem_omath}")
+
+d.save("FlockMap_manuscript.docx")
+out_copy = os.path.join(HERE, "..", "outputs", "FlockMap_manuscript.docx")
+if os.path.isdir(os.path.dirname(out_copy)):
+    shutil.copy("FlockMap_manuscript.docx", out_copy)
+
+print(f"DOCX ready: paragraphs={len(d.paragraphs)}, tables={len(d.tables)}, remaining_oMath={rem_omath}")
