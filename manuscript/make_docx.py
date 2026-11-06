@@ -433,7 +433,7 @@ def _repl_si_val(args, pos):
         return f"{v}{fmt_unit_math(u)}"
     up = fmt_unit_plain(u)
     vp = fmt_num_plain(v)
-    sep = "" if up in ("°", "%") else " "
+    sep = "" if up in ("°", r"\%", "%") else " "
     return f"{vp}{sep}{up}"
 
 
