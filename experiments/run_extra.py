@@ -102,7 +102,9 @@ def sec_skerr():
     so collocation points never land on singular 1/r trailing vortex filaments, then integrates via 61-point
     Gauss-Hermite quadrature."""
     rows = []
-    rng = np.random.default_rng(1)
+    n_pan = 60
+    xg, wg = np.polynomial.hermite.hermgauss(61)
+    wg = wg / np.sqrt(np.pi)
     for model, kw in (("vlm_sheet", dict(wake="sheet")), ("vlm_free", dict(wake="free")), ("strip_corrected", None)):
         for dyb in (0.80, 0.85, 0.90):
             for sig in (0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.60):
