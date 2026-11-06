@@ -33,6 +33,12 @@ def load(case, need_internal=True):
     return I, pa, meta
 
 
+def _enhance_archived_render(fname, title, cbar_label, clim):
+    """When large internal.vtu meshes are excluded from archive, add legible title and calibrated colorbar."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
     shown_bar = False
