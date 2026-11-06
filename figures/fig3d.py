@@ -237,7 +237,7 @@ def scene_split():
         add_uav(p, El[i], Nl[i], 0.0, course(El, Nl, i), scale=40, accent="#7d8794")
         add_uav(p, Er[i], Nr[i], 0.0, course(Er, Nr, i), bank_deg=phi[i], scale=40, accent=AQUA)
         add_uav(p, Elf[i], Nlf[i], 0.0, course(Elf, Nlf, i), bank_deg=-phi[i], scale=40, accent=AQUA)
-    p.add_text("Formation split into zones, 370 m lateral displacement (NMPC, VLM-sheet wake saving along the paths); aircraft drawn 40x", font_size=10, position="upper_left", color=INK)
+    p.add_text("Formation split into zones, 370 m lateral displacement (NMPC, VLM-sheet wake saving along the paths); aircraft drawn 40x", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(1000, -520, 800), (0, 950, 0), (0, 0, 1)]
     save(p, "B2_split_manoeuvre")
 
