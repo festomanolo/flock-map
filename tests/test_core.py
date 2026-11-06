@@ -116,3 +116,8 @@ def test_station_keeping_error_no_singularity_and_monotonic():
     for slot in (0.75, 0.85, 0.95):
         g = vs[np.isclose(vs.slot_dy_b, slot)].sort_values("sigma_m")
         diffs = np.diff(g.mean_pct.values)
+        assert np.all(diffs <= 1e-9), f"Non-monotonic station-keeping curve at slot {slot}: {g.mean_pct.values}"
+
+
+def test_planform_trefftz_oswald_and_symmetry_coupling():
+    from flockmap import cfdgeom as G
