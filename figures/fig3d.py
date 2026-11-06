@@ -123,7 +123,7 @@ def scene_wake():
     hp = horiz_plane(fw, np.linspace(-14, 1.0, 110), np.linspace(-4.0, 4.0, 70))
     p.add_mesh(hp, scalars="w", lighting=False, show_scalar_bar=True, scalar_bar_args=bars("w at flight level (m/s)", 0.04, 0.35), **CL)
     formation(p, dx, dy)
-    p.add_text("(b) plan view: upwash lobes outboard of the tip vortices", font_size=10, position="upper_left", color=INK)
+    p.add_text("(b) plan view: upwash lobes outboard of the tip vortices", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-6.5, 0.0, 20.0), (-6.5, 0.0, 0.0), (1, 0, 0)]
     # (c) rear view with swirl arrows
     p.subplot(1, 0); p.set_background("white", top="#dfe3ea")
