@@ -55,7 +55,7 @@ def X3_sens():
             ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
             put_right = (lab == "high") if (r_lo.delta_Wh == 0 and r_hi.delta_Wh == 0) else (r.delta_Wh >= (r_hi.delta_Wh if lab == "low" else r_lo.delta_Wh))
             x_txt = (max(0.0, r.delta_Wh) + 0.14) if put_right else (min(0.0, r.delta_Wh) - 0.14)
-            ax.text(r.delta_Wh + dx_txt, i, f"{r.value:g}", fontsize=6, va="center", ha=ha_txt, color=C["ink2"])
+            ax.text(x_txt, i, f"{r.value:g}", fontsize=6, va="center", ha="left" if put_right else "right", color=C["ink2"])
     ax.set_xlim(-4.35, 5.1)
     ax.set_yticks(range(len(order))); ax.set_yticklabels(order, fontsize=6.5); ax.axvline(0, color=C["ink"], lw=0.8); ax.set_xlabel(f"change in fleet saving S3 vs S1 (Wh); baseline {base:.2f} Wh"); ax.grid(axis="y", visible=False)
     ax = axs[1]; panel(ax, "b"); y = np.arange(len(s)); o = np.argsort(s.ST.values)
