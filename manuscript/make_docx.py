@@ -468,13 +468,23 @@ for pat in (
     r"\\setcounter\{(figure|table)\}\{0\}",
 ):
     t = re.sub(pat, "", t)
-t = re.sub(r"\\resizebox\{[^}]*\}\{[^}]*\}\{%?", "", t)
-t = t.replace("\\end{tabular}}", "\\end{tabular}")
-t = re.sub(r"\\begin\{table\}\[[^\]]*\]", r"\\begin{table}", t); t = re.sub(r"\\begin\{figure\}\[[^\]]*\]", r"\\begin{figure}", t)
-t = re.sub(r"\\includegraphics(\[[^\]]*\])?\{([^}]+)\}", lambda m: "\\includegraphics[width=15.5cm]{figures/" + os.path.splitext(os.path.basename(m.group(2)))[0] + ".png}", t)
-t = re.sub(r"\\begin\{highlights\}", r"\\subsection*{Highlights}\\begin{itemize}", t); t = t.replace("\\end{highlights}", "\\end{itemize}")
-# front matter: pull title/abstract/keywords out
-title = re.search(r"\\title\{(.*?)\}\s*\n\\author", t, re.S); title = title.group(1).replace("\n", " ") if title else "Manuscript"
+
+t = re.sub(r"\\begin\{table\}\[[^\]]*\]", r"\\begin{table}", t)
+t = re.sub(r"\\begin\{figure\}\[[^\]]*\]", r"\\begin{figure}", t)
+# Ensure every \begin{figure} puts \caption on its own line cleanly below \includegraphics
+t = re.sub(
+    r"\\includegraphics(\[[^\]]*\])?\{([^}]+)\}",
+    lambda m: "\\includegraphics[width=15.5cm]{figures/"
+    + os.path.splitext(os.path.basename(m.group(2)))[0]
+    + ".png}\n",
+    t,
+)
+t = re.sub(r"\\begin\{highlights\}", r"\\subsection*{Highlights}\\begin{itemize}", t)
+t = t.replace("\\end{highlights}", "\\end{itemize}")
+t = t.replace("\\LaTeX\\", "LaTeX ").replace("\\LaTeX", "LaTeX")
+
+title_m = re.search(r"\\title\{(.*?)\}\s*\n\\author", t, re.S)
+title = title_m.group(1).replace("\n", " ") if title_m else "Manuscript"
 abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", t, re.S).group(1)
 kw = re.search(r"\\begin\{keyword\}(.*?)\\end\{keyword\}", t, re.S).group(1).replace("\\sep", ";")
 hl = re.search(r"(\\subsection\*\{Highlights\}.*?\\end\{itemize\})", t, re.S).group(1)
