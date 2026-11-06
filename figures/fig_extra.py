@@ -182,7 +182,7 @@ def X11_control_stats():
     ax.set_xlabel("RMS lateral error, S5 (m)"); ax.set_ylabel("empirical CDF"); ax.legend(fontsize=6.3)
     ax = axs[1]; panel(ax, "b")
     for k in ("NMPC", "NMPC+CBF"):
-        v = np.sort(c[(c.controller == k)].solve_ms_max.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cols[k], label=k)
+        v = np.sort(c[(c.controller == k)].solve_ms_max.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cols[k], label=clab[k])
     ax.axvline(100, color=C["red"], ls="--", lw=0.8); ax.text(102, 0.1, "10 Hz budget", fontsize=6.3, color=C["red"]); ax.set_xlabel("worst solve time per run (ms)"); ax.set_xscale("log"); ax.legend(fontsize=6.3)
     ax = axs[2]; panel(ax, "c"); sc = ["S1_turbulence", "S2_gust_doublet", "S3_braking_dropout", "S4_degraded_gnss", "S5_combined", "S6_overcapability"]
     for j, k in enumerate(cols):
