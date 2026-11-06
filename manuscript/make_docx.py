@@ -465,8 +465,6 @@ for pat in (
     r"\\biboptions\{[^}]*\}",
     r"\\journal\{[^}]*\}",
     r"\\graphicspath\{\{[^}]*\}\}",
-    r"\\renewcommand\{\\theHfigure\}\{[^}]*\}",
-    r"\\renewcommand\{\\theHtable\}\{[^}]*\}",
     r"\\setcounter\{(figure|table)\}\{0\}",
 ):
     t = re.sub(pat, "", t)
