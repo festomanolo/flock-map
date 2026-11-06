@@ -13,7 +13,6 @@ Controllers:          "P"        proportional-derivative lateral/longitudinal la
 from __future__ import annotations
 import dataclasses, math, time
 import numpy as np
-import casadi as ca
 from scipy.optimize import minimize
 from .config import AC, G
 
@@ -25,6 +24,7 @@ DT_SIM, DT_MPC, NP = 0.02, 0.1, 25
 
 # --------------------------------------------------------------------------------------- NMPC
 def _build_nmpc():
+    import casadi as ca
     N = NP
     X = ca.SX.sym("X", 6, N + 1); U = ca.SX.sym("U", 2, N)
     P = ca.SX.sym("P", 6 + 2 + 4 * (N + 1) + 2)   # x0, w_hat, ref(px,py,vx,vy)*(N+1), u_prev
@@ -67,6 +67,7 @@ def _build_nmpc():
 
 # --------------------------------------------------------------------------------------- HOCBF (relative degree 3)
 def _build_hocbf(alpha=(1.2, 1.6, 2.0)):
+    import casadi as ca
     r = ca.SX.sym("r", 2)                 # relative position follower - leader
     V, chi, phi, a = ca.SX.sym("V"), ca.SX.sym("chi"), ca.SX.sym("phi"), ca.SX.sym("a")
     vL = ca.SX.sym("vL", 2); wf = ca.SX.sym("wf", 2)     # leader ground velocity, follower wind estimate
