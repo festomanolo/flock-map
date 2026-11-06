@@ -29,6 +29,7 @@ def load(case):
 
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
+    shown_bar = False
     for n, m in pa.items():
         m = m.cell_data_to_point_data(); cp = (np.asarray(m.point_data["p"])) / 0.5  # kinematic p -> Cp = p/(0.5 U^2)
         cp = cp / (18.0 ** 2) * 1.0; m.point_data["Cp"] = cp
