@@ -157,7 +157,7 @@ def fig15():
             r = d[(d.model == m) & (d.component == c)].iloc[0]
             ax.bar(i + (j - 1.5) * w, r.saving_pct, width=w * 0.9, color=cl[i], alpha=min(1.0, 0.35 + 0.2 * j), edgecolor="white")
     ax.axhline(0, color=C["ink"], lw=0.8); ax.set_xticks(range(4)); ax.set_xticklabels(["route / overlap\nonly (D1 vs S1)", "formation transit\nonly (S3 vs S1)", "interaction", "total\n(S4 vs S1)"])
-    ax.set_ylabel("energy saving vs S1 (%)"); ax.text(0.99, 0.97, "bars within a group: published → strip-corrected → VLM free wake → VLM sheet (darker = more independent model)", transform=ax.transAxes, ha="right", va="top", fontsize=6.2, color=C["ink2"])
+    ax.set_ylabel("energy saving vs S1 (%, + = saving)"); ax.text(0.99, 0.97, "bars within a group: preliminary → strip-corrected → VLM free wake → VLM sheet (+ = saving)", transform=ax.transAxes, ha="right", va="top", fontsize=6.1, color=C["ink2"])
     fig.tight_layout(); save(fig, "fig15_decomposition")
 
 
