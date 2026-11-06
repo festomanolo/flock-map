@@ -150,7 +150,7 @@ def scene_wake():
     arr = pv.PolyData(pts); arr["v"] = np.column_stack([np.zeros(len(pts)), np.zeros(len(pts)), vv[:, 2]]); arr["mag"] = np.abs(vv[:, 2])
     p.add_mesh(arr.glyph(orient="v", scale="mag", factor=2.0, geom=pv.Arrow(tip_length=0.35, tip_radius=0.1, shaft_radius=0.03)), color=BLUE)
     p.add_scalar_bar("circulation change vs isolated (%)") if False else None
-    p.add_text("(d) follower wing: circulation change (colour) and induced w (arrow length 2 m per m/s)", font_size=10, position="upper_left", color=INK)
+    p.add_text("(d) follower wing: circulation change (colour) and induced w (arrow length 2 m per m/s)", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-dx - 3.2, dy - 3.0, 2.2), (-dx - 0.2, dy, 0.1), (0, 0, 1)]
     save(p, "A1_freewake_formation")
 
