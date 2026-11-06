@@ -180,6 +180,7 @@ def sec_ctl():
     res = []
     with ctx.Pool(nw) as p:
         for idx, item in enumerate(p.imap(_cbf_job, jobs, chunksize=4), 1):
+            res.append(item)
     with Pool(nw) as p: res = p.map(_cbf_job, jobs)
     pd.DataFrame(res).to_csv(f"{OUT}/extra_cbf_ablation.csv", index=False)
     with Pool(min(3, nw)) as p: st = p.map(_step_job, [(c, s) for c in ("P", "NMPC", "NMPC+CBF") for s in range(3)])
