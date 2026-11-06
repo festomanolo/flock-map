@@ -155,8 +155,8 @@ t = re.sub(r"\\newcommand\{\\n\w+\}\{[^\n]*\}\s*", "", t)
 custom_macs = {
     "Va": " V_a",
     "dx": " d_x",
-    "dy": "d_y",
-    "Earea": r"E_{\mathrm{area}}",
+    "dy": " d_y",
+    "Earea": r" E_{\mathrm{area}}",
 }
 for k in sorted(macs, key=len, reverse=True):
     val = macs[k]
