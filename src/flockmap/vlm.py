@@ -283,6 +283,10 @@ class PlanformWing(Wing):
                 A_FL_cp[:, n - 1 - j] += _horseshoe_pts(cpL_from_p, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
                 A_FL_bd[:, n - 1 - j] += _horseshoe_pts(bdL_from_p, self.nodesA[j], self.nodesB[j], self.core)[:, 2]
             M = np.block([[self.A, A_FL_cp], [A_LS_cp, self.A + A_mir_cp]])
+            sol = np.linalg.solve(M, np.concatenate([rhs, rhs]))
+            gl, gam = sol[:n], sol[n:]
+            w_tot_L = self.Ab @ gl + A_FL_bd @ gam
+        else:
 
 _PW = {}
 
