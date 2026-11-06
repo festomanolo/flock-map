@@ -45,13 +45,20 @@ def X2_kappa():
 
 def X3_sens():
     t = pd.read_csv(f"{P}/extra_tornado.csv"); s = pd.read_csv(f"{P}/extra_sobol.csv")
-    fig, axs = plt.subplots(1, 2, figsize=(7.4, 2.8), gridspec_kw=dict(width_ratios=[1.3, 1]))
+    fig, axs = plt.subplots(1, 2, figsize=(7.6, 2.9), gridspec_kw=dict(width_ratios=[1.32, 1], wspace=0.52))
     ax = axs[0]; panel(ax, "a"); base = t.base_Wh.iloc[0]
     order = t.assign(a=t.delta_Wh.abs()).groupby("factor").a.max().sort_values().index
     for i, f in enumerate(order):
         for lab, c in (("low", C["orange"]), ("high", C["blue"])):
             r = t[(t.factor == f) & (t.setting == lab)].iloc[0]; ax.barh(i, r.delta_Wh, color=c, height=0.6, edgecolor="white")
-            ax.text(r.delta_Wh + (0.15 if r.delta_Wh >= 0 else -0.15), i, f"{r.value:g}", fontsize=6, va="center", ha="left" if r.delta_Wh >= 0 else "right", color=C["ink2"])
+            if abs(r.delta_Wh) < 0.08:
+                dx_txt = -0.14 if lab == "low" else 0.14
+                ha_txt = "right" if lab == "low" else "left"
+            else:
+                dx_txt = 0.14 if r.delta_Wh >= 0 else -0.14
+                ha_txt = "left" if r.delta_Wh >= 0 else "right"
+            ax.text(r.delta_Wh + dx_txt, i, f"{r.value:g}", fontsize=6, va="center", ha=ha_txt, color=C["ink2"])
+    ax.set_xlim(-4.35, 5.1)
     ax.set_yticks(range(len(order))); ax.set_yticklabels(order, fontsize=6.5); ax.axvline(0, color=C["ink"], lw=0.8); ax.set_xlabel(f"change in fleet saving S3 vs S1 (Wh); baseline {base:.2f} Wh"); ax.grid(axis="y", visible=False)
     ax = axs[1]; panel(ax, "b"); y = np.arange(len(s)); o = np.argsort(s.ST.values)
     ax.barh(y - 0.18, s.S1.values[o], height=0.34, color=C["blue"], label="first order $S_i$"); ax.barh(y + 0.18, s.ST.values[o], height=0.34, color=C["aqua"], label="total $S_{Ti}$")
@@ -168,13 +175,14 @@ def X10_soc():
 def X11_control_stats():
     c = pd.read_csv("data/raw/control_trials.csv"); fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.7))
     cols = {"P": C["orange"], "NMPC": C["blue"], "NMPC+CBF": C["violet"]}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     ax = axs[0]; panel(ax, "a")
     for k, cc in cols.items():
-        v = np.sort(c[(c.controller == k) & (c.scenario == "S5_combined")].rms_ey.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cc, label=k)
+        v = np.sort(c[(c.controller == k) & (c.scenario == "S5_combined")].rms_ey.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cc, label=clab[k])
     ax.set_xlabel("RMS lateral error, S5 (m)"); ax.set_ylabel("empirical CDF"); ax.legend(fontsize=6.3)
     ax = axs[1]; panel(ax, "b")
     for k in ("NMPC", "NMPC+CBF"):
-        v = np.sort(c[(c.controller == k)].solve_ms_max.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cols[k], label=k)
+        v = np.sort(c[(c.controller == k)].solve_ms_max.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cols[k], label=clab[k])
     ax.axvline(100, color=C["red"], ls="--", lw=0.8); ax.text(102, 0.1, "10 Hz budget", fontsize=6.3, color=C["red"]); ax.set_xlabel("worst solve time per run (ms)"); ax.set_xscale("log"); ax.legend(fontsize=6.3)
     ax = axs[2]; panel(ax, "c"); sc = ["S1_turbulence", "S2_gust_doublet", "S3_braking_dropout", "S4_degraded_gnss", "S5_combined", "S6_overcapability"]
     for j, k in enumerate(cols):
@@ -186,16 +194,18 @@ def X11_control_stats():
 def X12_cbf():
     d = pd.read_csv(f"{P}/extra_cbf_ablation.csv"); s = pd.read_csv(f"{P}/extra_step.csv")
     fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.7)); cols = {"S3_braking_dropout": C["blue"], "S5_combined": C["orange"], "S6_overcapability": C["red"]}
-    for ax, col, yl, l in ((axs[0], "violated", "trials with $h<0$ (%)", "a"), (axs[1], "rms_ey", "RMS lateral error (m)", "b"), (axs[2], "mean_dcd", "mean drag-coefficient saving", "c")):
+    for ax, col, yl, l in ((axs[0], "violated", "trials with $h<0$ (%)", "a"), (axs[1], "rms_ey", "RMS lateral error (m)", "b"), (axs[2], "mean_dcd", "mean $\\Delta C_D \\times 10^4$", "c")):
         panel(ax, l)
+        mult = 100.0 if col == "violated" else (1e4 if col == "mean_dcd" else 1.0)
         for sc, cc in cols.items():
-            g = d[d.scenario == sc].groupby("margin")[col].mean(); ax.plot(g.index, g.values * (100 if col == "violated" else 1), "o-", ms=3, color=cc, label=sc.split("_")[0])
+            g = d[d.scenario == sc].groupby("margin")[col].mean(); ax.plot(g.index, g.values * mult, "o-", ms=3.5, color=cc, label=sc.split("_")[0])
+        ax.axvline(0.5, color=C["ink2"], ls=":", lw=0.8)
         ax.set_xlabel("HOCBF margin $\\Delta D$ (m)"); ax.set_ylabel(yl)
     axs[0].legend(fontsize=6.3)
     save(fig, "X12_cbf_margin_ablation")
-    fig, ax = plt.subplots(figsize=(3.6, 2.4)); g = s.groupby("controller")[["overshoot_pct", "settle2_s"]].mean()
+    fig, ax = plt.subplots(figsize=(3.8, 2.5)); g = s.groupby("controller")[["overshoot_pct", "settle2_s"]].mean().reindex(["P", "NMPC", "NMPC+CBF"])
     ax.bar(np.arange(3) - 0.2, g.overshoot_pct, width=0.38, color=C["blue"], label="overshoot (%)"); ax.bar(np.arange(3) + 0.2, g.settle2_s, width=0.38, color=C["orange"], label="2 % settling time (s)")
-    ax.set_xticks(range(3)); ax.set_xticklabels(g.index, fontsize=7); ax.legend(fontsize=6.5); save(fig, "X12b_step_response")
+    ax.set_xticks(range(3)); ax.set_xticklabels(["PD", "NMPC", "NMPC+HOCBF"], fontsize=7); ax.legend(fontsize=6.5); save(fig, "X12b_step_response")
 
 
 if __name__ == "__main__":

@@ -73,8 +73,8 @@ def save(p, name, cam=None, zoom=None):
 
 
 # ---------------------------------------------------------------------------------- scene A: free wake and formation
-def bars(title, y, x=0.05, w=0.28):
-    return dict(title=title, vertical=False, position_x=x, position_y=y, width=w, height=0.05, color=INK, title_font_size=14, label_font_size=12, n_labels=5)
+def bars(title, y, x=0.05, w=0.32):
+    return dict(title=title, vertical=False, position_x=x, position_y=y, width=w, height=0.055, color=INK, title_font_size=20, label_font_size=16, n_labels=5)
 
 
 def w_plane(fw, x_plane, ys, zs):
@@ -116,14 +116,14 @@ def scene_wake():
     formation(p, dx, dy)
     pl = w_plane(fw, -dx - 0.3, np.linspace(-3.4, 3.4, 90), np.linspace(-1.3, 1.3, 50))
     p.add_mesh(pl, scalars="w", opacity=0.8, lighting=False, show_scalar_bar=True, scalar_bar_args=bars("w at follower plane (m/s)", 0.04, 0.02), **CL)
-    p.add_text("(a) free-wake sheet and follower plane", font_size=10, position="upper_left", color=INK)
+    p.add_text("(a) free-wake sheet and follower plane", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-9.5, -8.0, 3.6), (-4.8, 0.0, -0.2), (0, 0, 1)]
     # (b) plan view of w on the flight-level plane
     p.subplot(0, 1); p.set_background("white", top="#dfe3ea")
     hp = horiz_plane(fw, np.linspace(-14, 1.0, 110), np.linspace(-4.0, 4.0, 70))
     p.add_mesh(hp, scalars="w", lighting=False, show_scalar_bar=True, scalar_bar_args=bars("w at flight level (m/s)", 0.04, 0.35), **CL)
     formation(p, dx, dy)
-    p.add_text("(b) plan view: upwash lobes outboard of the tip vortices", font_size=10, position="upper_left", color=INK)
+    p.add_text("(b) plan view: upwash lobes outboard of the tip vortices", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-6.5, 0.0, 20.0), (-6.5, 0.0, 0.0), (1, 0, 0)]
     # (c) rear view with swirl arrows
     p.subplot(1, 0); p.set_background("white", top="#dfe3ea")
@@ -133,7 +133,7 @@ def scene_wake():
     gl = sub.glyph(orient="vec", scale=False, factor=0.28, geom=pv.Arrow(tip_length=0.4, tip_radius=0.12, shaft_radius=0.04))
     p.add_mesh(gl, color=INK)
     for sgn in (-1, 1): viz3d.add_x8(p, (-dx, sgn * dy, 0), accent=AQUA)
-    p.add_text("(c) rear view: cross-flow (v,w) at the followers' plane", font_size=10, position="upper_left", color=INK)
+    p.add_text("(c) rear view: cross-flow (v,w) at the followers' plane", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-dx - 9.0, 0.0, 0.6), (-dx, 0.0, 0.0), (0, 0, 1)]
     # (d) follower wing loading
     p.subplot(1, 1); p.set_background("white", top="#dfe3ea")
@@ -150,7 +150,7 @@ def scene_wake():
     arr = pv.PolyData(pts); arr["v"] = np.column_stack([np.zeros(len(pts)), np.zeros(len(pts)), vv[:, 2]]); arr["mag"] = np.abs(vv[:, 2])
     p.add_mesh(arr.glyph(orient="v", scale="mag", factor=2.0, geom=pv.Arrow(tip_length=0.35, tip_radius=0.1, shaft_radius=0.03)), color=BLUE)
     p.add_scalar_bar("circulation change vs isolated (%)") if False else None
-    p.add_text("(d) follower wing: circulation change (colour) and induced w (arrow length 2 m per m/s)", font_size=10, position="upper_left", color=INK)
+    p.add_text("(d) follower wing: circulation change (colour) and induced w (arrow length 2 m per m/s)", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-dx - 3.2, dy - 3.0, 2.2), (-dx - 0.2, dy, 0.1), (0, 0, 1)]
     save(p, "A1_freewake_formation")
 
@@ -181,6 +181,7 @@ def trail(p, pts, colors=None, scalars=None, cmap=None, clim=None, radius=0.2, c
 def scene_safety():
     z = np.load("data/raw/cases3d.npz")
     cols = {"P": ORANGE, "NMPC": BLUE, "NMPC+CBF": VIOLET}
+    clab = {"P": "PD", "NMPC": "NMPC", "NMPC+CBF": "NMPC+HOCBF"}
     p = pv.Plotter(off_screen=True, window_size=(2600, 950), shape=(1, 3))
     for k, (case, ttl, tw) in enumerate((("S3_braking_dropout", "S3: leader braking 4 m/s + 250 ms dropout", (14, 26)),
                                          ("S5_combined", "S5: combined disturbance", (14, 28)),
@@ -199,11 +200,11 @@ def scene_safety():
             m = (t >= tw[0]) & (t <= tw[1])
             pts = np.column_stack([-dxr[m], dyr[m], np.full(m.sum(), 0.05)])
             trail(p, pts, radius=0.07, color=cols[c])
-            i = np.argmin(d); mins.append((c, d[i]))
+            i = np.argmin(d); mins.append((clab[c], d[i]))
             add_uav(p, -dxr[i], dyr[i], 0.0, 90.0, bank_deg=0.0, accent=cols[c])
             p.add_mesh(pv.Sphere(radius=0.18, center=(-dxr[i], dyr[i], 0.2)), color=cols[c])
         txt = "\n".join(f"{c}: min separation {m:.2f} m" for c, m in mins)
-        p.add_text(f"{ttl}\n{txt}", font_size=9, position="upper_left", color=INK)
+        p.add_text(f"{ttl}\n{txt}", font_size=13, position="upper_left", color=INK)
         p.camera_position = [(-22.0, -26.0, 17.0), (-3.0, 0.8, 0.0), (0, 0, 1)]
     save(p, "B1_safety_sphere")
 
@@ -225,7 +226,7 @@ def scene_split():
         p.add_mesh(pv.Line((k * 150.0, -200, -1.5), (k * 150.0, 2400, -1.5)), color="#c8cec0", line_width=1)
     def W(E_, N_): return np.column_stack([E_, N_, np.zeros(len(E_))])
     trail(p, W(El, Nl), radius=1.6, color="#555555")
-    bar = dict(title="follower aerodynamic power saving (W)", vertical=False, position_x=0.35, position_y=0.05, width=0.3, height=0.05, color=INK, title_font_size=14, label_font_size=12, n_labels=5)
+    bar = dict(title="follower aerodynamic power saving (W)", vertical=False, position_x=0.32, position_y=0.05, width=0.36, height=0.055, color=INK, title_font_size=20, label_font_size=16, n_labels=5)
     trail(p, W(Er, Nr), scalars=sav, cmap="viridis", clim=(0, 8.5), radius=2.2, bar=bar)
     trail(p, W(Elf, Nlf), scalars=sav, cmap="viridis", clim=(0, 8.5), radius=2.2)
     def course(E_, N_, i):
@@ -236,7 +237,7 @@ def scene_split():
         add_uav(p, El[i], Nl[i], 0.0, course(El, Nl, i), scale=40, accent="#7d8794")
         add_uav(p, Er[i], Nr[i], 0.0, course(Er, Nr, i), bank_deg=phi[i], scale=40, accent=AQUA)
         add_uav(p, Elf[i], Nlf[i], 0.0, course(Elf, Nlf, i), bank_deg=-phi[i], scale=40, accent=AQUA)
-    p.add_text("Formation split into zones, 370 m lateral displacement (NMPC, VLM-sheet wake saving along the paths); aircraft drawn 40x", font_size=10, position="upper_left", color=INK)
+    p.add_text("Formation split into zones, 370 m lateral displacement (NMPC, VLM-sheet wake saving along the paths); aircraft drawn 40x", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(1000, -520, 800), (0, 950, 0), (0, 0, 1)]
     save(p, "B2_split_manoeuvre")
 
@@ -295,15 +296,15 @@ def scene_rollup():
         cs = pv.Spline(nodes[k], 100).tube(radius=0.08); p.add_mesh(cs, color=c)
     # leader, scaled for visibility
     p.add_mesh(pv.Sphere(radius=0.0001), color="w")
-    p.add_text("(a) free wake 0–115 m (0–54 b): sheet bows, tips start to curl; cross-sections at 10/40/80/110 m", font_size=10, position="upper_left", color=INK)
+    p.add_text("(a) free wake 0–115 m (0–54 b): sheet bows, tips start to curl; cross-sections at 10/40/80/110 m", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-34, -26, 11), (34, 0, -0.5), (0, 0, 1)]
     p.subplot(0, 1); p.set_background("white", top="#dfe3ea")
     for xs, c in ((5, "#7a8cff"), (10, BLUE), (40, AQUA), (80, YEL), (110, VIOLET)):
         k = int(np.argmin(np.abs(X - xs))); pts = nodes[k].copy(); pts[:, 0] = 0.0
         p.add_mesh(pv.Spline(pts, 120).tube(radius=0.012), color=c)
-        p.add_point_labels(pv.PolyData(pts[len(pts) // 2:len(pts) // 2 + 1] + [0, 0, -0.05]), [f"x={X[k]:.0f} m ({X[k]/b:.0f} b)"], font_size=14, text_color=INK, shape=None, show_points=False)
+        p.add_point_labels(pv.PolyData(pts[len(pts) // 2:len(pts) // 2 + 1] + [0, 0, -0.05]), [f"x={X[k]:.0f} m ({X[k]/b:.0f} b)"], font_size=16, text_color=INK, shape=None, show_points=False)
     p.add_mesh(pv.Line((-1.06, 0, 0), (1.06, 0, 0)), color=INK, line_width=3)
-    p.add_text("(b) rear view of the sheet cross-sections (leader span in black), true vertical scale", font_size=10, position="upper_left", color=INK)
+    p.add_text("(b) rear view of the sheet cross-sections (leader span in black), true vertical scale", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-6.5, 0, -0.6), (0, 0, -0.6), (0, 0, 1)]
     save(p, "A2_wake_rollup")
 
@@ -427,7 +428,7 @@ def scene_vorticity():
         p.add_mesh(g, scalars="om", cmap=cm, clim=(-lim, lim), lighting=False, scalar_bar_args=bars(f"omega_x (1/s), +-{lim:.1f}", 0.03, 0.3, 0.4))
         P = fw.rows[kx]; pts = P.copy(); pts[:, 0] = -0.03
         p.add_mesh(pv.Spline(pts, 150).tube(radius=0.01), color=INK)
-        p.add_text(f"x = {xq:.0f} m ({xq/b:.0f} b): black line = wake-sheet cross-section", font_size=10, position="upper_left", color=INK)
+        p.add_text(f"x = {xq:.0f} m ({xq/b:.0f} b): black line = wake-sheet cross-section", font_size=13, position="upper_left", color=INK)
         p.camera_position = [(-5.0, 0, zc - 0.45), (0, 0, zc - 0.45), (0, 0, 1)]; p.camera.parallel_projection = True; p.camera.parallel_scale = 1.35
     save(p, "A3_vorticity_isosurface")
 
