@@ -102,7 +102,7 @@ def vortex_scene(case):
     for n, m in pa.items():
         for s in (m, mirror(m)): p.add_mesh(s, color="#52514e", smooth_shading=True)
     if iso.n_points:
-        sbar = dict(title="wx b / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
+        sbar = dict(title="wx b / U", n_labels=5, vertical=False, position_x=0.58, position_y=0.06, width=0.35, height=0.07, title_font_size=22, label_font_size=18, color="black")
         p.add_mesh(iso, scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, smooth_shading=True, show_scalar_bar=True, scalar_bar_args=sbar)
         p.add_mesh(iso.copy().transform(np.diag([1, -1, 1, 1]), inplace=False), scalars="wx", cmap="RdBu_r", clim=(-8, 8), opacity=0.85, show_scalar_bar=False)
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
