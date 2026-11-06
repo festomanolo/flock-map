@@ -36,7 +36,7 @@ def cp_scene(case):
         cp = cp / (18.0 ** 2) * 1.0; m.point_data["Cp"] = cp
         for s in (m, mirror(m)):
             p.add_mesh(s, scalars="Cp", cmap="RdBu_r", clim=(-1.0, 0.6), smooth_shading=True, show_scalar_bar=not shown_bar, scalar_bar_args=sbar if not shown_bar else None)
-    p.add_scalar_bar("Cp", title="Cp", n_labels=5, vertical=False, position_x=0.35, position_y=0.04, width=0.3, height=0.05, title_font_size=18, label_font_size=14, color="black") if False else None
+            shown_bar = True
     xc = 0.5 * meta["follower"][1] * B if meta.get("follower") else 0.0
     p.camera_position = [(xc - 2.5, -5.5, 4.2), (xc, 0.0, 0.0), (0, 0, 1)]
     p.add_text(f"{case}: surface pressure coefficient (RANS, k-omega SST)", font_size=11, color="black", position="upper_left")
