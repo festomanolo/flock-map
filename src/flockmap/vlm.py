@@ -273,6 +273,11 @@ class PlanformWing(Wing):
             # Influence of starboard + mirrored port follower on leader cp / bd:
             A_FL_cp = np.zeros((n, n))
             A_FL_bd = np.zeros((n, n))
+            cpL_from_s = self.cp - off_s
+            cpL_from_p = self.cp - off_p
+            bdL_from_s = self.bd - off_s
+            bdL_from_p = self.bd - off_p
+            for j in range(n):
 
 _PW = {}
 
