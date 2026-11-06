@@ -143,7 +143,7 @@ def fig10():
             ax.errorbar(r.rel_change_pct, y0[k] + (list(mk).index(m) - 2.0) * 0.11, xerr=[[r.rel_change_pct - r.rel_p05_pct], [r.rel_p95_pct - r.rel_change_pct]], fmt=mm, color=MODEL[m][1], ms=4, lw=1)
     ax.axvline(0, color=C["ink"], lw=0.8); ax.set_yticks(list(y0.values())); ax.set_yticklabels(list(labs.values())); ax.invert_yaxis(); ax.set_xlabel("change in $E_{area}$ vs reference (%); <0 = saving\n(markers: mean; bars: 5–95 % of trials)"); ax.grid(axis="y", visible=False)
     from matplotlib.lines import Line2D
-    ax.legend(handles=[Line2D([], [], marker=mk[m], color=MODEL[m][1], ls="", label=MODEL[m][0].replace("VLM follower, ", "VLM ").replace("Manuscript equations (as published)", "As published").replace("Strip theory, corrected", "Strip, corrected").replace("VLM follower, free wake", "VLM free wake")) for m in mk], fontsize=6, loc="lower right")
+    ax.legend(handles=[Line2D([], [], marker=mk[m], color=MODEL[m][1], ls="", label=MODEL[m][0].replace("VLM follower, ", "VLM ").replace("Manuscript equations (as published)", "As published").replace("Strip theory, corrected", "Strip, corrected").replace("VLM follower, free wake", "VLM free wake")) for m in mk], fontsize=5.6, loc="lower right")
     fig.tight_layout(); save(fig, "fig10_energy_efficiency")
 
 
