@@ -73,6 +73,7 @@ def slices_scene(case):
     sbar = dict(title="w / U", n_labels=5, vertical=False, position_x=0.33, position_y=0.05, width=0.34, height=0.07, title_font_size=20, label_font_size=16, color="black")
     for xs in (1.0, 3.0 * B, 5.0 * B, 8.0 * B):
         sl = Ip.slice(normal="x", origin=(xs, 0, 0)).clip_box([xs - 1, xs + 1, 0.0, 3.4, -1.0, 1.0], invert=False)
+        if sl.n_points:
         if sl.n_points: p.add_mesh(sl, scalars="w", cmap="RdBu_r", clim=(-0.06, 0.06), opacity=0.9, show_scalar_bar=False)
     p.camera_position = [(-2.0, -5.0, 3.0), (6.0, 0.6, 0.0), (0, 0, 1)]
     p.add_text(f"{case}: vertical velocity w/U at x = 1 m, 3b, 5b, 8b", font_size=11, color="black", position="upper_left")
