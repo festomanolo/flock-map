@@ -24,6 +24,7 @@ DT_SIM, DT_MPC, NP = 0.02, 0.1, 25
 
 # --------------------------------------------------------------------------------------- NMPC
 def _build_nmpc():
+    import casadi as ca
     N = NP
     X = ca.SX.sym("X", 6, N + 1); U = ca.SX.sym("U", 2, N)
     P = ca.SX.sym("P", 6 + 2 + 4 * (N + 1) + 2)   # x0, w_hat, ref(px,py,vx,vy)*(N+1), u_prev
