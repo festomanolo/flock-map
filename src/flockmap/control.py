@@ -67,6 +67,7 @@ def _build_nmpc():
 
 # --------------------------------------------------------------------------------------- HOCBF (relative degree 3)
 def _build_hocbf(alpha=(1.2, 1.6, 2.0)):
+    import casadi as ca
     r = ca.SX.sym("r", 2)                 # relative position follower - leader
     V, chi, phi, a = ca.SX.sym("V"), ca.SX.sym("chi"), ca.SX.sym("phi"), ca.SX.sym("a")
     vL = ca.SX.sym("vL", 2); wf = ca.SX.sym("wf", 2)     # leader ground velocity, follower wind estimate
