@@ -116,7 +116,7 @@ def scene_wake():
     formation(p, dx, dy)
     pl = w_plane(fw, -dx - 0.3, np.linspace(-3.4, 3.4, 90), np.linspace(-1.3, 1.3, 50))
     p.add_mesh(pl, scalars="w", opacity=0.8, lighting=False, show_scalar_bar=True, scalar_bar_args=bars("w at follower plane (m/s)", 0.04, 0.02), **CL)
-    p.add_text("(a) free-wake sheet and follower plane", font_size=10, position="upper_left", color=INK)
+    p.add_text("(a) free-wake sheet and follower plane", font_size=14, position="upper_left", color=INK)
     p.camera_position = [(-9.5, -8.0, 3.6), (-4.8, 0.0, -0.2), (0, 0, 1)]
     # (b) plan view of w on the flight-level plane
     p.subplot(0, 1); p.set_background("white", top="#dfe3ea")
