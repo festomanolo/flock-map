@@ -111,6 +111,10 @@ def vortex_scene(case):
 
 
 def slices_scene(case):
+    v = vtkdir(case)
+    if not os.path.exists(os.path.join(v, "internal.vtu")):
+        _enhance_archived_render(
+            f"K3_wslices_{case}.png",
     I, pa, meta = load(case); Ip = I.cell_data_to_point_data(); w = np.asarray(Ip.point_data["U"])[:, 2] / 18.0; Ip.point_data["w"] = w
     p = plotter()
     for n, m in pa.items():
