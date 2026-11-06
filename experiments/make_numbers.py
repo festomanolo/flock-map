@@ -163,7 +163,7 @@ rows = []
 for lab, k in (("A:", "A"), ("B:", "B"), ("C:", "C"), ("D:", "D"), ("E:", "E"), ("F:", "F")):
     name = {"A": "S4 vs S1 (full framework)", "B": "S3 vs S1 (formation only)", "C": "S2 vs S1 (rigid V)", "D": "S3 vs S2 (adaptive vs rigid)", "E": "S4 vs D1 (formation, 14-strip route)", "F": "D1 vs S1 (route/overlap only)"}[k]
     cells = []
-    for m in ("vlm_sheet", "vlm_free", "strip_corrected", "published"):
+    for m in ("vlm_sheet", "vlm_rolled", "vlm_free", "strip_corrected", "published"):
         r = PT[(PT.model == m) & (PT.metric == "e_area_Wh_ha") & PT.comparison.str.startswith(lab)].iloc[0]
         cells.append(f"{r.rel_change_pct:+.1f} ({r.rel_p05_pct:+.1f}, {r.rel_p95_pct:+.1f})")
     rows.append(f"{name} & " + " & ".join(cells))
