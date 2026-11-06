@@ -304,7 +304,7 @@ def scene_rollup():
         p.add_mesh(pv.Spline(pts, 120).tube(radius=0.012), color=c)
         p.add_point_labels(pv.PolyData(pts[len(pts) // 2:len(pts) // 2 + 1] + [0, 0, -0.05]), [f"x={X[k]:.0f} m ({X[k]/b:.0f} b)"], font_size=16, text_color=INK, shape=None, show_points=False)
     p.add_mesh(pv.Line((-1.06, 0, 0), (1.06, 0, 0)), color=INK, line_width=3)
-    p.add_text("(b) rear view of the sheet cross-sections (leader span in black), true vertical scale", font_size=10, position="upper_left", color=INK)
+    p.add_text("(b) rear view of the sheet cross-sections (leader span in black), true vertical scale", font_size=13, position="upper_left", color=INK)
     p.camera_position = [(-6.5, 0, -0.6), (0, 0, -0.6), (0, 0, 1)]
     save(p, "A2_wake_rollup")
 
@@ -428,7 +428,7 @@ def scene_vorticity():
         p.add_mesh(g, scalars="om", cmap=cm, clim=(-lim, lim), lighting=False, scalar_bar_args=bars(f"omega_x (1/s), +-{lim:.1f}", 0.03, 0.3, 0.4))
         P = fw.rows[kx]; pts = P.copy(); pts[:, 0] = -0.03
         p.add_mesh(pv.Spline(pts, 150).tube(radius=0.01), color=INK)
-        p.add_text(f"x = {xq:.0f} m ({xq/b:.0f} b): black line = wake-sheet cross-section", font_size=10, position="upper_left", color=INK)
+        p.add_text(f"x = {xq:.0f} m ({xq/b:.0f} b): black line = wake-sheet cross-section", font_size=13, position="upper_left", color=INK)
         p.camera_position = [(-5.0, 0, zc - 0.45), (0, 0, zc - 0.45), (0, 0, 1)]; p.camera.parallel_projection = True; p.camera.parallel_scale = 1.35
     save(p, "A3_vorticity_isosurface")
 
