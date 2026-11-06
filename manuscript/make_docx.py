@@ -419,7 +419,7 @@ def _repl_sirange(args, pos):
         um = fmt_unit_math(u)
         return f"{a}\\text{{--}}{b}{um}"
     up = fmt_unit_plain(u)
-    sep = "" if up in ("°", "%") else " "
+    sep = "" if up in ("°", r"\%", "%") else " "
     return f"{fmt_num_plain(a)}–{fmt_num_plain(b)}{sep}{up}"
 
 
