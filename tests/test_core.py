@@ -105,3 +105,8 @@ def test_cfd_post_residual_parser(tmp_path):
     from postproc import residual_history
     (tmp_path / "log.simpleFoam").write_text("smoothSolver:  Solving for Ux, Initial residual = 0.5, Final residual = 1e-3, No Iterations 1\nGAMG:  Solving for p, Initial residual = 0.1, Final residual = 1e-3, No Iterations 3\n")
     r = residual_history(str(tmp_path)); assert r["Ux"] == [0.5] and r["p"] == [0.1]
+
+
+def test_station_keeping_error_no_singularity_and_monotonic():
+    import pandas as pd
+    p = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "extra_skerr.csv")
