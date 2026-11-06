@@ -168,7 +168,7 @@ def X10_soc():
     t_form = s3.ph_transit.values / (( piso + 2 * pform) / 3.0) * 3600 / 3        # per-UAV formation-transit time (s)
     imb_norot = (piso - pform) * t_form / 3600.0
     ax.hist(imb_norot, bins=18, color=C["violet"], alpha=0.8); ax.set_xlabel("leader-vs-follower energy gap without rotation (Wh)"); ax.set_ylabel("trials")
-    ax.text(0.97, 0.95, "with cyclic rotation the gap\nin formation phases is 0", transform=ax.transAxes, fontsize=6.5, ha="right", va="top")
+    ax.text(0.96, 0.94, "with cyclic rotation the gap\nin formation phases is zero", transform=ax.transAxes, fontsize=6.5, ha="right", va="top", bbox=dict(boxstyle="round,pad=0.22", fc="white", ec="none", alpha=0.88))
     save(fig, "X10_leader_rotation_energy")
 
 
