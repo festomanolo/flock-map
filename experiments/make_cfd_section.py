@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compose manuscript/sections/res_cfd.tex (+ tables) from the CFD campaign results. Run from the repository root."""
 import json, os, sys
-import json, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 import numpy as np, pandas as pd
 P = "data/processed"
 d = pd.read_csv(f"{P}/cfd_summary.csv"); d["dx_b"] = d.dx_b.fillna(0)
