@@ -226,7 +226,7 @@ def scene_split():
         p.add_mesh(pv.Line((k * 150.0, -200, -1.5), (k * 150.0, 2400, -1.5)), color="#c8cec0", line_width=1)
     def W(E_, N_): return np.column_stack([E_, N_, np.zeros(len(E_))])
     trail(p, W(El, Nl), radius=1.6, color="#555555")
-    bar = dict(title="follower aerodynamic power saving (W)", vertical=False, position_x=0.35, position_y=0.05, width=0.3, height=0.05, color=INK, title_font_size=14, label_font_size=12, n_labels=5)
+    bar = dict(title="follower aerodynamic power saving (W)", vertical=False, position_x=0.32, position_y=0.05, width=0.36, height=0.055, color=INK, title_font_size=20, label_font_size=16, n_labels=5)
     trail(p, W(Er, Nr), scalars=sav, cmap="viridis", clim=(0, 8.5), radius=2.2, bar=bar)
     trail(p, W(Elf, Nlf), scalars=sav, cmap="viridis", clim=(0, 8.5), radius=2.2)
     def course(E_, N_, i):
