@@ -73,8 +73,8 @@ def save(p, name, cam=None, zoom=None):
 
 
 # ---------------------------------------------------------------------------------- scene A: free wake and formation
-def bars(title, y, x=0.05, w=0.28):
-    return dict(title=title, vertical=False, position_x=x, position_y=y, width=w, height=0.05, color=INK, title_font_size=14, label_font_size=12, n_labels=5)
+def bars(title, y, x=0.05, w=0.32):
+    return dict(title=title, vertical=False, position_x=x, position_y=y, width=w, height=0.055, color=INK, title_font_size=20, label_font_size=16, n_labels=5)
 
 
 def w_plane(fw, x_plane, ys, zs):
