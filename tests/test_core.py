@@ -143,3 +143,9 @@ def test_cbf_margin_ablation_covers_30_seeds_and_5_margins():
 
 
 def test_number_macros_have_no_nan_and_five_paired_models():
+    root = os.path.join(os.path.dirname(__file__), "..", "manuscript")
+    for fn in ("numbers.tex", "numbers_extra.tex"):
+        txt = open(os.path.join(root, fn), encoding="utf8").read().lower()
+        assert "{nan}" not in txt
+    paired = open(os.path.join(root, "tables", "tab_paired.tex"), encoding="utf8").read().strip().splitlines()
+    assert len(paired) == 6
