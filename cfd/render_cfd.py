@@ -45,6 +45,12 @@ def _enhance_archived_render(fname, title, cbar_label, clim):
     if not os.path.exists(src):
         raise FileNotFoundError(src)
     img = plt.imread(src).copy()
+    # Replace tiny font_size=11 header strip (rows 0..34, cols 0..900) with adjacent sky gradient
+    if img.shape[0] >= 40 and img.shape[1] >= 950:
+        img[:36, :950] = img[:36, 960:961]
+    h, w = img.shape[:2]
+    dpi = 100
+    fig = plt.figure(figsize=(w / dpi, h / dpi), dpi=dpi)
 def cp_scene(case):
     I, pa, meta = load(case); p = plotter()
     shown_bar = False
