@@ -69,6 +69,7 @@ def slices_scene(case):
     p = plotter()
     for n, m in pa.items():
         for s in (m, mirror(m)): p.add_mesh(s, color="#52514e", smooth_shading=True)
+    shown_bar = False
     for xs in (1.0, 3.0 * B, 5.0 * B, 8.0 * B):
         sl = Ip.slice(normal="x", origin=(xs, 0, 0)).clip_box([xs - 1, xs + 1, 0.0, 3.4, -1.0, 1.0], invert=False)
         if sl.n_points: p.add_mesh(sl, scalars="w", cmap="RdBu_r", clim=(-0.06, 0.06), opacity=0.9, show_scalar_bar=False)
