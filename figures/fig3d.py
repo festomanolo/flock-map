@@ -302,7 +302,7 @@ def scene_rollup():
     for xs, c in ((5, "#7a8cff"), (10, BLUE), (40, AQUA), (80, YEL), (110, VIOLET)):
         k = int(np.argmin(np.abs(X - xs))); pts = nodes[k].copy(); pts[:, 0] = 0.0
         p.add_mesh(pv.Spline(pts, 120).tube(radius=0.012), color=c)
-        p.add_point_labels(pv.PolyData(pts[len(pts) // 2:len(pts) // 2 + 1] + [0, 0, -0.05]), [f"x={X[k]:.0f} m ({X[k]/b:.0f} b)"], font_size=14, text_color=INK, shape=None, show_points=False)
+        p.add_point_labels(pv.PolyData(pts[len(pts) // 2:len(pts) // 2 + 1] + [0, 0, -0.05]), [f"x={X[k]:.0f} m ({X[k]/b:.0f} b)"], font_size=16, text_color=INK, shape=None, show_points=False)
     p.add_mesh(pv.Line((-1.06, 0, 0), (1.06, 0, 0)), color=INK, line_width=3)
     p.add_text("(b) rear view of the sheet cross-sections (leader span in black), true vertical scale", font_size=10, position="upper_left", color=INK)
     p.camera_position = [(-6.5, 0, -0.6), (0, 0, -0.6), (0, 0, 1)]
