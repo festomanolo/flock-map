@@ -165,3 +165,9 @@ def test_compiled_manuscript_pdf_and_docx_completeness():
         assert "??" not in full_pdf and "VLM rolled-up" in full_pdf
     d = docx.Document(docx_path)
     M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+    assert len(d.element.body.findall(f".//{{{M_NS}}}oMath")) == 0
+    assert len(d.tables) >= 16
+    full_docx = "\n".join(p.text for p in d.paragraphs)
+    for req in ("Table 1.", "Table 4.", "Table 9.", "Algorithm 1.", "Figure 1.", "Figure 10.", "Figure 42.", "Figure 43.", "Figure A.1.", "RMSE"):
+        assert req in full_docx, f"Missing '{req}' in DOCX text"
+    assert "\\SI{" not in full_docx and " nan " not in full_docx.lower()
