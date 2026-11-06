@@ -242,7 +242,7 @@ def fig14():
             for i, s in enumerate(order):
                 v = d[(d.scenario == s) & (d.controller == c)][col].values
                 x = i + (j - 1) * 0.26
-                ax.scatter(x + np.random.default_rng(i).uniform(-0.07, 0.07, len(v)), v, s=4, color=cols[c], alpha=0.5, lw=0)
+                ax.scatter(x + np.random.default_rng(i).uniform(-0.07, 0.07, len(v)), v, s=8, color=cols[c], alpha=0.68, lw=0)
                 ax.plot([x - 0.1, x + 0.1], [np.median(v)] * 2, color=C["ink"], lw=1.2)
         ax.set_xticks(range(6)); ax.set_xticklabels(short, fontsize=6.5); ax.set_ylabel(ylabel)
         if log: ax.set_yscale("log")
