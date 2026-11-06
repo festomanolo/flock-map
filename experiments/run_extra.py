@@ -114,7 +114,9 @@ def sec_skerr():
         ])
         for dyb in (0.80, 0.85, 0.90):
             for sig in (0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.60):
-                z = rng.standard_normal(60) * sig if sig > 0 else np.zeros(1)
+                if sig > 0.0:
+                    pts = np.abs(dyb + np.sqrt(2.0) * (sig / AC.b) * xg)
+                    sv = float(np.sum(wg * np.interp(pts, g_abs, curve)))
                 vals = [(vlm.follower(3.0, dyb, 0.0, 18.0, y_err=e, **kw)["pct_power"] if kw else aero.strip_follower(3.0, dyb, 0.0, 18.0, variant="corrected", y_err=e)["pct_power"]) for e in z]
                 rows.append(dict(model=model, dy_b=dyb, sigma_m=sig, saving_pct=float(np.mean(vals))))
     pd.DataFrame(rows).to_csv(f"{OUT}/extra_skerr.csv", index=False); print("skerr done")
