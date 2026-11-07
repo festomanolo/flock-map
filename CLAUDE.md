@@ -14,3 +14,5 @@ See `README.md` for the repository layout and what the study does and does not c
 - Elsevier needs an AI-use disclosure; the Declarations section mentions an AI coding assistant. Check it against the journal's current wording before submission.
 
 ## Build
+- LaTeX: no TeX Live on this machine. Tectonic 0.17.0 is installed at `~/.local/bin/tectonic` (add to PATH). Build with `cd manuscript && tectonic -k main.tex`, then `cp main.pdf ../outputs/FlockMap_manuscript.pdf`. `make paper` tries `latexmk` first, which is absent, so it falls through to `tectonic`.
+- DOCX: `cd manuscript && python make_docx.py` (needs `python-docx` and `pypandoc-binary`; it writes `manuscript/FlockMap_manuscript.docx` and `outputs/FlockMap_manuscript.docx`). Expected output ends with `remaining_oMath=0`.
