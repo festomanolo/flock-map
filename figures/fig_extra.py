@@ -181,7 +181,7 @@ def X11_control_stats():
     ax = axs[1]; panel(ax, "b")
     for k in ("NMPC", "NMPC+CBF"):
         v = np.sort(c[(c.controller == k)].solve_ms_max.values); ax.step(v, np.arange(1, len(v) + 1) / len(v), color=cols[k], label=clab[k])
-    ax.axvline(100, color=C["red"], ls="--", lw=0.8); ax.text(102, 0.1, "10 Hz budget", fontsize=6.3, color=C["red"]); ax.set_xlabel("worst solve time per run (ms)"); ax.set_xscale("log"); ax.legend(fontsize=6.3)
+    ax.axvline(100, color=C["red"], ls="--", lw=0.8); ax.text(112, 0.45, "10 Hz budget", fontsize=6.3, color=C["red"], rotation=90, va="center"); ax.set_xlabel("worst solve time per run (ms)"); ax.set_xscale("log"); ax.legend(fontsize=6.3, loc="lower left", bbox_to_anchor=(0.22, 0.04))
     ax = axs[2]; panel(ax, "c"); sc = ["S1_turbulence", "S2_gust_doublet", "S3_braking_dropout", "S4_degraded_gnss", "S5_combined", "S6_overcapability"]
     for j, k in enumerate(cols):
         ax.bar(np.arange(6) + (j - 1) * 0.27, [c[(c.controller == k) & (c.scenario == s)].max_abs_ey.mean() for s in sc], width=0.25, color=cols[k], edgecolor="white")
