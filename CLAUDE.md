@@ -18,3 +18,5 @@ See `README.md` for the repository layout and what the study does and does not c
 - DOCX: `cd manuscript && python make_docx.py` (needs `python-docx` and `pypandoc-binary`; it writes `manuscript/FlockMap_manuscript.docx` and `outputs/FlockMap_manuscript.docx`). Expected output ends with `remaining_oMath=0`.
 - Python: use the project `.venv` (`.venv/bin/python`) — it already has pandas, CasADi etc. System `python3` lacks pandas/casadi/docx. Do not compile PyMuPDF from source (very slow); the system Python has `pymupdf` for reading PDFs.
 - Regenerate one figure: `.venv/bin/python figures/fig_extra.py <name>` (e.g. `X5_coverage`, `X11_control_stats`), then copy `figures/out/<fig>.{pdf,png}` to `manuscript/figures/`.
+- macOS: BSD `sed` rejects GNU-style in-place edits; use Python or the Edit tool.
+
