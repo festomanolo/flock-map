@@ -12,3 +12,5 @@ See `README.md` for the repository layout and what the study does and does not c
 - Format: Elsevier `elsarticle`, targeted at *Aerospace Science and Technology* ("Preprint submitted to ..." line in the PDF). Numbers come from generated `manuscript/numbers*.tex` and `manuscript/tables/*.tex`; never hand-edit them, regenerate with `make numbers`.
 - Six strategies exist in code (S1–S4 plus diagnostics D1, D2); text says "four main strategies" and explains D1/D2 in Sec. 3.
 - Elsevier needs an AI-use disclosure; the Declarations section mentions an AI coding assistant. Check it against the journal's current wording before submission.
+
+## Build
