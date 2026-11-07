@@ -22,3 +22,5 @@ See `README.md` for the repository layout and what the study does and does not c
 
 ## Review status (audit of the external review, 2026-11-07)
 All substantive review points are resolved in the source and the rebuilt PDF/DOCX: station-keeping singularity (Gauss–Hermite quadrature on a Cauchy-midpoint lattice), relative-degree-3 HOCBF wording and QP/saturation handling, margin ablation on all 30 seeds, CFD half-model/trim caveats, X8 literature cross-check, table headers, reference details. Reviewer claims found to be wrong: "Table 4" does not exist (it does), the PD S5 minimum separation of 0.06 m is correct and visible in Fig. 13a, and the software versions in Table C.4 are real. The "blank math" complaint came from the reviewer's DOCX/pandoc rendering, not from the LaTeX/PDF.
+
+## Submission notes (checked 2026-11-07; re-verify, policies change)
