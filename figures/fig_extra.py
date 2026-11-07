@@ -86,7 +86,7 @@ def X5_coverage():
     ax = axs[1]; panel(ax, "b"); s = d[d.crab_deg == 0.0]
     ax.step(s.side_overlap * 100, s.n_strips, where="mid", color=C["violet"]); ax.set_xlabel("side overlap (%)"); ax.set_ylabel("strips for 1 km", color=C["violet"]); ax.tick_params(axis="y", labelcolor=C["violet"])
     ax = axs[2]; panel(ax, "c"); ax.plot(s.side_overlap * 100, s.BH, color=C["blue"], label="$B/H$ (adjacent strips)"); ax.plot(s.side_overlap * 100, s.min_mult / 10.0, color=C["red"], label="min. rays/10")
-    ax.axvline(58, color=C["ink2"], ls=":", lw=0.8); ax.axvline(65, color=C["ink2"], ls=":", lw=0.8); ax.set_xlabel("side overlap (%)"); ax.legend(fontsize=6)
+    ax.axvline(58, color=C["ink2"], ls=":", lw=0.8); ax.axvline(65, color=C["ink2"], ls=":", lw=0.8); ax.set_xlabel("side overlap (%)"); ax.set_ylim(0.35, 0.95); ax.legend(fontsize=6, loc="upper left", ncol=1)
     save(fig, "X5_overlap_sweep")
 
 
