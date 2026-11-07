@@ -512,7 +512,7 @@ doc_tex = (
     "\n"
     r"\begin{document}"
     "\n"
-    f"\\title{{{title}}}\\author{{[Author One], [Author Two] ([Institution])}}\\date{{}}\\maketitle\n"
+    f"\\title{{{title}}}\\author{{Festo K. Magembe (Department of Computer Science and Engineering, Mbeya University of Science and Technology, Mbeya, Tanzania)}}\\date{{}}\\maketitle\n"
     f"\\begin{{abstract}}{abstract}\\end{{abstract}}\n\\textbf{{Keywords:}} {kw}\n\n{hl}\n{body}\n\\section*{{References}}\n\\end{{document}}\n"
 )
 
