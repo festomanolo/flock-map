@@ -16,3 +16,5 @@ See `README.md` for the repository layout and what the study does and does not c
 ## Build
 - LaTeX: no TeX Live on this machine. Tectonic 0.17.0 is installed at `~/.local/bin/tectonic` (add to PATH). Build with `cd manuscript && tectonic -k main.tex`, then `cp main.pdf ../outputs/FlockMap_manuscript.pdf`. `make paper` tries `latexmk` first, which is absent, so it falls through to `tectonic`.
 - DOCX: `cd manuscript && python make_docx.py` (needs `python-docx` and `pypandoc-binary`; it writes `manuscript/FlockMap_manuscript.docx` and `outputs/FlockMap_manuscript.docx`). Expected output ends with `remaining_oMath=0`.
+- Python: use the project `.venv` (`.venv/bin/python`) — it already has pandas, CasADi etc. System `python3` lacks pandas/casadi/docx. Do not compile PyMuPDF from source (very slow); the system Python has `pymupdf` for reading PDFs.
+- Regenerate one figure: `.venv/bin/python figures/fig_extra.py <name>` (e.g. `X5_coverage`, `X11_control_stats`), then copy `figures/out/<fig>.{pdf,png}` to `manuscript/figures/`.
